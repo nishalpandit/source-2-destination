@@ -15,109 +15,136 @@
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
   <style>
-    /* Specific adjustments for 70/30 login layout */
-    .banner-graphic-card {
-      background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
-      border: 1px solid rgba(99, 102, 241, 0.25);
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    /* Strict non-scrollable viewport lock */
+    html, body.auth-viewport-locked {
+      height: 100vh !important;
+      max-height: 100vh !important;
+      overflow: hidden !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    .dev-top-strip {
+      height: 38px;
+      max-height: 38px;
+      background: #060911;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 0.78rem;
+      z-index: 1050;
       position: relative;
     }
-    .banner-graphic-card img {
-      width: 100%;
-      height: auto;
-      display: block;
-      transition: transform 300ms ease;
-    }
-    .banner-graphic-card:hover img {
-      transform: scale(1.01);
-    }
-    .feature-pill-card {
-      padding: 14px 18px;
-      border-radius: 12px;
-      background: rgba(30, 41, 59, 0.65);
-      border: 1px solid rgba(51, 65, 85, 0.8);
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      transition: all 200ms ease;
-    }
-    .feature-pill-card:hover {
-      background: rgba(30, 41, 59, 0.95);
-      border-color: rgba(99, 102, 241, 0.4);
-      transform: translateY(-2px);
-    }
-    .dev-nav-banner {
-      background: #080C14;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.9);
-      color: #94A3B8;
-      font-size: 0.8rem;
-    }
-    .dev-nav-btn {
-      font-size: 0.74rem;
-      padding: 4px 10px;
+
+    .dev-pill-btn {
+      font-size: 0.72rem;
+      padding: 3px 9px;
       font-weight: 600;
       border-radius: 6px;
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       transition: all 160ms ease;
+      line-height: 1.2;
     }
-    .dev-nav-btn-super {
-      background: rgba(99, 102, 241, 0.15);
+    .dev-pill-btn.super {
+      background: rgba(99, 102, 241, 0.16);
       color: #C7D2FE;
-      border: 1px solid rgba(99, 102, 241, 0.35);
+      border: 1px solid rgba(99, 102, 241, 0.4);
     }
-    .dev-nav-btn-super:hover {
+    .dev-pill-btn.super:hover {
       background: #6366F1;
       color: #FFFFFF;
     }
-    .dev-nav-btn-franchise {
-      background: rgba(6, 182, 212, 0.15);
+    .dev-pill-btn.franchise {
+      background: rgba(6, 182, 212, 0.16);
       color: #A5F3FC;
-      border: 1px solid rgba(6, 182, 212, 0.35);
+      border: 1px solid rgba(6, 182, 212, 0.4);
     }
-    .dev-nav-btn-franchise:hover {
+    .dev-pill-btn.franchise:hover {
       background: #06B6D4;
       color: #FFFFFF;
     }
-    .dev-nav-btn-school {
-      background: rgba(16, 185, 129, 0.15);
+    .dev-pill-btn.school {
+      background: rgba(16, 185, 129, 0.16);
       color: #A7F3D0;
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      border: 1px solid rgba(16, 185, 129, 0.4);
     }
-    .dev-nav-btn-school:hover {
+    .dev-pill-btn.school:hover {
       background: #10B981;
       color: #FFFFFF;
     }
+    .dev-pill-btn.legacy {
+      background: rgba(148, 163, 184, 0.12);
+      color: #CBD5E1;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+    .dev-pill-btn.legacy:hover {
+      background: rgba(148, 163, 184, 0.25);
+      color: #FFFFFF;
+    }
+
+    .telemetry-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(129, 140, 248, 0.35);
+      color: #C7D2FE;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .telemetry-pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 8px #34D399;
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .telemetry-stat-cell {
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(51, 65, 85, 0.5);
+    }
   </style>
 </head>
-<body data-root="" data-route="index.html">
+<body class="auth-viewport-locked" data-root="" data-route="index.html">
 
   <!-- =========================================================================
-       DEVELOPMENT NAVIGATION BAR (TEMPORARY DEV SHORTCUTS - ALL DASHBOARDS)
+       DEVELOPMENT NAVIGATION BAR (NON-SCROLLABLE 38px COMPACT HEADER)
        ========================================================================= -->
-  <header class="dev-nav-banner py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2 sticky-top" style="z-index: 1040;">
+  <header class="dev-top-strip">
     <div class="d-flex align-items-center gap-2">
-      <span class="badge bg-warning text-dark font-monospace fw-bold" style="font-size:0.7rem;letter-spacing:0.04em;">DEV SHORTCUTS</span>
-      <span class="d-none d-md-inline" style="font-size:0.78rem;color:#94A3B8;">Direct Portal Navigation (Temporary Development Phase):</span>
+      <span class="badge bg-warning text-dark font-monospace fw-bold" style="font-size:0.68rem;padding:3px 6px;">DEV MODE</span>
+      <span class="d-none d-lg-inline text-secondary" style="font-size:0.75rem;">Direct Portal Navigation (Temporary Dev Phase):</span>
     </div>
-    <div class="d-flex align-items-center gap-2 flex-wrap">
-      <a href="super-admin/dashboard.html" class="dev-nav-btn dev-nav-btn-super">
+    <div class="d-flex align-items-center gap-2">
+      <a href="super-admin/dashboard.html" class="dev-pill-btn super">
         <i data-lucide="shield-check" style="width:13px;height:13px;"></i>
         <span>Super Admin</span>
       </a>
-      <a href="franchise/dashboard.html" class="dev-nav-btn dev-nav-btn-franchise">
+      <a href="franchise/dashboard.html" class="dev-pill-btn franchise">
         <i data-lucide="building-2" style="width:13px;height:13px;"></i>
         <span>Franchise Dashboard</span>
       </a>
-      <a href="school-admin/dashboard.html" class="dev-nav-btn dev-nav-btn-school">
+      <a href="school-admin/dashboard.html" class="dev-pill-btn school">
         <i data-lucide="graduation-cap" style="width:13px;height:13px;"></i>
         <span>School Admin</span>
       </a>
-      <a href="auth/login.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d" title="Legacy Auth Gateway">
+      <a href="auth/login.html" class="dev-pill-btn legacy" title="Auth Suite">
         <i data-lucide="key" style="width:12px;height:12px;"></i>
         <span>Auth Suite</span>
       </a>
@@ -125,253 +152,235 @@
   </header>
 
   <!-- =========================================================================
-       70% BANNER / 30% LOGIN & SIGNUP SPLIT LAYOUT
+       70% BANNER / 30% LOGIN & SIGNUP SPLIT (ZERO SCROLL VIEWPORT)
        ========================================================================= -->
   <main class="auth-split-70-30">
     
-    <!-- 70% LEFT PANEL: Project Brand Showcase & Graphic Banner -->
+    <!-- 70% LEFT PANEL: Cinematic Campus Calling Telemetry Banner -->
     <section class="auth-banner-70">
-      <div style="position:relative;z-index:2;max-width:1100px;margin:0 auto;width:100%;">
-        
-        <!-- Brand Header -->
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-          <a href="index.html" class="d-inline-flex align-items-center gap-3 text-decoration-none text-white">
-            <img src="assets/images/logo.svg" alt="Source 2 Destination" width="40" height="40">
-            <div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;">Source 2 Destination</div>
-              <div style="font-size:0.75rem;color:#94A3B8;">Campus &amp; Hostel Calling Governance Platform</div>
-            </div>
-          </a>
-          <div class="d-flex align-items-center gap-2">
-            <span class="s2d-badge no-dot" style="background:rgba(99,102,241,0.18);color:#C7D2FE;border-color:rgba(129,140,248,0.35);font-size:0.75rem;">
-              <i data-lucide="smartphone" style="width:13px;height:13px;margin-right:4px;"></i>
-              ANDROID ENTERPRISE KIOSK CERTIFIED
-            </span>
-            <span class="s2d-badge no-dot" style="background:rgba(16,185,129,0.18);color:#6EE7B7;border-color:rgba(16,185,129,0.35);font-size:0.75rem;">
-              <i data-lucide="shield-check" style="width:13px;height:13px;margin-right:4px;"></i>
-              WHITELIST ENFORCED
-            </span>
-          </div>
-        </div>
+      <!-- High-Resolution Cinematic Enterprise Campus Visual Backdrop -->
+      <img src="assets/images/login-banner.jpg" alt="Source 2 Destination Campus Calling Telemetry" class="auth-banner-bg">
+      <div class="auth-banner-overlay"></div>
 
-        <!-- Hero Headline & Description -->
-        <div class="mb-4">
-          <h1 style="color:#FFFFFF;font-size:2.25rem;line-height:1.2;font-weight:700;margin-bottom:12px;letter-spacing:-0.03em;">
-            Secure, Policy-Controlled Student Calling for Residential Schools &amp; Hostels
-          </h1>
-          <p style="color:#94A3B8;font-size:0.95rem;line-height:1.65;max-width:820px;margin-bottom:0;">
-            Unified governance for residential campus principals, regional franchise partners, and hostel wardens. Every outgoing student call is strictly confined to verified parent/guardian numbers, governed by weekly schedule matrices, duration limits, and wallet validity.
-          </p>
-        </div>
-
-        <!-- Generated Banner Graphic (70% Visual Core) -->
-        <div class="banner-graphic-card mb-4">
-          <img src="assets/images/login-banner.svg" alt="Source 2 Destination Calling Architecture Banner">
-        </div>
-
-        <!-- Key Architectural Features Cards -->
-        <div class="row g-3 mb-4">
-          <div class="col-md-4">
-            <div class="feature-pill-card h-100">
-              <div class="p-2 rounded-3" style="background:rgba(99,102,241,0.2);color:#818CF8;">
-                <i data-lucide="shield-check" style="width:20px;height:20px;"></i>
-              </div>
-              <div>
-                <div style="font-weight:600;font-size:0.86rem;color:#F8FAFC;margin-bottom:2px;">Strict Whitelist Enforcement</div>
-                <div style="font-size:0.76rem;color:#94A3B8;line-height:1.45;">Zero unauthorized outgoing calls. Dialing allowed only to verified guardian contacts.</div>
-              </div>
-            </div>
+      <!-- Top Branding Strip -->
+      <div class="auth-banner-content d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <a href="index.html" class="d-inline-flex align-items-center gap-2.5 text-decoration-none text-white">
+          <img src="assets/images/logo.svg" alt="Source 2 Destination" width="34" height="34">
+          <div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:1.05rem;letter-spacing:-0.02em;line-height:1.2;">Source 2 Destination</div>
+            <div style="font-size:0.7rem;color:#94A3B8;">Campus &amp; Hostel Calling Governance</div>
           </div>
-          <div class="col-md-4">
-            <div class="feature-pill-card h-100">
-              <div class="p-2 rounded-3" style="background:rgba(6,182,212,0.2);color:#22D3EE;">
-                <i data-lucide="clock" style="width:20px;height:20px;"></i>
-              </div>
-              <div>
-                <div style="font-weight:600;font-size:0.86rem;color:#F8FAFC;margin-bottom:2px;">Schedules &amp; Duration Caps</div>
-                <div style="font-size:0.76rem;color:#94A3B8;line-height:1.45;">Hostel calling hours (e.g. 17:00–19:30) with automatic duration cutoffs and cooldown periods.</div>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="feature-pill-card h-100">
-              <div class="p-2 rounded-3" style="background:rgba(16,185,129,0.2);color:#34D399;">
-                <i data-lucide="tablet-smartphone" style="width:20px;height:20px;"></i>
-              </div>
-              <div>
-                <div style="font-weight:600;font-size:0.86rem;color:#F8FAFC;margin-bottom:2px;">Android Enterprise Kiosk</div>
-                <div style="font-size:0.76rem;color:#94A3B8;line-height:1.45;">Tamper-proof dedicated campus booth handsets with live telemetry and audit logging.</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        </a>
 
+        <div class="d-flex align-items-center gap-2">
+          <span class="telemetry-tag">
+            <span class="telemetry-pulse"></span>
+            <span>POLICE &amp; GUARDIAN WHITELIST VERIFIED</span>
+          </span>
+        </div>
       </div>
 
-      <!-- Left Panel Bottom Footer -->
-      <div style="position:relative;z-index:2;font-size:0.75rem;color:#64748B;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:16px;border-top:1px solid rgba(51,65,85,0.6);max-width:1100px;margin:0 auto;width:100%;">
-        <span>&copy; 2026 Source 2 Destination Systems Ltd. All rights reserved.</span>
-        <span>Enterprise Architecture · Django REST Framework (DRF) API Integration Ready</span>
+      <!-- Middle Value Proposition -->
+      <div class="auth-banner-content" style="max-width: 680px; margin: auto 0;">
+        <span class="s2d-badge no-dot mb-2.5" style="background:rgba(99,102,241,0.25);color:#E0E7FF;border-color:rgba(129,140,248,0.4);font-size:0.74rem;">
+          CENTRALIZED CAMPUS VOICE GOVERNANCE
+        </span>
+        <h1 style="color:#FFFFFF;font-size:2.2rem;line-height:1.18;font-weight:700;margin-bottom:12px;letter-spacing:-0.03em;text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+          Policy-Restricted Student Voice Calling for Residential Schools &amp; Hostels
+        </h1>
+        <p style="color:#CBD5E1;font-size:0.92rem;line-height:1.55;margin-bottom:0;text-shadow: 0 1px 4px rgba(0,0,0,0.4);">
+          Unified administration for multi-campus networks, residential principals, and hostel wardens. Every outgoing student call is strictly confined to verified parent contacts, governed by calling windows and Android Enterprise kiosk terminals.
+        </p>
+      </div>
+
+      <!-- Bottom Glassmorphic Telemetry Card -->
+      <div class="auth-glass-footer-card">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-4">
+            <div class="telemetry-stat-cell d-flex align-items-center gap-2.5">
+              <i data-lucide="shield-check" style="width:20px;height:20px;color:#818CF8;flex-shrink:0;"></i>
+              <div>
+                <div style="font-size:0.8rem;font-weight:600;color:#F8FAFC;">100% Whitelist Enforced</div>
+                <div style="font-size:0.7rem;color:#94A3B8;">Zero unapproved dials</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="telemetry-stat-cell d-flex align-items-center gap-2.5">
+              <i data-lucide="clock" style="width:20px;height:20px;color:#22D3EE;flex-shrink:0;"></i>
+              <div>
+                <div style="font-size:0.8rem;font-weight:600;color:#F8FAFC;">Hostel Calling Windows</div>
+                <div style="font-size:0.7rem;color:#94A3B8;">Auto duration &amp; cap cutoff</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="telemetry-stat-cell d-flex align-items-center gap-2.5">
+              <i data-lucide="tablet-smartphone" style="width:20px;height:20px;color:#34D399;flex-shrink:0;"></i>
+              <div>
+                <div style="font-size:0.8rem;font-weight:600;color:#F8FAFC;">Android Kiosk Lock</div>
+                <div style="font-size:0.7rem;color:#94A3B8;">Tamper-proof terminal MDM</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center pt-2.5 mt-2 border-top border-secondary border-opacity-25" style="font-size:0.72rem;color:#94A3B8;">
+          <span>&copy; 2026 Source 2 Destination Systems Ltd.</span>
+          <span>DRF API Gateway Integration Ready</span>
+        </div>
       </div>
     </section>
 
-    <!-- 30% RIGHT PANEL: Login & Signup Forms -->
+    <!-- 30% RIGHT PANEL: Compact Non-Scrollable Login & Sign Up Card -->
     <section class="auth-form-30">
       <div class="auth-card-30">
         
-        <!-- Auth Tabs Navigation (Sign In vs Sign Up) -->
+        <!-- Auth Tabs Switcher (Sign In vs Sign Up) -->
         <div class="auth-tabs-nav" role="tablist">
           <button type="button" class="auth-tab-btn active" id="tab-btn-signin" data-tab-target="#auth-tab-signin" role="tab" aria-selected="true">
-            <i data-lucide="log-in" style="width:15px;height:15px;"></i>
+            <i data-lucide="log-in" style="width:14px;height:14px;"></i>
             <span>Sign In</span>
           </button>
           <button type="button" class="auth-tab-btn" id="tab-btn-signup" data-tab-target="#auth-tab-signup" role="tab" aria-selected="false">
-            <i data-lucide="user-plus" style="width:15px;height:15px;"></i>
+            <i data-lucide="user-plus" style="width:14px;height:14px;"></i>
             <span>Sign Up</span>
           </button>
         </div>
 
-        <!-- ==================== TAB 1: SIGN IN FORM ==================== -->
+        <!-- ==================== TAB 1: SIGN IN ==================== -->
         <div class="auth-tab-content active" id="auth-tab-signin" role="tabpanel">
-          <div class="mb-3">
-            <h2 class="h2-s2d mb-1" style="font-size:1.35rem;">Welcome back</h2>
-            <p class="text-secondary-s2d mb-0" style="font-size:0.82rem;">Sign in to your authorized institutional workspace.</p>
+          <div class="mb-2">
+            <h2 class="h2-s2d mb-0" style="font-size:1.25rem;">Workspace Sign In</h2>
+            <p class="text-secondary-s2d mb-0" style="font-size:0.78rem;">Choose a demo role preset or sign in with your email.</p>
           </div>
 
           <!-- Quick Demo Role Switcher Pills -->
-          <div class="mb-3 p-2.5 rounded-3" style="background:var(--s2d-bg);border:1px solid var(--s2d-border);">
-            <div style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--s2d-text-secondary);margin-bottom:6px;">
+          <div class="p-2 rounded-3 mb-2.5" style="background:var(--s2d-bg);border:1px solid var(--s2d-border);">
+            <div style="font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--s2d-text-secondary);margin-bottom:4px;">
               Quick Demo Role Presets
             </div>
             <div class="d-flex gap-1.5 flex-wrap">
-              <button type="button" class="btn-s2d btn-s2d-soft btn-xs-s2d" data-quick-role-fill="super-admin">Super Admin</button>
-              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d" data-quick-role-fill="franchise">Franchise</button>
-              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d" data-quick-role-fill="school-admin">School Admin</button>
+              <button type="button" class="btn-s2d btn-s2d-soft btn-xs-s2d py-1 px-2" style="font-size:0.72rem;" data-quick-role-fill="super-admin">Super Admin</button>
+              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d py-1 px-2" style="font-size:0.72rem;" data-quick-role-fill="franchise">Franchise</button>
+              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d py-1 px-2" style="font-size:0.72rem;" data-quick-role-fill="school-admin">School Admin</button>
             </div>
           </div>
 
           <form id="s2d-auth-login-form" data-s2d-form data-redirect="super-admin/dashboard.html" data-success-title="Authenticated (Demo Mode)" data-success-desc="Routing to your role-scoped workspace...">
             
-            <div class="s2d-field">
+            <div class="s2d-field mb-2">
               <label class="s2d-label" for="login-demo-role">Target Environment <span class="req-star">*</span></label>
               <select id="login-demo-role" name="role_environment" class="s2d-select" required>
-                <option value="super-admin">Super Admin Dashboard (Global HQ)</option>
-                <option value="franchise">Franchise Dashboard (North-East EduNet)</option>
-                <option value="school-admin">School Admin Dashboard (Oakridge Academy)</option>
+                <option value="super-admin">Super Admin (Global HQ)</option>
+                <option value="franchise">Franchise Partner (North-East EduNet)</option>
+                <option value="school-admin">School Admin (Oakridge Academy)</option>
               </select>
             </div>
 
-            <div class="s2d-field">
+            <div class="s2d-field mb-2">
               <label class="s2d-label" for="login-email">Institutional Email <span class="req-star">*</span></label>
               <input type="email" id="login-email" name="email" class="s2d-input" value="e.vance@source2destination.io" placeholder="name@institution.edu" required autocomplete="username">
               <div data-drf-error="email"></div>
             </div>
 
-            <div class="s2d-field">
+            <div class="s2d-field mb-2">
               <div class="d-flex justify-content-between align-items-center mb-1">
                 <label class="s2d-label mb-0" for="login-password">Password <span class="req-star">*</span></label>
-                <a href="auth/forgot-password.html" class="s2d-link" style="font-size:0.75rem;">Forgot password?</a>
+                <a href="auth/forgot-password.html" class="s2d-link" style="font-size:0.72rem;">Forgot?</a>
               </div>
               <div style="position:relative;">
-                <input type="password" id="login-password" name="password" class="s2d-input" value="DemoPass123!" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:38px;">
-                <button type="button" class="btn" data-toggle-password="#login-password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
-                  <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                <input type="password" id="login-password" name="password" class="s2d-input" value="DemoPass123!" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:34px;">
+                <button type="button" class="btn" data-toggle-password="#login-password" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:2px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
+                  <i data-lucide="eye" style="width:15px;height:15px;"></i>
                 </button>
               </div>
             </div>
 
-            <div class="d-flex align-items-center justify-content-between mb-3">
-              <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.79rem;color:var(--s2d-text-secondary);cursor:pointer;">
+            <div class="d-flex align-items-center justify-content-between mb-2.5">
+              <label class="d-flex align-items-center gap-1.5 mb-0" style="font-size:0.76rem;color:var(--s2d-text-secondary);cursor:pointer;">
                 <input type="checkbox" name="remember" class="s2d-checkbox" checked>
                 <span>Remember this terminal</span>
               </label>
             </div>
 
-            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2.5">
+            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2" style="font-size:0.85rem;">
               <span>Sign In to Workspace</span>
-              <i data-lucide="arrow-right"></i>
+              <i data-lucide="arrow-right" style="width:15px;height:15px;"></i>
             </button>
           </form>
 
-          <div class="text-center mt-3 pt-3 border-top" style="font-size:0.8rem;color:var(--s2d-text-secondary);">
-            <span>Need institutional onboarding? </span>
-            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.8rem;" onclick="switchAuthTab('signup')">Request Account / Sign Up</button>
+          <div class="text-center mt-2.5 pt-2 border-top" style="font-size:0.76rem;color:var(--s2d-text-secondary);">
+            <span>New campus setup? </span>
+            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.76rem;" onclick="switchAuthTab('signup')">Register Institution</button>
           </div>
         </div>
 
-        <!-- ==================== TAB 2: SIGN UP FORM ==================== -->
+        <!-- ==================== TAB 2: SIGN UP ==================== -->
         <div class="auth-tab-content" id="auth-tab-signup" role="tabpanel">
-          <div class="mb-3">
-            <h2 class="h2-s2d mb-1" style="font-size:1.35rem;">Register Account</h2>
-            <p class="text-secondary-s2d mb-0" style="font-size:0.82rem;">Onboard your campus, hostel, or franchise territory.</p>
+          <div class="mb-2">
+            <h2 class="h2-s2d mb-0" style="font-size:1.25rem;">Register Account</h2>
+            <p class="text-secondary-s2d mb-0" style="font-size:0.78rem;">Onboard your campus, hostel, or franchise network.</p>
           </div>
 
           <form id="s2d-auth-signup-form" data-s2d-form data-redirect="index.html" data-success-title="Onboarding Request Submitted" data-success-desc="Your institutional registration has been queued for Super Admin authorization.">
             
-            <div class="s2d-field">
+            <div class="s2d-field mb-2">
               <label class="s2d-label" for="signup-name">Full Name <span class="req-star">*</span></label>
               <input type="text" id="signup-name" name="name" class="s2d-input" placeholder="e.g. Dr. Alistair Finch" required>
             </div>
 
-            <div class="s2d-field">
-              <label class="s2d-label" for="signup-org">Institution / Organization Name <span class="req-star">*</span></label>
+            <div class="s2d-field mb-2">
+              <label class="s2d-label" for="signup-org">Institution Name <span class="req-star">*</span></label>
               <input type="text" id="signup-org" name="organization" class="s2d-input" placeholder="e.g. St. Jude Residential Campus" required>
             </div>
 
-            <div class="s2d-field">
-              <label class="s2d-label" for="signup-email">Institutional Work Email <span class="req-star">*</span></label>
+            <div class="s2d-field mb-2">
+              <label class="s2d-label" for="signup-email">Institutional Email <span class="req-star">*</span></label>
               <input type="email" id="signup-email" name="email" class="s2d-input" placeholder="admin@institution.edu" required autocomplete="username">
             </div>
 
-            <div class="s2d-field">
-              <label class="s2d-label" for="signup-role">Institutional Role Type <span class="req-star">*</span></label>
+            <div class="s2d-field mb-2">
+              <label class="s2d-label" for="signup-role">Role Type <span class="req-star">*</span></label>
               <select id="signup-role" name="role_type" class="s2d-select" required>
-                <option value="school_admin">School Administrator (Residential Principal)</option>
-                <option value="franchise_partner">Franchise Partner (Territory Network)</option>
-                <option value="hostel_warden">Campus Hostel Warden / Calling Supervisor</option>
+                <option value="school_admin">School Admin (Residential Campus)</option>
+                <option value="franchise_partner">Franchise Partner (Territory)</option>
+                <option value="hostel_warden">Campus Hostel Warden</option>
               </select>
             </div>
 
-            <div class="s2d-field">
-              <label class="s2d-label" for="signup-password">Create Password <span class="req-star">*</span></label>
-              <div style="position:relative;">
-                <input type="password" id="signup-password" name="password" class="s2d-input" data-password-strength placeholder="At least 8 characters" required autocomplete="new-password" style="padding-right:38px;">
-                <button type="button" class="btn" data-toggle-password="#signup-password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
-                  <i data-lucide="eye" style="width:16px;height:16px;"></i>
-                </button>
+            <!-- Two-column password row to prevent overflow -->
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <div class="s2d-field mb-0">
+                  <label class="s2d-label" for="signup-password">Password <span class="req-star">*</span></label>
+                  <input type="password" id="signup-password" name="password" class="s2d-input" placeholder="8+ chars" required autocomplete="new-password">
+                </div>
               </div>
-              <div class="s2d-progress mt-2" style="height:4px;">
-                <div id="pwd-strength-bar" class="s2d-progress-bar rose" style="width:0%;"></div>
-              </div>
-              <span id="pwd-strength-label" class="field-hint" style="font-size:0.7rem;">Enter at least 8 characters with digits &amp; symbols</span>
-            </div>
-
-            <div class="s2d-field">
-              <label class="s2d-label" for="signup-password-confirm">Confirm Password <span class="req-star">*</span></label>
-              <div style="position:relative;">
-                <input type="password" id="signup-password-confirm" name="password_confirm" class="s2d-input" data-match-target="#signup-password" placeholder="Confirm password" required autocomplete="new-password" style="padding-right:38px;">
-                <button type="button" class="btn" data-toggle-password="#signup-password-confirm" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
-                  <i data-lucide="eye" style="width:16px;height:16px;"></i>
-                </button>
+              <div class="col-6">
+                <div class="s2d-field mb-0">
+                  <label class="s2d-label" for="signup-password-confirm">Confirm <span class="req-star">*</span></label>
+                  <input type="password" id="signup-password-confirm" name="password_confirm" class="s2d-input" data-match-target="#signup-password" placeholder="Confirm" required autocomplete="new-password">
+                </div>
               </div>
             </div>
 
-            <div class="mb-3">
-              <label class="d-flex align-items-start gap-2 mb-0" style="font-size:0.77rem;color:var(--s2d-text-secondary);cursor:pointer;line-height:1.4;">
+            <div class="mb-2.5">
+              <label class="d-flex align-items-start gap-1.5 mb-0" style="font-size:0.73rem;color:var(--s2d-text-secondary);cursor:pointer;line-height:1.35;">
                 <input type="checkbox" name="terms_agreed" class="s2d-checkbox mt-0.5" required>
-                <span>I confirm institutional authority and agree to the <strong>Student Calling Privacy &amp; Whitelist Compliance Policy</strong>.</span>
+                <span>I confirm institutional authority and agree to the <strong>Student Calling Privacy Policy</strong>.</span>
               </label>
             </div>
 
-            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2.5">
-              <span>Submit Registration Request</span>
-              <i data-lucide="shield-check"></i>
+            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2" style="font-size:0.85rem;">
+              <span>Submit Registration</span>
+              <i data-lucide="shield-check" style="width:15px;height:15px;"></i>
             </button>
           </form>
 
-          <div class="text-center mt-3 pt-3 border-top" style="font-size:0.8rem;color:var(--s2d-text-secondary);">
-            <span>Already have an account? </span>
-            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.8rem;" onclick="switchAuthTab('signin')">Sign In here</button>
+          <div class="text-center mt-2.5 pt-2 border-top" style="font-size:0.76rem;color:var(--s2d-text-secondary);">
+            <span>Already registered? </span>
+            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.76rem;" onclick="switchAuthTab('signin')">Sign In</button>
           </div>
         </div>
 
