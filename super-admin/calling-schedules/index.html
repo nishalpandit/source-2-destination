@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calling Schedule Management — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/calling-schedules/index.html" data-section="Calling Policy" data-page-title="Global Calling Schedules">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">TIME-WINDOW GOVERNANCE</div><h1 class="page-title">Global &amp; School Calling Schedules</h1><p class="page-description">Configure baseline weekly hostel calling windows, academic quiet hours, and campus-specific schedule overrides. Click any time slot below to cycle Allowed / Restricted / Supervised states.</p></div>
+        </div>
+        <div class="s2d-card mb-4">
+          <div class="s2d-card-header"><div><h3 class="s2d-card-title">Interactive Weekly Calling Matrix (Baseline Policy)</h3><p class="s2d-card-subtitle">Click cells to toggle Allowed, Restricted (Academic/Curfew), or Warden-Supervised windows</p></div>
+            <button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" data-demo-action="Global Schedule Matrix Saved"><i data-lucide="save"></i><span>Publish Baseline Schedule</span></button>
+          </div>
+          <div class="s2d-card-body">
+<div class="schedule-grid" data-schedule-matrix>
+  <div class="fw-semibold text-secondary-s2d py-2" style="font-size:0.75rem;">TIME WINDOW</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">MON</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">TUE</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">WED</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">THU</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">FRI</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">SAT</div>
+  <div class="fw-semibold text-center py-2" style="font-size:0.75rem;">SUN</div>
+
+  <div class="mono-code py-2 text-secondary-s2d">07:00 – 08:15</div>
+  <div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div>
+
+  <div class="mono-code py-2 text-secondary-s2d">08:30 – 16:30</div>
+  <div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div>
+
+  <div class="mono-code py-2 text-secondary-s2d">17:00 – 20:30</div>
+  <div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div>
+
+  <div class="mono-code py-2 text-secondary-s2d">20:30 – 22:00</div>
+  <div class="schedule-cell override">Supervised</div><div class="schedule-cell override">Supervised</div><div class="schedule-cell override">Supervised</div><div class="schedule-cell override">Supervised</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell allowed">Allowed</div><div class="schedule-cell override">Supervised</div>
+
+  <div class="mono-code py-2 text-secondary-s2d">22:00 – 06:45</div>
+  <div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div><div class="schedule-cell restricted">Restricted</div>
+</div>
+</div>
+        </div>
+        <div class="s2d-card">
+          <div class="s2d-card-header"><h3 class="s2d-card-title">School Schedule Override Summary</h3></div>
+          <div class="s2d-table-wrap">
+            <table class="s2d-table">
+              <thead><tr><th>School</th><th>Timezone</th><th>Weekday Evening Window</th><th>Sunday Window</th><th>Curfew Cutoff</th><th>Policy State</th></tr></thead>
+              <tbody>
+                <tr><td class="cell-primary">Oakridge Residential Academy</td><td>EST</td><td class="mono-code">17:30 – 21:00</td><td class="mono-code">10:00 – 20:00</td><td class="mono-code">21:30</td><td><span class="s2d-badge s2d-badge-success">Active Override</span></td></tr>
+                <tr><td class="cell-primary">Westfield Collegiate Hostel</td><td>EST</td><td class="mono-code">17:00 – 20:30</td><td class="mono-code">09:00 – 20:30</td><td class="mono-code">21:00</td><td><span class="s2d-badge s2d-badge-indigo">Global Default</span></td></tr>
+                <tr><td class="cell-primary">Greenwood International Prep</td><td>PST</td><td class="mono-code">16:30 – 20:30</td><td class="mono-code">10:00 – 21:00</td><td class="mono-code">21:30</td><td><span class="s2d-badge s2d-badge-success">Active Override</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add School — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/schools/add.html" data-section="School Management" data-page-title="Add New School">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+        <div class="page-header">
+          <div class="page-header-info">
+            <div class="page-eyebrow">CAMPUS ONBOARDING</div>
+            <h1 class="page-title">Register New School &amp; Hostel</h1>
+            <p class="page-description">Provision a new institutional tenant, assign its governing franchise partner, configure default calling limits, and link an initial subscription tier.</p>
+          </div>
+          <div class="page-actions">
+            <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
+          </div>
+        </div>
+
+        <div class="s2d-card">
+          <div class="s2d-card-body">
+            <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="School Tenant Created (Demo)" data-success-desc="New school staged in session memory; ready for POST /api/v1/super-admin/schools/.">
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Institution Identity</h3>
+                  <p>Official boarding school or residential hostel registration details and unique campus code prefix.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-8 s2d-field">
+                    <label class="s2d-label" for="school_name">Official School / Hostel Name <span class="req-star">*</span></label>
+                    <input type="text" id="school_name" name="name" class="s2d-input" placeholder="e.g. Hawthorne Preparatory Boarding School" required>
+                    <div data-drf-error="name"></div>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="school_code">Campus Short Code <span class="req-star">*</span></label>
+                    <input type="text" id="school_code" name="code" class="s2d-input mono-code" placeholder="HWT-09" required>
+                    <span class="field-hint">Used as prefix in server-issued student codes.</span>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="city_state">City &amp; State / Region <span class="req-star">*</span></label>
+                    <input type="text" id="city_state" name="city" class="s2d-input" placeholder="New Haven, CT" required>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="timezone">Campus Timezone <span class="req-star">*</span></label>
+                    <select id="timezone" name="timezone" class="s2d-select" required>
+                      <option value="America/New_York">America/New_York (EST/EDT)</option>
+                      <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                      <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+                      <option value="UTC">UTC Standard</option>
+                    </select>
+                  </div>
+                  <div class="col-12 s2d-field">
+                    <label class="s2d-label" for="campus_address">Physical Campus Address <span class="req-star">*</span></label>
+                    <textarea id="campus_address" name="address" class="s2d-textarea" placeholder="400 Academic Way, Residential North Campus..." required></textarea>
+                  </div>
+                </div>
+              </div>
+
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Franchise &amp; Primary Administrator</h3>
+                  <p>Allocate the campus to an authorized regional franchise and designate the primary School Admin contact.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="franchise_id">Assigned Franchise Partner <span class="req-star">*</span></label>
+                    <select id="franchise_id" name="franchise_id" class="s2d-select" required>
+                      <option value="">Select franchise partner...</option>
+                      <option value="FRN-101">FRN-101 · North-East EduNet Partners (18%)</option>
+                      <option value="FRN-102">FRN-102 · Pacific Crest Scholastic Group (16%)</option>
+                      <option value="FRN-103">FRN-103 · Heartland Boarding Solutions (15%)</option>
+                      <option value="FRN-104">FRN-104 · Atlantic Campus Connect (15%)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="admin_name">Primary Administrator Full Name <span class="req-star">*</span></label>
+                    <input type="text" id="admin_name" name="admin_name" class="s2d-input" placeholder="Dr. Jonathan Sterling" required>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="admin_email">Administrator Official Email <span class="req-star">*</span></label>
+                    <input type="email" id="admin_email" name="admin_email" class="s2d-input" placeholder="principal@hawthorneprep.edu" required>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="admin_phone">Official Contact Phone <span class="req-star">*</span></label>
+                    <input type="tel" id="admin_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 290-4100" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Subscription &amp; Calling Policy Defaults</h3>
+                  <p>Set seat capacity, subscription tier, and default daily calling ceiling inherited by campus students.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="sub_plan">Initial Subscription Plan <span class="req-star">*</span></label>
+                    <select id="sub_plan" name="subscription_plan" class="s2d-select" required>
+                      <option value="Enterprise Boarding Annual">Enterprise Boarding Annual ($8,400 / yr · 850 seats)</option>
+                      <option value="Campus Growth Annual">Campus Growth Annual ($5,900 / yr · 550 seats)</option>
+                      <option value="Standard Hostel Quarterly">Standard Hostel Quarterly ($1,850 / qtr · 300 seats)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="student_cap">Licensed Student Seats <span class="req-star">*</span></label>
+                    <input type="number" id="student_cap" name="student_seats" class="s2d-input" min="25" max="5000" value="550" required>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="default_daily_cap">Default Daily Cap (Mins) <span class="req-star">*</span></label>
+                    <input type="number" id="default_daily_cap" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="15" required>
+                  </div>
+                  <div class="col-12">
+                    <div class="s2d-switch-row">
+                      <div>
+                        <div style="font-weight:600;color:var(--s2d-heading);">Activate Tenant Immediately Upon Onboarding</div>
+                        <div class="text-secondary-s2d" style="font-size:0.77rem;">Dispatches welcome onboarding credentials to the designated School Administrator via DRF mailer.</div>
+                      </div>
+                      <label class="s2d-switch"><input type="checkbox" name="activate_immediately" checked><span class="s2d-switch-slider"></span></label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions-bar">
+                <div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved form changes</span></div>
+                <div class="d-flex gap-2 ms-auto">
+                  <a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a>
+                  <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Create School Tenant</span></button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

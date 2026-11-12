@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin Dashboard — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../assets/vendor/bootstrap.min.css">
+  <script src="../assets/vendor/tailwind-config.js"></script>
+  <script src="../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/tables.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+  <link rel="stylesheet" href="../assets/css/charts.css">
+  <link rel="stylesheet" href="../assets/css/animations.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body data-role="super-admin" data-root="../" data-route="super-admin/dashboard.html" data-section="Executive Command" data-page-title="Dashboard Overview">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+
+      <main class="app-content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <div class="page-eyebrow">GLOBAL PLATFORM COMMAND · NOVEMBER 2026</div>
+            <h1 class="page-title">Executive Platform Overview</h1>
+            <p class="page-description">Real-time operational telemetry across 4 regional franchises, 52 residential campuses, student calling usage, subscriptions, and Android Enterprise device compliance.</p>
+          </div>
+          <div class="page-actions">
+            <a href="reports/index.html" class="btn-s2d btn-s2d-secondary">
+              <i data-lucide="bar-chart-3"></i>
+              <span>Analytical Reports</span>
+            </a>
+            <a href="devices/register.html" class="btn-s2d btn-s2d-secondary">
+              <i data-lucide="tablet-smartphone"></i>
+              <span>Provision Device</span>
+            </a>
+            <a href="schools/add.html" class="btn-s2d btn-s2d-primary">
+              <i data-lucide="plus"></i>
+              <span>Register School</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 12 Mandatory KPI Cards (Section 5.1) -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Total Schools</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div>
+              <div class="kpi-value">52</div>
+              <div class="kpi-meta"><span class="kpi-delta up">+4 QoQ</span><span>Across 4 regions</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Active Schools</span><span class="kpi-icon emerald"><i data-lucide="check-circle-2"></i></span></div>
+              <div class="kpi-value">50</div>
+              <div class="kpi-meta"><span class="kpi-delta up">96.2%</span><span>2 suspended</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Total Franchises</span><span class="kpi-icon sky"><i data-lucide="network"></i></span></div>
+              <div class="kpi-value">4</div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">100% Active</span><span>18% avg tier</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="users"></i></span></div>
+              <div class="kpi-value">18,430</div>
+              <div class="kpi-meta"><span class="kpi-delta up">+8.4%</span><span>Enrolled accounts</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div>
+              <div class="kpi-value">17,210</div>
+              <div class="kpi-meta"><span class="kpi-delta up">93.4%</span><span>Calling enabled</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Registered Devices</span><span class="kpi-icon slate"><i data-lucide="tablet-smartphone"></i></span></div>
+              <div class="kpi-value">418</div>
+              <div class="kpi-meta"><span class="kpi-delta up">406 Online</span><span>AE Dedicated</span></div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Active Subscriptions</span><span class="kpi-icon"><i data-lucide="layers"></i></span></div>
+              <div class="kpi-value">50</div>
+              <div class="kpi-meta"><span class="kpi-delta warn">4 Expiring</span><span>&lt;30d window</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Total Calls (MTD)</span><span class="kpi-icon sky"><i data-lucide="phone-call"></i></span></div>
+              <div class="kpi-value">42,890</div>
+              <div class="kpi-meta"><span class="kpi-delta up">+11.2%</span><span>98.1% completed</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Calling Minutes</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div>
+              <div class="kpi-value">384,120</div>
+              <div class="kpi-meta"><span class="kpi-delta up">8.9m avg</span><span>Per session</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Total Revenue</span><span class="kpi-icon emerald"><i data-lucide="dollar-sign"></i></span></div>
+              <div class="kpi-value">$420,970</div>
+              <div class="kpi-meta"><span class="kpi-delta up">+14.6% YoY</span><span>Gross YTD</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Pending Payments</span><span class="kpi-icon amber"><i data-lucide="clock"></i></span></div>
+              <div class="kpi-value">$14,820</div>
+              <div class="kpi-meta"><span class="kpi-delta warn">9 Invoices</span><span>ACH / Wire</span></div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4 col-xl-2">
+            <div class="kpi-card">
+              <div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon rose"><i data-lucide="calendar-x-2"></i></span></div>
+              <div class="kpi-value">680</div>
+              <div class="kpi-meta"><span class="kpi-delta warn">Next 14d</span><span><a href="validity/overview.html">Review</a></span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Charts Row: Monthly Revenue Trend (Area) + Subscription Distribution (Donut) -->
+        <div class="row g-4 mb-4">
+          <div class="col-xl-8">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Monthly Revenue Trend (Subscriptions &amp; Recharges)</h2>
+                  <p class="chart-card-subtitle">Demo telemetry comparing institutional contracts vs student credit top-ups</p>
+                </div>
+                <div class="chart-range-group">
+                  <button type="button" class="chart-range-btn" data-chart-target="sa-revenue-trend" data-range="30D">30D</button>
+                  <button type="button" class="chart-range-btn" data-chart-target="sa-revenue-trend" data-range="90D">90D</button>
+                  <button type="button" class="chart-range-btn active" data-chart-target="sa-revenue-trend" data-range="12M">12M</button>
+                </div>
+              </div>
+              <div class="chart-card-body">
+                <div class="chart-canvas" data-s2d-chart="sa-revenue-trend"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-4">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Subscription Distribution</h2>
+                  <p class="chart-card-subtitle">Active plan tier mix across 52 schools</p>
+                </div>
+                <a href="subscriptions/overview.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Manage</a>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sa-subscription-donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Charts Row: School Growth (Line) + Call Usage Trends (Line) + Active vs Inactive Students (Donut) -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-4">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">School Registration Growth</h2>
+                  <p class="chart-card-subtitle">12-month campus expansion trajectory</p>
+                </div>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sa-school-growth"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Call Usage Trends</h2>
+                  <p class="chart-card-subtitle">Minutes consumed vs completed call count</p>
+                </div>
+                <div class="chart-range-group">
+                  <button type="button" class="chart-range-btn" data-chart-target="sa-call-usage-trend" data-range="7D">7D</button>
+                  <button type="button" class="chart-range-btn active" data-chart-target="sa-call-usage-trend" data-range="90D">8W</button>
+                </div>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sa-call-usage-trend"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Active vs Inactive Students</h2>
+                  <p class="chart-card-subtitle">Global student calling account health</p>
+                </div>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sa-student-status-donut"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tertiary Charts Row: School-wise Calling Usage (Bar) + Payment Status Distribution -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-7">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">School-wise Calling Usage</h2>
+                  <p class="chart-card-subtitle">Top boarding campuses by monthly voice minutes</p>
+                </div>
+                <a href="reports/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Full School Report</a>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sa-school-usage-bar"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Payment Status Distribution</h2>
+                  <p class="chart-card-subtitle">Last 30 days transaction settlement breakdown</p>
+                </div>
+                <a href="payments/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Ledger</a>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sa-payment-status-chart"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 Operational Summary Sections (Section 5.1) -->
+        <div class="row g-4 mb-4">
+          <!-- 1. Recently Registered Schools -->
+          <div class="col-xl-6">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header">
+                <div>
+                  <h3 class="s2d-card-title">Recently Registered Schools</h3>
+                  <p class="s2d-card-subtitle">Latest onboarded boarding institutions</p>
+                </div>
+                <a href="schools/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">View All 52</a>
+              </div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>School</th><th>Franchise</th><th>Students</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><a href="schools/details.html?id=SCH-1008" class="cell-primary">Harborview Collegiate Academy</a><span class="cell-sub">Charleston, SC</span></td>
+                      <td>Atlantic Campus Connect</td>
+                      <td class="mono-code">540</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="schools/details.html?id=SCH-1005" class="cell-primary">Crestview Boys &amp; Girls Hostel</a><span class="cell-sub">Portland, OR</span></td>
+                      <td>Pacific Crest Scholastic</td>
+                      <td class="mono-code">345</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="schools/details.html?id=SCH-1001" class="cell-primary">Oakridge Residential Academy</a><span class="cell-sub">Hartford, CT</span></td>
+                      <td>North-East EduNet</td>
+                      <td class="mono-code">684</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td><a href="schools/details.html?id=SCH-1007" class="cell-primary">Silverstone Preparatory Campus</a><span class="cell-sub">Albany, NY</span></td>
+                      <td>North-East EduNet</td>
+                      <td class="mono-code">295</td>
+                      <td><span class="s2d-badge s2d-badge-danger">Suspended</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Recent Transactions -->
+          <div class="col-xl-6">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header">
+                <div>
+                  <h3 class="s2d-card-title">Recent Financial Transactions</h3>
+                  <p class="s2d-card-subtitle">Subscriptions, bulk allocations &amp; parent top-ups</p>
+                </div>
+                <a href="payments/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">All Payments</a>
+              </div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>Ref</th><th>Institution</th><th>Category</th><th>Amount</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td class="mono-code"><a href="payments/details.html?id=TXN-30001">TXN-30001</a></td>
+                      <td>Oakridge Residential Academy</td>
+                      <td>Student Recharge</td>
+                      <td class="mono-code fw-semibold">$22.00</td>
+                      <td><span class="s2d-badge s2d-badge-success">Successful</span></td>
+                    </tr>
+                    <tr>
+                      <td class="mono-code"><a href="payments/details.html?id=TXN-30002">TXN-30002</a></td>
+                      <td>Greenwood International Prep</td>
+                      <td>Annual Subscription</td>
+                      <td class="mono-code fw-semibold">$8,400.00</td>
+                      <td><span class="s2d-badge s2d-badge-success">Successful</span></td>
+                    </tr>
+                    <tr>
+                      <td class="mono-code"><a href="payments/details.html?id=TXN-30003">TXN-30003</a></td>
+                      <td>Oakridge Residential Academy</td>
+                      <td>Bulk Credit Allocation</td>
+                      <td class="mono-code fw-semibold">$1,320.00</td>
+                      <td><span class="s2d-badge s2d-badge-warning">Pending</span></td>
+                    </tr>
+                    <tr>
+                      <td class="mono-code"><a href="payments/details.html?id=TXN-30005">TXN-30005</a></td>
+                      <td>Oakridge Residential Academy</td>
+                      <td>Student Recharge</td>
+                      <td class="mono-code fw-semibold">$8.00</td>
+                      <td><span class="s2d-badge s2d-badge-danger">Failed</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <!-- 3. Recent Calling Activity -->
+          <div class="col-xl-4">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header">
+                <h3 class="s2d-card-title">Recent Calling Activity</h3>
+                <a href="call-history/index.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Call Logs</a>
+              </div>
+              <div class="s2d-card-body d-grid gap-3">
+                <div class="d-flex justify-content-between align-items-start border-bottom border-s2d pb-2">
+                  <div><div class="fw-semibold text-heading">Clara Bennett &rarr; Mother</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Oakridge · +1 (555) 802-3490</div></div>
+                  <div class="text-end"><span class="s2d-badge s2d-badge-success">08m 42s</span><div class="mono-code text-muted-s2d mt-1">07:40</div></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-start border-bottom border-s2d pb-2">
+                  <div><div class="fw-semibold text-heading">Amelia Fletcher &rarr; Mother</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Oakridge · +1 (555) 804-7740</div></div>
+                  <div class="text-end"><span class="s2d-badge s2d-badge-success">14m 58s</span><div class="mono-code text-muted-s2d mt-1">20:45</div></div>
+                </div>
+                <div class="d-flex justify-content-between align-items-start">
+                  <div><div class="fw-semibold text-heading">Noah Montgomery &rarr; Father</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Blocked outside calling hours</div></div>
+                  <div class="text-end"><span class="s2d-badge s2d-badge-danger">Restricted</span><div class="mono-code text-muted-s2d mt-1">14:12</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Subscription Expiry Alerts & 5. Device Status Summary -->
+          <div class="col-xl-4">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header">
+                <h3 class="s2d-card-title">Subscription &amp; Device Health</h3>
+                <a href="devices/list.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">MDM Fleet</a>
+              </div>
+              <div class="s2d-card-body">
+                <div class="s2d-callout amber mb-3" style="padding:10px 12px;">
+                  <i data-lucide="alert-triangle" style="width:16px;height:16px;"></i>
+                  <div><strong>Maplewood Residential High</strong> renews in 9 days (Nov 19, 2026) · $5,900.00</div>
+                </div>
+                <div class="s2d-callout amber mb-3" style="padding:10px 12px;">
+                  <i data-lucide="calendar-clock" style="width:16px;height:16px;"></i>
+                  <div><strong>St. Jude Boarding Institute</strong> renews in 14 days (Nov 24, 2026) · $5,900.00</div>
+                </div>
+                <div class="pt-2 border-top border-s2d">
+                  <div class="d-flex justify-content-between mb-1" style="font-size:0.79rem;"><span>Android Enterprise Online Kiosks</span><strong class="mono-code">406 / 418 (97.1%)</strong></div>
+                  <div class="s2d-progress mb-2"><div class="s2d-progress-bar emerald" style="width:97.1%;"></div></div>
+                  <div class="d-flex justify-content-between" style="font-size:0.75rem;color:var(--s2d-text-secondary);"><span>Compliant: 412</span><span>Policy Drift: 4</span><span>Blocked: 2</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 6. Recent Administrative Activity -->
+          <div class="col-xl-4">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header">
+                <h3 class="s2d-card-title">Recent Administrative Activity</h3>
+                <a href="settings/audit-logs.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Audit Log</a>
+              </div>
+              <div class="s2d-card-body d-grid gap-3">
+                <div class="d-flex gap-3">
+                  <span class="kpi-icon" style="width:30px;height:30px;"><i data-lucide="sliders" style="width:14px;height:14px;"></i></span>
+                  <div><div class="fw-semibold text-heading" style="font-size:0.81rem;">Global Max Per-Call Cap set to 20m</div><div class="text-secondary-s2d" style="font-size:0.74rem;">Eleanor Vance · Today, 08:44 UTC</div></div>
+                </div>
+                <div class="d-flex gap-3">
+                  <span class="kpi-icon amber" style="width:30px;height:30px;"><i data-lucide="shield-alert" style="width:14px;height:14px;"></i></span>
+                  <div><div class="fw-semibold text-heading" style="font-size:0.81rem;">Kiosk Policy Drift on DEV-7707</div><div class="text-secondary-s2d" style="font-size:0.74rem;">Policy Worker · Yesterday, 21:10 UTC</div></div>
+                </div>
+                <div class="d-flex gap-3">
+                  <span class="kpi-icon rose" style="width:30px;height:30px;"><i data-lucide="ban" style="width:14px;height:14px;"></i></span>
+                  <div><div class="fw-semibold text-heading" style="font-size:0.81rem;">Suspended Silverstone Prep (SCH-1007)</div><div class="text-secondary-s2d" style="font-size:0.74rem;">Eleanor Vance · Nov 8, 2026</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/vendor/lucide.min.js"></script>
+  <script src="../assets/vendor/apexcharts.min.js"></script>
+  <script src="../assets/vendor/gsap.min.js"></script>
+  <script src="../assets/js/api-config.js"></script>
+  <script src="../assets/js/demo-data.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+  <script src="../assets/js/modals.js"></script>
+  <script src="../assets/js/navigation.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script src="../assets/js/tables.js"></script>
+  <script src="../assets/js/forms.js"></script>
+  <script src="../assets/js/charts.js"></script>
+  <script src="../assets/js/animations.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

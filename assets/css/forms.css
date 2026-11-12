@@ -1,0 +1,259 @@
+/* ==========================================================================
+   Source 2 Destination — Enterprise Form Architecture & Validation
+   File: assets/css/forms.css
+   ========================================================================== */
+
+.s2d-form-section {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 28px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--s2d-border);
+}
+
+.s2d-form-section:first-child {
+  padding-top: 4px;
+}
+
+.s2d-form-section:last-of-type {
+  border-bottom: none;
+}
+
+.form-section-meta h3 {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: var(--s2d-heading);
+  margin-bottom: 4px;
+}
+
+.form-section-meta p {
+  font-size: 0.8rem;
+  color: var(--s2d-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.s2d-field {
+  margin-bottom: 16px;
+}
+
+.s2d-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--s2d-heading);
+  margin-bottom: 6px;
+}
+
+.req-star {
+  color: var(--s2d-danger);
+  font-weight: 600;
+}
+
+.s2d-input,
+.s2d-select,
+.s2d-textarea {
+  width: 100%;
+  height: 39px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--s2d-border);
+  background-color: var(--s2d-surface);
+  color: var(--s2d-heading);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.s2d-textarea {
+  height: auto;
+  min-height: 92px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+.s2d-input::placeholder,
+.s2d-textarea::placeholder {
+  color: var(--s2d-text-muted);
+}
+
+.s2d-input:hover:not(:disabled),
+.s2d-select:hover:not(:disabled),
+.s2d-textarea:hover:not(:disabled) {
+  border-color: var(--s2d-border-strong);
+}
+
+.s2d-input:focus,
+.s2d-select:focus,
+.s2d-textarea:focus {
+  border-color: var(--s2d-primary);
+  box-shadow: 0 0 0 3px var(--s2d-primary-ring);
+  outline: none;
+}
+
+.s2d-input:disabled,
+.s2d-select:disabled,
+.s2d-input[readonly] {
+  background-color: var(--s2d-surface-muted);
+  color: var(--s2d-text-secondary);
+  cursor: not-allowed;
+}
+
+/* Input Group with Prefix / Suffix */
+.s2d-input-group {
+  display: flex;
+  align-items: stretch;
+  position: relative;
+}
+
+.s2d-input-addon {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 11px;
+  background: var(--s2d-surface-subtle);
+  border: 1px solid var(--s2d-border);
+  border-right: none;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  color: var(--s2d-text-secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.s2d-input-group .s2d-input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.input-icon-right {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--s2d-text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+}
+
+/* Validation States & DRF Server Error Slots */
+.s2d-input.is-invalid,
+.s2d-select.is-invalid,
+.s2d-textarea.is-invalid {
+  border-color: var(--s2d-danger);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.14);
+}
+
+.s2d-input.is-valid,
+.s2d-select.is-valid {
+  border-color: var(--s2d-success);
+}
+
+.field-hint {
+  display: block;
+  margin-top: 5px;
+  font-size: 0.74rem;
+  color: var(--s2d-text-secondary);
+}
+
+.field-error,
+[data-drf-error] {
+  display: none;
+  margin-top: 5px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--s2d-danger-text);
+}
+
+.field-error.show,
+[data-drf-error].show {
+  display: block;
+}
+
+/* Toggle Switch */
+.s2d-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid var(--s2d-border);
+  border-radius: var(--radius-md);
+  background: var(--s2d-surface-subtle);
+}
+
+.s2d-switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.s2d-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.s2d-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #CBD5E1;
+  border-radius: 999px;
+  transition: 180ms ease;
+}
+
+.s2d-switch-slider::before {
+  position: absolute;
+  content: '';
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  transition: 180ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+.s2d-switch input:checked + .s2d-switch-slider {
+  background-color: var(--s2d-primary);
+}
+
+.s2d-switch input:checked + .s2d-switch-slider::before {
+  transform: translateX(18px);
+}
+
+/* Form Action Bar & Dirty State */
+.form-actions-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: 8px;
+  border-top: 1px solid var(--s2d-border);
+}
+
+.unsaved-indicator {
+  display: none;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--s2d-warning-text);
+  background: var(--s2d-warning-bg);
+  border: 1px solid var(--s2d-warning-border);
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+.unsaved-indicator.show {
+  display: inline-flex;
+}

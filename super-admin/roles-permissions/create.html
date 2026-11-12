@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create / Edit Role — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/roles-permissions/create.html" data-section="Governance" data-page-title="Create Role">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">IAM ROLE DEFINITION</div><h1 class="page-title">Create / Edit Administrative Role</h1><p class="page-description">Define role scope and assign capability groups consumed by Django REST permission classes.</p></div>
+          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Roles</span></a></div>
+        </div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-redirect="list.html" data-success-title="Custom Role Saved (Demo)">
+            <div class="row g-3 mb-4">
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Role Name <span class="req-star">*</span></label><input type="text" name="role_name" class="s2d-input" placeholder="Regional Compliance Auditor" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Organizational Scope <span class="req-star">*</span></label><select name="scope" class="s2d-select"><option>Global Platform</option><option>Franchise Territory</option><option>Single School Campus</option></select></div>
+              <div class="col-12 s2d-field"><label class="s2d-label">Role Description <span class="req-star">*</span></label><textarea name="desc" class="s2d-textarea" placeholder="Describe operational responsibilities and boundaries..." required></textarea></div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Save Role</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

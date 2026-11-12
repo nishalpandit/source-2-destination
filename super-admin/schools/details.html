@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School 360° Details — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/schools/details.html" data-section="School Management" data-page-title="School Details">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+        <div class="page-header">
+          <div class="page-header-info">
+            <div class="page-eyebrow">SCHOOL 360° DOSSIER · <span data-bind-field="id">SCH-1001</span></div>
+            <h1 class="page-title" data-bind-field="name">Oakridge Residential Academy</h1>
+            <p class="page-description"><span data-bind-field="city">Hartford, CT</span> · Assigned to <strong data-bind-field="franchise">North-East EduNet Partners</strong> · Primary Admin: <span data-bind-field="adminName">Dr. Arthur Pendelton</span></p>
+          </div>
+          <div class="page-actions">
+            <a href="edit.html?id=SCH-1001" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
+            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Suspend Campus Calling" data-record-label="SCH-1001 · Oakridge Residential Academy" data-confirm-prompt="Suspending this school immediately pauses outbound student calling across all 28 enrolled Android kiosks."><i data-lucide="ban"></i><span>Suspend School</span></button>
+          </div>
+        </div>
+
+        <!-- 7 Mandatory Tabs from Section 5.2 -->
+        <div class="s2d-tabs" data-s2d-tabs="school-detail-tabs" role="tablist">
+          <button type="button" class="s2d-tab-btn active" data-tab-target="tab-overview">Overview</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-students">Students (684)</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-admins">Administrators (2)</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-subscription">Subscription</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-usage">Calling Usage</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-devices">Devices (28)</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-transactions">Transactions</button>
+        </div>
+
+        <div id="school-detail-tabs">
+          <!-- Tab 1: Overview -->
+          <div class="s2d-tab-panel active" id="tab-overview">
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Active Students</div><div class="kpi-value mt-2">658 <span class="text-secondary-s2d" style="font-size:0.9rem;">/ 684</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Monthly Voice Usage</div><div class="kpi-value mt-2">42,850m</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Enrolled AE Kiosks</div><div class="kpi-value mt-2">28</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Subscription Status</div><div class="mt-2"><span class="s2d-badge s2d-badge-success">Active · Aug 2027</span></div></div></div>
+            </div>
+            <div class="s2d-card">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Institutional Metadata &amp; Governance</h3></div>
+              <div class="s2d-card-body">
+                <div class="kv-grid">
+                  <div><div class="kv-item-label">Tenant Identifier</div><div class="kv-item-value mono-code" data-bind-field="id">SCH-1001</div></div>
+                  <div><div class="kv-item-label">Short Prefix</div><div class="kv-item-value mono-code" data-bind-field="code">OAK-01</div></div>
+                  <div><div class="kv-item-label">Franchise Partner</div><div class="kv-item-value" data-bind-field="franchise">North-East EduNet Partners</div></div>
+                  <div><div class="kv-item-label">Primary Admin</div><div class="kv-item-value" data-bind-field="adminName">Dr. Arthur Pendelton</div></div>
+                  <div><div class="kv-item-label">Official Email</div><div class="kv-item-value" data-bind-field="adminEmail">admin@oakridge-academy.edu</div></div>
+                  <div><div class="kv-item-label">Campus Telephone</div><div class="kv-item-value mono-code" data-bind-field="phone">+1 (555) 210-9001</div></div>
+                  <div><div class="kv-item-label">Default Per-Call Limit</div><div class="kv-item-value">15 Minutes (Global Cap: 20m)</div></div>
+                  <div><div class="kv-item-label">Allowed Schedule Window</div><div class="kv-item-value">Mon–Fri 17:30–21:00 · Sun 10:00–20:00</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Students -->
+          <div class="s2d-tab-panel" id="tab-students">
+            <div data-s2d-table="sch-students-table"></div>
+          </div>
+
+          <!-- Tab 3: Administrators -->
+          <div class="s2d-tab-panel" id="tab-admins">
+            <div class="s2d-card">
+              <div class="s2d-card-header">
+                <h3 class="s2d-card-title">Assigned Campus Administrators</h3>
+                <a href="../school-admins/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="user-plus"></i><span>Assign Admin</span></a>
+              </div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>Name</th><th>Email</th><th>Designation</th><th>MFA</th><th>Last Active</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td class="cell-primary">Dr. Arthur Pendelton</td><td>admin@oakridge-academy.edu</td><td>Principal &amp; Primary Admin</td><td><span class="s2d-badge s2d-badge-success">Enabled</span></td><td class="mono-code">2026-11-10 08:42</td><td><span class="s2d-badge s2d-badge-success">Active</span></td></tr>
+                    <tr><td class="cell-primary">Clarissa Sterling</td><td>c.sterling@oakridge-academy.edu</td><td>Hostel Operations Coordinator</td><td><span class="s2d-badge s2d-badge-success">Enabled</span></td><td class="mono-code">2026-11-10 07:55</td><td><span class="s2d-badge s2d-badge-success">Active</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 4: Subscription -->
+          <div class="s2d-tab-panel" id="tab-subscription">
+            <div class="s2d-card">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Active Subscription Contract (SUB-9001)</h3><a href="../subscriptions/create.html?id=SUB-9001" class="btn-s2d btn-s2d-secondary btn-sm-s2d">Modify Plan</a></div>
+              <div class="s2d-card-body">
+                <div class="kv-grid mb-3">
+                  <div><div class="kv-item-label">Plan Tier</div><div class="kv-item-value">Enterprise Boarding Annual</div></div>
+                  <div><div class="kv-item-label">Annual Contract Value</div><div class="kv-item-value mono-code">$8,400.00 / year</div></div>
+                  <div><div class="kv-item-label">Student Seat Utilization</div><div class="kv-item-value">684 / 750 seats (91.2%)</div></div>
+                  <div><div class="kv-item-label">Renewal Date</div><div class="kv-item-value mono-code">2027-08-15 (Auto-Renew)</div></div>
+                </div>
+                <div class="s2d-progress"><div class="s2d-progress-bar" style="width:91.2%;"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 5: Calling Usage -->
+          <div class="s2d-tab-panel" id="tab-usage">
+            <div class="row g-4">
+              <div class="col-lg-7"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Daily Calling Sessions (Last 7 Days)</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sch-daily-calls"></div></div></div></div>
+              <div class="col-lg-5"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Usage by Grade</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sch-usage-by-class"></div></div></div></div>
+            </div>
+          </div>
+
+          <!-- Tab 6: Devices -->
+          <div class="s2d-tab-panel" id="tab-devices">
+            <div data-s2d-table="sch-devices-table"></div>
+          </div>
+
+          <!-- Tab 7: Transactions -->
+          <div class="s2d-tab-panel" id="tab-transactions">
+            <div data-s2d-table="sa-payments-table"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/apexcharts.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

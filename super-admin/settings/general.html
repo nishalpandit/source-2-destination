@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>General & Administrative Settings — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/settings/general.html" data-section="Settings & Audit" data-page-title="General Settings">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">SYSTEM CONFIGURATION</div><h1 class="page-title">General, Administrative &amp; Profile Settings</h1><p class="page-description">Manage platform identity, session security policies, and Super Administrator profile details.</p></div>
+        </div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-success-title="System Settings Updated (Demo)">
+            <div class="s2d-form-section">
+              <div class="form-section-meta"><h3>Platform Identity</h3><p>Global organization settings displayed on invoices and notifications.</p></div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Platform Name <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Source 2 Destination" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Support Helpdesk Email <span class="req-star">*</span></label><input type="email" class="s2d-input" value="support@source2destination.io" required></div>
+              </div>
+            </div>
+            <div class="s2d-form-section">
+              <div class="form-section-meta"><h3>Super Admin Profile</h3><p>Active operator identity.</p></div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Eleanor Vance" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" class="s2d-input" value="e.vance@source2destination.io" required></div>
+              </div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Settings</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

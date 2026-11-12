@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Admin Dashboard — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../assets/vendor/bootstrap.min.css">
+  <script src="../assets/vendor/tailwind-config.js"></script>
+  <script src="../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/layout.css">
+  <link rel="stylesheet" href="../assets/css/components.css">
+  <link rel="stylesheet" href="../assets/css/tables.css">
+  <link rel="stylesheet" href="../assets/css/forms.css">
+  <link rel="stylesheet" href="../assets/css/charts.css">
+  <link rel="stylesheet" href="../assets/css/animations.css">
+  <link rel="stylesheet" href="../assets/css/responsive.css">
+</head>
+<body data-role="school-admin" data-root="../" data-route="school-admin/dashboard.html" data-section="Campus Command" data-page-title="School Dashboard">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-header-info">
+            <div class="page-eyebrow">OAKRIDGE RESIDENTIAL ACADEMY (SCH-1001) · HARTFORD, CT</div>
+            <h1 class="page-title">Campus &amp; Hostel Calling Operations</h1>
+            <p class="page-description">Daily operational command for enrolled boarding students, verified guardian phone whitelists, hostel calling windows, credit recharges, booth devices, and duty wardens.</p>
+          </div>
+          <div class="page-actions">
+            <a href="recharges/student-recharge.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="zap"></i><span>Student Recharge</span></a>
+            <a href="calling-schedules/index.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="calendar-range"></i><span>Hostel Schedules</span></a>
+            <a href="students/add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="user-plus"></i><span>Enroll Student</span></a>
+          </div>
+        </div>
+
+        <!-- 12 Mandatory KPI Cards (Section 7.1) -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="graduation-cap"></i></span></div><div class="kpi-value">684</div><div class="kpi-meta"><span>Grades 7–12</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">658</div><div class="kpi-meta"><span class="kpi-delta up">96.2%</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Inactive Students</span><span class="kpi-icon rose"><i data-lucide="user-x"></i></span></div><div class="kpi-value">26</div><div class="kpi-meta"><span>Paused / Expired</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon sky"><i data-lucide="book-open"></i></span></div><div class="kpi-value">6</div><div class="kpi-meta"><span>Grades 7 to 12</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon slate"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">20</div><div class="kpi-meta"><span>Avg 34 / section</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Guardians</span><span class="kpi-icon emerald"><i data-lucide="heart-handshake"></i></span></div><div class="kpi-value">1,290</div><div class="kpi-meta"><span>KYC Whitelisted</span></div></div></div>
+
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Registered Devices</span><span class="kpi-icon"><i data-lucide="tablet-smartphone"></i></span></div><div class="kpi-value">28</div><div class="kpi-meta"><span class="kpi-delta up">27 Online</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon emerald"><i data-lucide="key-round"></i></span></div><div class="kpi-value">658</div><div class="kpi-meta"><span>Codes issued</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Calls Today</span><span class="kpi-icon sky"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">142</div><div class="kpi-meta"><span class="kpi-delta up">+10.1%</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Minutes Used (MTD)</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div><div class="kpi-value">42,850</div><div class="kpi-meta"><span>1,595m today</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon amber"><i data-lucide="calendar-clock"></i></span></div><div class="kpi-value">14</div><div class="kpi-meta"><span class="kpi-delta warn">&lt;14 days</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Recent Recharges</span><span class="kpi-icon emerald"><i data-lucide="zap"></i></span></div><div class="kpi-value">91</div><div class="kpi-meta"><span class="kpi-delta up">Last 30d</span></div></div></div>
+        </div>
+
+        <!-- 6 Mandatory School Admin Charts (Section 7.1) -->
+        <div class="row g-4 mb-4">
+          <div class="col-lg-6">
+            <div class="chart-card">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Daily Calling Activity</h2><p class="chart-card-subtitle">Completed guardian sessions vs schedule-restricted attempts</p></div></div>
+              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-daily-calls"></div></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="chart-card">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Weekly Call Duration (Minutes)</h2><p class="chart-card-subtitle">Total hostel calling minutes consumed per day</p></div></div>
+              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-weekly-duration"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-lg-4">
+            <div class="chart-card">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Class-wise Student Distribution</h2><p class="chart-card-subtitle">Active vs inactive accounts per grade</p></div></div>
+              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-class-distribution"></div></div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="chart-card">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Active vs Inactive Students</h2><p class="chart-card-subtitle">Current Oakridge account breakdown</p></div></div>
+              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-active-donut"></div></div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="chart-card">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Calling Usage by Class</h2><p class="chart-card-subtitle">30-day voice minutes by grade</p></div></div>
+              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-usage-by-class"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+          <div class="col-xl-7">
+            <div class="chart-card">
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Campus Recharge Trend</h2><p class="chart-card-subtitle">Parent portal self-service top-ups vs school desk allocations</p></div></div>
+              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-recharge-trend"></div></div>
+            </div>
+          </div>
+          <!-- Hostel Warden Summary & Device Assignment Status -->
+          <div class="col-xl-5">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Hostel Wardens &amp; Booth Status</h3><a href="hostel-wardens/list.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Wardens</a></div>
+              <div class="s2d-card-body d-grid gap-3">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-2">
+                  <div><div class="fw-semibold text-heading">Major Kenneth Cole · North Hall</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 16:00–00:00 · 8 Booths Online</div></div>
+                  <span class="s2d-badge s2d-badge-success">On Duty</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-2">
+                  <div><div class="fw-semibold text-heading">Matron Beatrice Holloway · East Gables</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 15:00–23:00 · 10 Booths Online</div></div>
+                  <span class="s2d-badge s2d-badge-success">On Duty</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div><div class="fw-semibold text-heading">DEV-7704 · Junior Wing Kiosk</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Heartbeat delayed 3h · Wi-Fi check requested</div></div>
+                  <span class="s2d-badge s2d-badge-danger">Offline</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remaining Operational Summary Tables: Recently Added Students, Today's Call Activity, Expiring Validities, Recent Recharges -->
+        <div class="row g-4">
+          <div class="col-xl-6">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Recently Added Students &amp; Expiring Validities</h3><a href="validity/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity Desk</a></div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>Student</th><th>Code</th><th>Class</th><th>Validity</th></tr></thead>
+                  <tbody>
+                    <tr><td><a href="students/details.html?id=STU-4003" class="cell-primary">Noah Montgomery</a></td><td class="mono-code">S2D-OAK-8843</td><td>Grade 11 · A</td><td><span class="s2d-badge s2d-badge-warning">Exp Nov 18</span></td></tr>
+                    <tr><td><a href="students/details.html?id=STU-4006" class="cell-primary">Sophia Whitaker</a></td><td class="mono-code">S2D-OAK-8846</td><td>Grade 10 · B</td><td><span class="s2d-badge s2d-badge-warning">Exp Nov 22</span></td></tr>
+                    <tr><td><a href="students/details.html?id=STU-4011" class="cell-primary">Benjamin Mercer</a></td><td class="mono-code">S2D-OAK-8847</td><td>Grade 7 · B</td><td><span class="s2d-badge s2d-badge-success">Active</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Today's Call Activity &amp; Recent Recharges</h3><a href="call-history/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Call History</a></div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>Time</th><th>Student</th><th>Event</th><th>Detail</th></tr></thead>
+                  <tbody>
+                    <tr><td class="mono-code">08:30</td><td class="cell-primary">Liam Hawthorne</td><td>Term Pack Recharge</td><td><span class="s2d-badge s2d-badge-success">+300 mins ($22)</span></td></tr>
+                    <tr><td class="mono-code">07:45</td><td class="cell-primary">Clara Bennett</td><td>Starter Recharge</td><td><span class="s2d-badge s2d-badge-success">+90 mins ($8)</span></td></tr>
+                    <tr><td class="mono-code">07:40</td><td class="cell-primary">Clara Bennett</td><td>Call to Mother</td><td><span class="s2d-badge s2d-badge-info">08m 42s</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../assets/vendor/lucide.min.js"></script>
+  <script src="../assets/vendor/apexcharts.min.js"></script>
+  <script src="../assets/vendor/gsap.min.js"></script>
+  <script src="../assets/js/api-config.js"></script>
+  <script src="../assets/js/demo-data.js"></script>
+  <script src="../assets/js/notifications.js"></script>
+  <script src="../assets/js/modals.js"></script>
+  <script src="../assets/js/navigation.js"></script>
+  <script src="../assets/js/sidebar.js"></script>
+  <script src="../assets/js/tables.js"></script>
+  <script src="../assets/js/forms.js"></script>
+  <script src="../assets/js/charts.js"></script>
+  <script src="../assets/js/animations.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

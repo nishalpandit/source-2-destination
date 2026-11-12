@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bulk Student Upload — Franchise — Franchise Portal — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="franchise" data-root="../../" data-route="franchise/bulk-upload/index.html" data-section="Bulk Upload" data-page-title="Bulk Student Import">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">BATCH ONBOARDING</div><h1 class="page-title">Bulk Student Excel / CSV Import</h1><p class="page-description">Onboard hundreds of students across assigned schools with duplicate detection and guardian phone validation.</p></div>
+        </div>
+        
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="s2d-card mb-4">
+      <div class="s2d-card-header">
+        <div><h3 class="s2d-card-title">Upload Student Enrollment Spreadsheet (.xlsx / .csv)</h3><p class="s2d-card-subtitle">Client-side schema pre-check followed by authoritative server-side DRF import validation</p></div>
+        <button type="button" class="btn-s2d btn-s2d-secondary btn-sm-s2d" id="download-sample-template"><i data-lucide="download"></i><span>Download Sample CSV</span></button>
+      </div>
+      <div class="s2d-card-body">
+        <input type="file" id="bulk-file-input" accept=".xlsx,.xls,.csv" style="display:none;">
+        <div class="upload-dropzone" id="bulk-upload-dropzone">
+          <div class="kpi-icon mx-auto mb-3" style="width:48px;height:48px;"><i data-lucide="upload-cloud" style="width:24px;height:24px;"></i></div>
+          <h3 class="h3-s2d mb-1">Drag &amp; drop Excel or CSV file here, or click to browse</h3>
+          <p class="text-secondary-s2d mb-3" style="font-size:0.81rem;">Supports <code>.xlsx</code> and <code>.csv</code> up to 5,000 student rows per batch.</p>
+          <span class="btn-s2d btn-s2d-primary btn-sm-s2d">Select Spreadsheet File</span>
+        </div>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+          <span class="text-secondary-s2d" style="font-size:0.78rem;">No spreadsheet handy? Run a live interactive validation preview:</span>
+          <button type="button" class="btn-s2d btn-s2d-soft btn-sm-s2d" id="simulate-sample-validation"><i data-lucide="play"></i><span>Simulate Validation Preview</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Validation Preview Section -->
+    <div class="s2d-card" id="bulk-validation-preview" style="display:none;">
+      <div class="s2d-card-header">
+        <div>
+          <h3 class="s2d-card-title">Validation Preview: <span class="mono-code text-brand" id="uploaded-filename-badge">sample.xlsx</span></h3>
+          <p class="s2d-card-subtitle">3 Valid Records · 1 Duplicate Record Flagged · 1 Format Error</p>
+        </div>
+        <button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" id="confirm-bulk-import-btn"><i data-lucide="check-circle-2"></i><span>Confirm &amp; Import Valid Rows (3)</span></button>
+      </div>
+      <div class="s2d-table-wrap">
+        <table class="s2d-table">
+          <thead><tr><th>Row</th><th>Student Name</th><th>Class / Sec</th><th>Primary Guardian Phone</th><th>Validation</th><th>Diagnostic Note</th></tr></thead>
+          <tbody id="bulk-preview-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="s2d-card">
+      <div class="s2d-card-header"><h3 class="s2d-card-title">Required Column Schema</h3></div>
+      <div class="s2d-card-body d-grid gap-2" style="font-size:0.8rem;">
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">student_full_name</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">class_grade</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">section</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">father_authorized_phone</code><span class="s2d-badge s2d-badge-indigo">E.164 Req</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">mother_authorized_phone</code><span class="s2d-badge s2d-badge-neutral">Optional</span></div>
+        <div class="d-flex justify-content-between py-1"><code class="mono-code">validity_plan_code</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
+        <div class="s2d-callout indigo mt-2" style="font-size:0.76rem;">
+          <i data-lucide="shield-check"></i>
+          <span>Unique Student Calling Codes are assigned server-side after import confirmation.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

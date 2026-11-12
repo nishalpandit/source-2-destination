@@ -1,0 +1,209 @@
+/* ==========================================================================
+   Source 2 Destination — Enterprise Design Tokens & Base Typography
+   File: assets/css/main.css
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap');
+
+:root {
+  /* Brand Palette */
+  --s2d-primary: #4F46E5;
+  --s2d-primary-hover: #4338CA;
+  --s2d-primary-dark: #3730A3;
+  --s2d-primary-soft: #EEF2FF;
+  --s2d-primary-border: #C7D2FE;
+  --s2d-primary-ring: rgba(79, 70, 229, 0.18);
+
+  /* Surfaces & Neutrals */
+  --s2d-bg: #F8FAFC;
+  --s2d-surface: #FFFFFF;
+  --s2d-surface-muted: #F1F5F9;
+  --s2d-surface-subtle: #F8FAFC;
+  --s2d-heading: #0F172A;
+  --s2d-text: #1E293B;
+  --s2d-text-secondary: #64748B;
+  --s2d-text-muted: #94A3B8;
+  --s2d-border: #E2E8F0;
+  --s2d-border-strong: #CBD5E1;
+
+  /* Semantic Feedback Colors */
+  --s2d-success: #10B981;
+  --s2d-success-bg: #ECFDF5;
+  --s2d-success-text: #047857;
+  --s2d-success-border: #A7F3D0;
+
+  --s2d-warning: #F59E0B;
+  --s2d-warning-bg: #FFFBEB;
+  --s2d-warning-text: #B45309;
+  --s2d-warning-border: #FDE68A;
+
+  --s2d-danger: #EF4444;
+  --s2d-danger-bg: #FEF2F2;
+  --s2d-danger-text: #B91C1C;
+  --s2d-danger-border: #FECACA;
+
+  --s2d-info: #0284C7;
+  --s2d-info-bg: #F0F9FF;
+  --s2d-info-text: #0369A1;
+  --s2d-info-border: #BAE6FD;
+
+  /* Role Subtle Accent Tokens */
+  --role-super: #4F46E5;
+  --role-franchise: #0D9488;
+  --role-school: #0284C7;
+
+  /* Layout Dimensions */
+  --sidebar-width: 264px;
+  --sidebar-collapsed-width: 76px;
+  --topbar-height: 64px;
+
+  /* Radii & Elevations */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 12px 28px -4px rgba(15, 23, 42, 0.10), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --shadow-modal: 0 20px 44px -8px rgba(15, 23, 42, 0.18), 0 8px 16px -4px rgba(15, 23, 42, 0.06);
+
+  /* Typography Families */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--s2d-text);
+  background-color: var(--s2d-bg);
+  overflow-x: hidden;
+}
+
+/* Prevent Bootstrap & Tailwind collapse collision */
+.collapse:not(.show) {
+  display: none;
+}
+.collapsing {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.22s ease;
+}
+
+/* Headings Scale */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--s2d-heading);
+  margin-top: 0;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+h1, .h1-s2d { font-size: 1.5rem; font-weight: 700; }
+h2, .h2-s2d { font-size: 1.25rem; font-weight: 600; }
+h3, .h3-s2d { font-size: 1.0625rem; font-weight: 600; }
+h4, .h4-s2d { font-size: 0.9375rem; font-weight: 600; }
+
+p {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+a {
+  color: var(--s2d-primary);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+a:hover {
+  color: var(--s2d-primary-hover);
+}
+
+/* Tabular Numbers & Code Typography */
+.tabular-nums,
+.kpi-value,
+.s2d-table td,
+.mono-code {
+  font-variant-numeric: tabular-nums;
+}
+
+.mono-code {
+  font-family: var(--font-mono);
+  font-size: 0.79rem;
+  letter-spacing: -0.01em;
+}
+
+/* Accessible Keyboard Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--s2d-primary);
+  outline-offset: 2px;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+select:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Selection & Subtle Scrollbar */
+::selection {
+  background-color: var(--s2d-primary-soft);
+  color: var(--s2d-primary-dark);
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Lucide Icons Standard Sizing */
+[data-lucide], .lucide {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.85;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.icon-xs [data-lucide], .icon-xs.lucide { width: 14px; height: 14px; }
+.icon-sm [data-lucide], .icon-sm.lucide { width: 16px; height: 16px; }
+.icon-md [data-lucide], .icon-md.lucide { width: 20px; height: 20px; }
+.icon-lg [data-lucide], .icon-lg.lucide { width: 24px; height: 24px; }
+
+/* Utility Helpers */
+.text-heading { color: var(--s2d-heading) !important; }
+.text-secondary-s2d { color: var(--s2d-text-secondary) !important; }
+.text-muted-s2d { color: var(--s2d-text-muted) !important; }
+.text-brand { color: var(--s2d-primary) !important; }
+.bg-surface { background-color: var(--s2d-surface) !important; }
+.bg-canvas { background-color: var(--s2d-bg) !important; }
+.border-s2d { border-color: var(--s2d-border) !important; }

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hostel Warden Details — School Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="school-admin" data-root="../../" data-route="school-admin/hostel-wardens/details.html" data-section="Hostel Wardens" data-page-title="Warden Details">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">WARDEN SUPERVISION PROFILE · <span data-bind-field="id">WRD-601</span></div><h1 class="page-title" data-bind-field="name">Major Kenneth Cole (Ret.)</h1><p class="page-description">Assigned Wing: <strong data-bind-field="hostelWing">North Hall (Boys Grades 10–11)</strong> · Shift: <span class="mono-code" data-bind-field="shiftHours">16:00 – 00:00</span></p></div>
+          <div class="page-actions"><a href="edit.html?id=WRD-601" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Assignment</span></a></div>
+        </div>
+        <div class="s2d-card mb-4"><div class="s2d-card-body"><div class="kv-grid">
+          <div><div class="kv-item-label">Email</div><div class="kv-item-value" data-bind-field="email">k.cole@oakridge-academy.edu</div></div>
+          <div><div class="kv-item-label">Phone</div><div class="kv-item-value mono-code" data-bind-field="phone">+1 (555) 210-9101</div></div>
+          <div><div class="kv-item-label">Supervised Students</div><div class="kv-item-value" data-bind-field="supervisedStudents">185</div></div>
+          <div><div class="kv-item-label">Supervised Booths</div><div class="kv-item-value" data-bind-field="supervisedDevices">8</div></div>
+        </div></div></div>
+        <div data-s2d-table="sch-devices-table"></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

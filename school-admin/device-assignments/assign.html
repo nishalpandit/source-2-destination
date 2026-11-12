@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assign Device — School Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/charts.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="school-admin" data-root="../../" data-route="school-admin/device-assignments/assign.html" data-section="Hostel & Reporting" data-page-title="Assign Device">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">BOOTH &amp; STUDENT MAPPING</div><h1 class="page-title">Assign Enrolled Device</h1><p class="page-description">Verify Android Enterprise enrollment and availability status before mapping a terminal to a hostel wing or student cohort.</p></div>
+          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Device List</span></a></div>
+        </div>
+        <div class="s2d-callout emerald mb-4"><i data-lucide="check-circle-2"></i><div><strong>Pre-Flight Check Passed:</strong> <code>DEV-7709 (Oakridge Spare Unit 05)</code> is Enrolled (AE Dedicated), Kiosk Compliant, Online, and currently in the Available Pool.</div></div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-redirect="list.html" data-success-title="Device Assignment Saved (Demo)">
+            <div class="row g-3">
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Available Enrolled Device <span class="req-star">*</span></label><select name="device_id" class="s2d-select" required><option value="DEV-7709">DEV-7709 · Oakridge Spare Unit 05 (Available · Online)</option><option value="DEV-7701">DEV-7701 · North Hall Booth 1 (Shared Pool)</option></select></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Assignment Mode <span class="req-star">*</span></label><select name="mode" class="s2d-select" required><option>Shared Hostel Wing Booth (Recommended)</option><option>Individual Student / Medical Room Assignment</option></select></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Target Hostel Wing / Student <span class="req-star">*</span></label><input type="text" name="target" class="s2d-input" value="North Hall · Floor 3 (Grade 11-A)" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Supervising Hostel Warden <span class="req-star">*</span></label><select name="warden" class="s2d-select" required><option>Major Kenneth Cole (North Hall)</option><option>Matron Beatrice Holloway (East Gables)</option></select></div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Confirm Device Assignment</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/charts.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

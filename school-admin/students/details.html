@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student 360° Details — School Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="../../assets/icons/favicon.svg">
+  <link rel="stylesheet" href="../../assets/vendor/bootstrap.min.css">
+  <script src="../../assets/vendor/tailwind-config.js"></script>
+  <script src="../../assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="../../assets/css/main.css">
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="../../assets/css/components.css">
+  <link rel="stylesheet" href="../../assets/css/tables.css">
+  <link rel="stylesheet" href="../../assets/css/forms.css">
+  <link rel="stylesheet" href="../../assets/css/animations.css">
+  <link rel="stylesheet" href="../../assets/css/responsive.css">
+</head>
+<body data-role="school-admin" data-root="../../" data-route="school-admin/students/details.html" data-section="Student Management" data-page-title="Student Details">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+        <div class="page-header">
+          <div class="page-header-info">
+            <div class="page-eyebrow">STUDENT 360° PROFILE · <span data-bind-field="studentCode">S2D-OAK-8841</span></div>
+            <h1 class="page-title" data-bind-field="name">Liam Hawthorne</h1>
+            <p class="page-description"><span data-bind-field="className">Grade 10</span> · <span data-bind-field="section">Section A</span> · <span data-bind-field="hostelWing">North Hall · Rm 204</span></p>
+          </div>
+          <div class="page-actions">
+            <a href="../recharges/student-recharge.html?student=STU-4001" class="btn-s2d btn-s2d-soft"><i data-lucide="zap"></i><span>Recharge Credits</span></a>
+            <a href="edit.html?id=STU-4001" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Student</span></a>
+            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Deactivate Student Calling Account" data-record-label="S2D-OAK-8841 · Liam Hawthorne" data-confirm-prompt="Deactivating this account immediately suspends booth logins for Liam Hawthorne until reactivated."><i data-lucide="power"></i><span>Deactivate</span></button>
+          </div>
+        </div>
+
+        <!-- All 7 Mandatory Student Details Tabs (Section 7.2) -->
+        <div class="s2d-tabs" data-s2d-tabs="student-detail-tabs" role="tablist">
+          <button type="button" class="s2d-tab-btn active" data-tab-target="stu-overview">Overview</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="stu-guardians">Guardians</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="stu-rules">Calling Rules</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="stu-history">Calling History</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="stu-validity">Validity</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="stu-recharges">Recharges</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="stu-device">Assigned Device</button>
+        </div>
+
+        <div id="student-detail-tabs">
+          <!-- Tab 1: Overview -->
+          <div class="s2d-tab-panel active" id="stu-overview">
+            <div class="row g-3 mb-4">
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Remaining Credits</div><div class="kpi-value mt-2"><span data-bind-field="remainingMinutes">142</span>m</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Daily Cap</div><div class="kpi-value mt-2"><span data-bind-field="dailyLimitMin">15</span>m</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Validity Expiry</div><div class="kpi-value mt-2 mono-code" style="font-size:1.2rem;" data-bind-field="validityExpiry">2027-05-31</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Account Status</div><div class="mt-2"><span class="s2d-badge s2d-badge-success" data-bind-field="status">Active</span></div></div></div>
+            </div>
+            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Enrollment &amp; Hostel Identity</h3></div>
+              <div class="s2d-card-body"><div class="kv-grid">
+                <div><div class="kv-item-label">Student Record ID</div><div class="kv-item-value mono-code" data-bind-field="id">STU-4001</div></div>
+                <div><div class="kv-item-label">Server-Issued Calling Code</div><div class="kv-item-value mono-code" data-bind-field="studentCode">S2D-OAK-8841</div></div>
+                <div><div class="kv-item-label">School</div><div class="kv-item-value" data-bind-field="school">Oakridge Residential Academy</div></div>
+                <div><div class="kv-item-label">Class &amp; Section</div><div class="kv-item-value"><span data-bind-field="className">Grade 10</span> · <span data-bind-field="section">Section A</span></div></div>
+                <div><div class="kv-item-label">Hostel Room</div><div class="kv-item-value" data-bind-field="hostelWing">North Hall · Rm 204</div></div>
+                <div><div class="kv-item-label">Assigned Booth</div><div class="kv-item-value" data-bind-field="assignedDevice">DEV-7701 (North Hall Booth 1)</div></div>
+              </div></div>
+            </div>
+          </div>
+
+          <!-- Tab 2: Guardians -->
+          <div class="s2d-tab-panel" id="stu-guardians">
+            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Authorized Guardian Contact Whitelist</h3><a href="../guardians/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d">Add Authorized Number</a></div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>Contact Name</th><th>Relationship</th><th>Authorized Phone</th><th>Verification</th><th>Dialer Access</th></tr></thead>
+                  <tbody>
+                    <tr><td class="cell-primary">Robert Hawthorne</td><td>Father (Primary)</td><td class="mono-code">+1 (555) 801-2210</td><td><span class="s2d-badge s2d-badge-success">KYC Verified</span></td><td><span class="s2d-badge s2d-badge-success">Whitelisted</span></td></tr>
+                    <tr><td class="cell-primary">Claire Hawthorne</td><td>Mother</td><td class="mono-code">+1 (555) 801-2211</td><td><span class="s2d-badge s2d-badge-success">KYC Verified</span></td><td><span class="s2d-badge s2d-badge-success">Whitelisted</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: Calling Rules -->
+          <div class="s2d-tab-panel" id="stu-rules">
+            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Effective Calling Rules &amp; Inherited Ceilings</h3></div>
+              <div class="s2d-card-body"><div class="kv-grid">
+                <div><div class="kv-item-label">Per-Call Cap</div><div class="kv-item-value">15 Minutes (Inherited Grade 10 Policy)</div></div>
+                <div><div class="kv-item-label">Daily Cumulative Cap</div><div class="kv-item-value">15 Minutes / Day</div></div>
+                <div><div class="kv-item-label">Allowed Weekday Window</div><div class="kv-item-value mono-code">17:30 – 21:00 EST</div></div>
+                <div><div class="kv-item-label">Allowed Sunday Window</div><div class="kv-item-value mono-code">10:00 – 20:00 EST</div></div>
+              </div></div>
+            </div>
+          </div>
+
+          <!-- Tab 4: Calling History -->
+          <div class="s2d-tab-panel" id="stu-history">
+            <div data-s2d-table="global-call-history-table"></div>
+          </div>
+
+          <!-- Tab 5: Validity -->
+          <div class="s2d-tab-panel" id="stu-validity">
+            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Student Account Validity</h3><button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" data-demo-action="Validity Extended (+90 Days)">Extend +90 Days</button></div>
+              <div class="s2d-card-body"><div class="kv-grid">
+                <div><div class="kv-item-label">Activated On</div><div class="kv-item-value mono-code" data-bind-field="validityStart">2026-08-01</div></div>
+                <div><div class="kv-item-label">Current Expiry Date</div><div class="kv-item-value mono-code" data-bind-field="validityExpiry">2027-05-31</div></div>
+                <div><div class="kv-item-label">Validity Health</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success">Active</span></div></div>
+              </div></div>
+            </div>
+          </div>
+
+          <!-- Tab 6: Recharges -->
+          <div class="s2d-tab-panel" id="stu-recharges">
+            <div data-s2d-table="sa-recharge-history-table"></div>
+          </div>
+
+          <!-- Tab 7: Assigned Device -->
+          <div class="s2d-tab-panel" id="stu-device">
+            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Assigned Hostel Calling Booth</h3><a href="../device-assignments/assign.html?student=STU-4001" class="btn-s2d btn-s2d-secondary btn-sm-s2d">Change Booth Assignment</a></div>
+              <div class="s2d-card-body"><div class="kv-grid">
+                <div><div class="kv-item-label">Primary Booth</div><div class="kv-item-value">DEV-7701 · North Hall Booth 1</div></div>
+                <div><div class="kv-item-label">Hardware Model</div><div class="kv-item-value">Samsung Galaxy Tab Active5 Enterprise</div></div>
+                <div><div class="kv-item-label">Enrollment Status</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success">Enrolled (AE Dedicated)</span></div></div>
+                <div><div class="kv-item-label">Online Telemetry</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success">Online · 2m ago</span></div></div>
+              </div></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../assets/vendor/lucide.min.js"></script>
+  <script src="../../assets/vendor/gsap.min.js"></script>
+  <script src="../../assets/js/api-config.js"></script>
+  <script src="../../assets/js/demo-data.js"></script>
+  <script src="../../assets/js/notifications.js"></script>
+  <script src="../../assets/js/modals.js"></script>
+  <script src="../../assets/js/navigation.js"></script>
+  <script src="../../assets/js/sidebar.js"></script>
+  <script src="../../assets/js/tables.js"></script>
+  <script src="../../assets/js/forms.js"></script>
+  <script src="../../assets/js/animations.js"></script>
+  <script src="../../assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Source 2 Destination — School &amp; Hostel Student Calling Management System</title>
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
+  <script src="assets/vendor/tailwind-config.js"></script>
+  <script src="assets/vendor/tailwindcss-cdn.js"></script>
+  <link rel="stylesheet" href="assets/css/main.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/tables.css">
+  <link rel="stylesheet" href="assets/css/forms.css">
+  <link rel="stylesheet" href="assets/css/charts.css">
+  <link rel="stylesheet" href="assets/css/animations.css">
+  <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body data-root="" data-route="index.html">
+  <!-- Executive Top Header -->
+  <header style="background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--s2d-border);position:sticky;top:0;z-index:1020;">
+    <div class="container py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
+      <a href="index.html" class="d-flex align-items-center gap-3 text-decoration-none">
+        <img src="assets/images/logo.svg" alt="Source 2 Destination" width="36" height="36">
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--s2d-heading);letter-spacing:-0.02em;">Source 2 Destination</div>
+          <div style="font-size:0.72rem;color:var(--s2d-text-secondary);font-weight:500;">School &amp; Hostel Student Calling Management Platform</div>
+        </div>
+      </a>
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="demo-mode-pill">
+          <span class="demo-mode-dot"></span>
+          <span>Enterprise Frontend · DRF API Ready</span>
+        </span>
+        <a href="auth/login.html" class="btn-s2d btn-s2d-secondary">
+          <i data-lucide="lock"></i>
+          <span>Sign In Gateway</span>
+        </a>
+        <a href="super-admin/dashboard.html" class="btn-s2d btn-s2d-primary">
+          <span>Launch Super Admin</span>
+          <i data-lucide="arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container py-5">
+    <!-- Hero Overview -->
+    <div class="row align-items-center g-4 mb-5">
+      <div class="col-lg-8">
+        <div class="page-eyebrow mb-2">
+          <i data-lucide="shield-check" style="width:14px;height:14px;"></i>
+          <span>CENTRALIZED CAMPUS &amp; HOSTEL CALLING GOVERNANCE</span>
+        </div>
+        <h1 style="font-size:2.15rem;line-height:1.18;margin-bottom:14px;">Secure, Policy-Controlled Student-to-Guardian Calling Infrastructure</h1>
+        <p class="text-secondary-s2d mb-4" style="font-size:0.96rem;max-width:680px;line-height:1.65;">
+          <strong>Source 2 Destination</strong> enables residential schools, boarding hostels, and regional franchises to govern authorized guardian phone whitelists, calling schedules, duration limits, student account validity, credit recharges, and Android Enterprise kiosk terminals from three role-isolated web environments.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="s2d-badge s2d-badge-indigo">80+ Dedicated HTML5 Module Pages</span>
+          <span class="s2d-badge s2d-badge-success">3 Role-Scoped Portals</span>
+          <span class="s2d-badge s2d-badge-neutral">Zero Browser Persistence · Ephemeral Demo State</span>
+          <span class="s2d-badge s2d-badge-info">Django REST Framework Integration Ready</span>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="s2d-card">
+          <div class="s2d-card-header">
+            <div>
+              <h2 class="s2d-card-title">Authentication Suite</h2>
+              <p class="s2d-card-subtitle">Role-aware enterprise identity screens</p>
+            </div>
+            <span class="kpi-icon"><i data-lucide="key-round"></i></span>
+          </div>
+          <div class="s2d-card-body d-grid gap-2">
+            <a href="auth/login.html" class="btn-s2d btn-s2d-primary justify-content-between w-100">
+              <span>Role-Aware Sign In</span>
+              <i data-lucide="log-in"></i>
+            </a>
+            <a href="auth/forgot-password.html" class="btn-s2d btn-s2d-secondary justify-content-between w-100">
+              <span>Password Recovery Request</span>
+              <i data-lucide="mail-check"></i>
+            </a>
+            <a href="auth/reset-password.html" class="btn-s2d btn-s2d-secondary justify-content-between w-100">
+              <span>Credential Reset &amp; Policy Check</span>
+              <i data-lucide="shield-ellipsis"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three Independent Dashboard Environments -->
+    <div class="mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <h2 class="h2-s2d mb-0">Select Role Environment</h2>
+      <span class="text-secondary-s2d" style="font-size:0.8rem;">Each portal enforces distinct navigation, KPIs, and operational scope</span>
+    </div>
+
+    <div class="row g-4 mb-5">
+      <!-- 1. Super Admin -->
+      <div class="col-lg-4">
+        <div class="s2d-card h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="s2d-card-header">
+              <div>
+                <span class="s2d-badge s2d-badge-indigo mb-2">ENVIRONMENT 01</span>
+                <h3 class="h2-s2d mb-1">Super Admin Dashboard</h3>
+                <p class="s2d-card-subtitle">Global platform governance, billing &amp; MDM fleet</p>
+              </div>
+              <span class="kpi-icon"><i data-lucide="shield"></i></span>
+            </div>
+            <div class="s2d-card-body">
+              <p class="text-secondary-s2d" style="font-size:0.83rem;">Full visibility across all franchises, boarding schools, global calling rules, subscription contracts, payment settlements, Android Enterprise devices, and RBAC permission matrices.</p>
+              <div class="d-flex flex-wrap gap-1 mb-3">
+                <a href="super-admin/schools/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Schools</a>
+                <a href="super-admin/school-admins/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">School Admins</a>
+                <a href="super-admin/validity/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity</a>
+                <a href="super-admin/recharges/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Recharges</a>
+                <a href="super-admin/subscriptions/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Subscriptions</a>
+                <a href="super-admin/devices/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Devices</a>
+                <a href="super-admin/roles-permissions/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">RBAC</a>
+              </div>
+            </div>
+          </div>
+          <div class="s2d-card-footer">
+            <a href="super-admin/dashboard.html" class="btn-s2d btn-s2d-primary w-100">
+              <span>Enter Super Admin Portal</span>
+              <i data-lucide="arrow-up-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Franchise -->
+      <div class="col-lg-4">
+        <div class="s2d-card h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="s2d-card-header">
+              <div>
+                <span class="s2d-badge s2d-badge-success mb-2">ENVIRONMENT 02</span>
+                <h3 class="h2-s2d mb-1">Franchise Dashboard</h3>
+                <p class="s2d-card-subtitle">Assigned territory schools, onboarding &amp; commissions</p>
+              </div>
+              <span class="kpi-icon emerald"><i data-lucide="network"></i></span>
+            </div>
+            <div class="s2d-card-body">
+              <p class="text-secondary-s2d" style="font-size:0.83rem;">Strictly scoped to franchise-allocated schools, bulk Excel student onboarding, duration configurations within global limits, recharge allocations, and earned commission ledgers.</p>
+              <div class="d-flex flex-wrap gap-1 mb-3">
+                <a href="franchise/schools/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Assigned Schools</a>
+                <a href="franchise/students/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Students</a>
+                <a href="franchise/bulk-upload/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Bulk Upload</a>
+                <a href="franchise/commissions/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Commissions</a>
+                <a href="franchise/transactions/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Transactions</a>
+                <a href="franchise/reports/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Reports</a>
+              </div>
+            </div>
+          </div>
+          <div class="s2d-card-footer">
+            <a href="franchise/dashboard.html" class="btn-s2d btn-s2d-primary w-100">
+              <span>Enter Franchise Portal</span>
+              <i data-lucide="arrow-up-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. School Admin -->
+      <div class="col-lg-4">
+        <div class="s2d-card h-100 d-flex flex-column justify-content-between">
+          <div>
+            <div class="s2d-card-header">
+              <div>
+                <span class="s2d-badge s2d-badge-info mb-2">ENVIRONMENT 03</span>
+                <h3 class="h2-s2d mb-1">School Admin Dashboard</h3>
+                <p class="s2d-card-subtitle">Daily campus, guardian whitelist &amp; hostel operations</p>
+              </div>
+              <span class="kpi-icon sky"><i data-lucide="school"></i></span>
+            </div>
+            <div class="s2d-card-body">
+              <p class="text-secondary-s2d" style="font-size:0.83rem;">Campus-focused control over students, classes, sections, verified parent/guardian numbers, server-issued student codes, weekly hostel schedules, booth assignments, and wardens.</p>
+              <div class="d-flex flex-wrap gap-1 mb-3">
+                <a href="school-admin/students/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Students</a>
+                <a href="school-admin/guardians/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Guardians</a>
+                <a href="school-admin/student-codes/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Unique Codes</a>
+                <a href="school-admin/calling-schedules/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Schedules</a>
+                <a href="school-admin/device-assignments/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Devices</a>
+                <a href="school-admin/hostel-wardens/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Wardens</a>
+              </div>
+            </div>
+          </div>
+          <div class="s2d-card-footer">
+            <a href="school-admin/dashboard.html" class="btn-s2d btn-s2d-primary w-100">
+              <span>Enter School Admin Portal</span>
+              <i data-lucide="arrow-up-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backend Readiness Architecture Summary -->
+    <div class="s2d-card">
+      <div class="s2d-card-body">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-8">
+            <h3 class="h3-s2d mb-1">Engineered for Seamless Django REST Framework Integration</h3>
+            <p class="text-secondary-s2d mb-0" style="font-size:0.83rem;">
+              Centralized endpoint definitions in <code>assets/js/api-config.js</code>, DRF serializer error slots on all forms, server-side pagination parameters, zero client-side persistent storage, and strict backend enforcement boundaries for RBAC, unique student calling codes, guardian whitelists, and Android Enterprise kiosk telemetry.
+            </p>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <a href="auth/login.html" class="btn-s2d btn-s2d-soft">
+              <i data-lucide="key-round"></i>
+              <span>Test Role-Based Sign In Flow</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="assets/vendor/lucide.min.js"></script>
+  <script src="assets/vendor/gsap.min.js"></script>
+  <script src="assets/js/api-config.js"></script>
+  <script src="assets/js/demo-data.js"></script>
+  <script src="assets/js/notifications.js"></script>
+  <script src="assets/js/modals.js"></script>
+  <script src="assets/js/navigation.js"></script>
+  <script src="assets/js/animations.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
