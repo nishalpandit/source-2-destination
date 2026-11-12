@@ -723,14 +723,13 @@ body.sidebar-collapsed .sidebar-user-card {
 
 .auth-banner-bg {
   position: absolute;
-  inset: -8px;
-  width: calc(100% + 16px);
-  height: calc(100% + 16px);
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   object-position: center;
   z-index: 1;
-  filter: blur(2.5px) brightness(0.98); /* 20% soft blur, 80% visible clarity */
-  transform: scale(1.02);
+  filter: none;
 }
 
 .auth-banner-overlay {
