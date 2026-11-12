@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Source 2 Destination — School &amp; Hostel Student Calling Management System</title>
+  <title>Sign In &amp; Register — Source 2 Destination</title>
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
   <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <script src="assets/vendor/tailwind-config.js"></script>
@@ -11,223 +11,428 @@
   <link rel="stylesheet" href="assets/css/main.css">
   <link rel="stylesheet" href="assets/css/layout.css">
   <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/tables.css">
   <link rel="stylesheet" href="assets/css/forms.css">
-  <link rel="stylesheet" href="assets/css/charts.css">
   <link rel="stylesheet" href="assets/css/animations.css">
   <link rel="stylesheet" href="assets/css/responsive.css">
+  <style>
+    /* Specific adjustments for 70/30 login layout */
+    .banner-graphic-card {
+      background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+      position: relative;
+    }
+    .banner-graphic-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 300ms ease;
+    }
+    .banner-graphic-card:hover img {
+      transform: scale(1.01);
+    }
+    .feature-pill-card {
+      padding: 14px 18px;
+      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.65);
+      border: 1px solid rgba(51, 65, 85, 0.8);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: all 200ms ease;
+    }
+    .feature-pill-card:hover {
+      background: rgba(30, 41, 59, 0.95);
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+    .dev-nav-banner {
+      background: #080C14;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.9);
+      color: #94A3B8;
+      font-size: 0.8rem;
+    }
+    .dev-nav-btn {
+      font-size: 0.74rem;
+      padding: 4px 10px;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 160ms ease;
+    }
+    .dev-nav-btn-super {
+      background: rgba(99, 102, 241, 0.15);
+      color: #C7D2FE;
+      border: 1px solid rgba(99, 102, 241, 0.35);
+    }
+    .dev-nav-btn-super:hover {
+      background: #6366F1;
+      color: #FFFFFF;
+    }
+    .dev-nav-btn-franchise {
+      background: rgba(6, 182, 212, 0.15);
+      color: #A5F3FC;
+      border: 1px solid rgba(6, 182, 212, 0.35);
+    }
+    .dev-nav-btn-franchise:hover {
+      background: #06B6D4;
+      color: #FFFFFF;
+    }
+    .dev-nav-btn-school {
+      background: rgba(16, 185, 129, 0.15);
+      color: #A7F3D0;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+    .dev-nav-btn-school:hover {
+      background: #10B981;
+      color: #FFFFFF;
+    }
+  </style>
 </head>
 <body data-root="" data-route="index.html">
-  <!-- Executive Top Header -->
-  <header style="background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--s2d-border);position:sticky;top:0;z-index:1020;">
-    <div class="container py-3 d-flex flex-wrap align-items-center justify-content-between gap-3">
-      <a href="index.html" class="d-flex align-items-center gap-3 text-decoration-none">
-        <img src="assets/images/logo.svg" alt="Source 2 Destination" width="36" height="36">
-        <div>
-          <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--s2d-heading);letter-spacing:-0.02em;">Source 2 Destination</div>
-          <div style="font-size:0.72rem;color:var(--s2d-text-secondary);font-weight:500;">School &amp; Hostel Student Calling Management Platform</div>
-        </div>
+
+  <!-- =========================================================================
+       DEVELOPMENT NAVIGATION BAR (TEMPORARY DEV SHORTCUTS - ALL DASHBOARDS)
+       ========================================================================= -->
+  <header class="dev-nav-banner py-2 px-3 d-flex flex-wrap align-items-center justify-content-between gap-2 sticky-top" style="z-index: 1040;">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-warning text-dark font-monospace fw-bold" style="font-size:0.7rem;letter-spacing:0.04em;">DEV SHORTCUTS</span>
+      <span class="d-none d-md-inline" style="font-size:0.78rem;color:#94A3B8;">Direct Portal Navigation (Temporary Development Phase):</span>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <a href="super-admin/dashboard.html" class="dev-nav-btn dev-nav-btn-super">
+        <i data-lucide="shield-check" style="width:13px;height:13px;"></i>
+        <span>Super Admin</span>
       </a>
-      <div class="d-flex align-items-center gap-2 flex-wrap">
-        <span class="demo-mode-pill">
-          <span class="demo-mode-dot"></span>
-          <span>Enterprise Frontend · DRF API Ready</span>
-        </span>
-        <a href="auth/login.html" class="btn-s2d btn-s2d-secondary">
-          <i data-lucide="lock"></i>
-          <span>Sign In Gateway</span>
-        </a>
-        <a href="super-admin/dashboard.html" class="btn-s2d btn-s2d-primary">
-          <span>Launch Super Admin</span>
-          <i data-lucide="arrow-right"></i>
-        </a>
-      </div>
+      <a href="franchise/dashboard.html" class="dev-nav-btn dev-nav-btn-franchise">
+        <i data-lucide="building-2" style="width:13px;height:13px;"></i>
+        <span>Franchise Dashboard</span>
+      </a>
+      <a href="school-admin/dashboard.html" class="dev-nav-btn dev-nav-btn-school">
+        <i data-lucide="graduation-cap" style="width:13px;height:13px;"></i>
+        <span>School Admin</span>
+      </a>
+      <a href="auth/login.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d" title="Legacy Auth Gateway">
+        <i data-lucide="key" style="width:12px;height:12px;"></i>
+        <span>Auth Suite</span>
+      </a>
     </div>
   </header>
 
-  <main class="container py-5">
-    <!-- Hero Overview -->
-    <div class="row align-items-center g-4 mb-5">
-      <div class="col-lg-8">
-        <div class="page-eyebrow mb-2">
-          <i data-lucide="shield-check" style="width:14px;height:14px;"></i>
-          <span>CENTRALIZED CAMPUS &amp; HOSTEL CALLING GOVERNANCE</span>
-        </div>
-        <h1 style="font-size:2.15rem;line-height:1.18;margin-bottom:14px;">Secure, Policy-Controlled Student-to-Guardian Calling Infrastructure</h1>
-        <p class="text-secondary-s2d mb-4" style="font-size:0.96rem;max-width:680px;line-height:1.65;">
-          <strong>Source 2 Destination</strong> enables residential schools, boarding hostels, and regional franchises to govern authorized guardian phone whitelists, calling schedules, duration limits, student account validity, credit recharges, and Android Enterprise kiosk terminals from three role-isolated web environments.
-        </p>
-        <div class="d-flex flex-wrap gap-2">
-          <span class="s2d-badge s2d-badge-indigo">80+ Dedicated HTML5 Module Pages</span>
-          <span class="s2d-badge s2d-badge-success">3 Role-Scoped Portals</span>
-          <span class="s2d-badge s2d-badge-neutral">Zero Browser Persistence · Ephemeral Demo State</span>
-          <span class="s2d-badge s2d-badge-info">Django REST Framework Integration Ready</span>
-        </div>
-      </div>
-      <div class="col-lg-4">
-        <div class="s2d-card">
-          <div class="s2d-card-header">
+  <!-- =========================================================================
+       70% BANNER / 30% LOGIN & SIGNUP SPLIT LAYOUT
+       ========================================================================= -->
+  <main class="auth-split-70-30">
+    
+    <!-- 70% LEFT PANEL: Project Brand Showcase & Graphic Banner -->
+    <section class="auth-banner-70">
+      <div style="position:relative;z-index:2;max-width:1100px;margin:0 auto;width:100%;">
+        
+        <!-- Brand Header -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+          <a href="index.html" class="d-inline-flex align-items-center gap-3 text-decoration-none text-white">
+            <img src="assets/images/logo.svg" alt="Source 2 Destination" width="40" height="40">
             <div>
-              <h2 class="s2d-card-title">Authentication Suite</h2>
-              <p class="s2d-card-subtitle">Role-aware enterprise identity screens</p>
+              <div style="font-family:var(--font-display);font-weight:700;font-size:1.15rem;letter-spacing:-0.02em;">Source 2 Destination</div>
+              <div style="font-size:0.75rem;color:#94A3B8;">Campus &amp; Hostel Calling Governance Platform</div>
             </div>
-            <span class="kpi-icon"><i data-lucide="key-round"></i></span>
-          </div>
-          <div class="s2d-card-body d-grid gap-2">
-            <a href="auth/login.html" class="btn-s2d btn-s2d-primary justify-content-between w-100">
-              <span>Role-Aware Sign In</span>
-              <i data-lucide="log-in"></i>
-            </a>
-            <a href="auth/forgot-password.html" class="btn-s2d btn-s2d-secondary justify-content-between w-100">
-              <span>Password Recovery Request</span>
-              <i data-lucide="mail-check"></i>
-            </a>
-            <a href="auth/reset-password.html" class="btn-s2d btn-s2d-secondary justify-content-between w-100">
-              <span>Credential Reset &amp; Policy Check</span>
-              <i data-lucide="shield-ellipsis"></i>
-            </a>
+          </a>
+          <div class="d-flex align-items-center gap-2">
+            <span class="s2d-badge no-dot" style="background:rgba(99,102,241,0.18);color:#C7D2FE;border-color:rgba(129,140,248,0.35);font-size:0.75rem;">
+              <i data-lucide="smartphone" style="width:13px;height:13px;margin-right:4px;"></i>
+              ANDROID ENTERPRISE KIOSK CERTIFIED
+            </span>
+            <span class="s2d-badge no-dot" style="background:rgba(16,185,129,0.18);color:#6EE7B7;border-color:rgba(16,185,129,0.35);font-size:0.75rem;">
+              <i data-lucide="shield-check" style="width:13px;height:13px;margin-right:4px;"></i>
+              WHITELIST ENFORCED
+            </span>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Three Independent Dashboard Environments -->
-    <div class="mb-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
-      <h2 class="h2-s2d mb-0">Select Role Environment</h2>
-      <span class="text-secondary-s2d" style="font-size:0.8rem;">Each portal enforces distinct navigation, KPIs, and operational scope</span>
-    </div>
+        <!-- Hero Headline & Description -->
+        <div class="mb-4">
+          <h1 style="color:#FFFFFF;font-size:2.25rem;line-height:1.2;font-weight:700;margin-bottom:12px;letter-spacing:-0.03em;">
+            Secure, Policy-Controlled Student Calling for Residential Schools &amp; Hostels
+          </h1>
+          <p style="color:#94A3B8;font-size:0.95rem;line-height:1.65;max-width:820px;margin-bottom:0;">
+            Unified governance for residential campus principals, regional franchise partners, and hostel wardens. Every outgoing student call is strictly confined to verified parent/guardian numbers, governed by weekly schedule matrices, duration limits, and wallet validity.
+          </p>
+        </div>
 
-    <div class="row g-4 mb-5">
-      <!-- 1. Super Admin -->
-      <div class="col-lg-4">
-        <div class="s2d-card h-100 d-flex flex-column justify-content-between">
-          <div>
-            <div class="s2d-card-header">
+        <!-- Generated Banner Graphic (70% Visual Core) -->
+        <div class="banner-graphic-card mb-4">
+          <img src="assets/images/login-banner.svg" alt="Source 2 Destination Calling Architecture Banner">
+        </div>
+
+        <!-- Key Architectural Features Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="feature-pill-card h-100">
+              <div class="p-2 rounded-3" style="background:rgba(99,102,241,0.2);color:#818CF8;">
+                <i data-lucide="shield-check" style="width:20px;height:20px;"></i>
+              </div>
               <div>
-                <span class="s2d-badge s2d-badge-indigo mb-2">ENVIRONMENT 01</span>
-                <h3 class="h2-s2d mb-1">Super Admin Dashboard</h3>
-                <p class="s2d-card-subtitle">Global platform governance, billing &amp; MDM fleet</p>
-              </div>
-              <span class="kpi-icon"><i data-lucide="shield"></i></span>
-            </div>
-            <div class="s2d-card-body">
-              <p class="text-secondary-s2d" style="font-size:0.83rem;">Full visibility across all franchises, boarding schools, global calling rules, subscription contracts, payment settlements, Android Enterprise devices, and RBAC permission matrices.</p>
-              <div class="d-flex flex-wrap gap-1 mb-3">
-                <a href="super-admin/schools/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Schools</a>
-                <a href="super-admin/school-admins/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">School Admins</a>
-                <a href="super-admin/validity/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity</a>
-                <a href="super-admin/recharges/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Recharges</a>
-                <a href="super-admin/subscriptions/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Subscriptions</a>
-                <a href="super-admin/devices/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Devices</a>
-                <a href="super-admin/roles-permissions/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">RBAC</a>
+                <div style="font-weight:600;font-size:0.86rem;color:#F8FAFC;margin-bottom:2px;">Strict Whitelist Enforcement</div>
+                <div style="font-size:0.76rem;color:#94A3B8;line-height:1.45;">Zero unauthorized outgoing calls. Dialing allowed only to verified guardian contacts.</div>
               </div>
             </div>
           </div>
-          <div class="s2d-card-footer">
-            <a href="super-admin/dashboard.html" class="btn-s2d btn-s2d-primary w-100">
-              <span>Enter Super Admin Portal</span>
-              <i data-lucide="arrow-up-right"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. Franchise -->
-      <div class="col-lg-4">
-        <div class="s2d-card h-100 d-flex flex-column justify-content-between">
-          <div>
-            <div class="s2d-card-header">
+          <div class="col-md-4">
+            <div class="feature-pill-card h-100">
+              <div class="p-2 rounded-3" style="background:rgba(6,182,212,0.2);color:#22D3EE;">
+                <i data-lucide="clock" style="width:20px;height:20px;"></i>
+              </div>
               <div>
-                <span class="s2d-badge s2d-badge-success mb-2">ENVIRONMENT 02</span>
-                <h3 class="h2-s2d mb-1">Franchise Dashboard</h3>
-                <p class="s2d-card-subtitle">Assigned territory schools, onboarding &amp; commissions</p>
-              </div>
-              <span class="kpi-icon emerald"><i data-lucide="network"></i></span>
-            </div>
-            <div class="s2d-card-body">
-              <p class="text-secondary-s2d" style="font-size:0.83rem;">Strictly scoped to franchise-allocated schools, bulk Excel student onboarding, duration configurations within global limits, recharge allocations, and earned commission ledgers.</p>
-              <div class="d-flex flex-wrap gap-1 mb-3">
-                <a href="franchise/schools/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Assigned Schools</a>
-                <a href="franchise/students/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Students</a>
-                <a href="franchise/bulk-upload/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Bulk Upload</a>
-                <a href="franchise/commissions/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Commissions</a>
-                <a href="franchise/transactions/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Transactions</a>
-                <a href="franchise/reports/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Reports</a>
+                <div style="font-weight:600;font-size:0.86rem;color:#F8FAFC;margin-bottom:2px;">Schedules &amp; Duration Caps</div>
+                <div style="font-size:0.76rem;color:#94A3B8;line-height:1.45;">Hostel calling hours (e.g. 17:00–19:30) with automatic duration cutoffs and cooldown periods.</div>
               </div>
             </div>
           </div>
-          <div class="s2d-card-footer">
-            <a href="franchise/dashboard.html" class="btn-s2d btn-s2d-primary w-100">
-              <span>Enter Franchise Portal</span>
-              <i data-lucide="arrow-up-right"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. School Admin -->
-      <div class="col-lg-4">
-        <div class="s2d-card h-100 d-flex flex-column justify-content-between">
-          <div>
-            <div class="s2d-card-header">
+          <div class="col-md-4">
+            <div class="feature-pill-card h-100">
+              <div class="p-2 rounded-3" style="background:rgba(16,185,129,0.2);color:#34D399;">
+                <i data-lucide="tablet-smartphone" style="width:20px;height:20px;"></i>
+              </div>
               <div>
-                <span class="s2d-badge s2d-badge-info mb-2">ENVIRONMENT 03</span>
-                <h3 class="h2-s2d mb-1">School Admin Dashboard</h3>
-                <p class="s2d-card-subtitle">Daily campus, guardian whitelist &amp; hostel operations</p>
-              </div>
-              <span class="kpi-icon sky"><i data-lucide="school"></i></span>
-            </div>
-            <div class="s2d-card-body">
-              <p class="text-secondary-s2d" style="font-size:0.83rem;">Campus-focused control over students, classes, sections, verified parent/guardian numbers, server-issued student codes, weekly hostel schedules, booth assignments, and wardens.</p>
-              <div class="d-flex flex-wrap gap-1 mb-3">
-                <a href="school-admin/students/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Students</a>
-                <a href="school-admin/guardians/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Guardians</a>
-                <a href="school-admin/student-codes/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Unique Codes</a>
-                <a href="school-admin/calling-schedules/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Schedules</a>
-                <a href="school-admin/device-assignments/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Devices</a>
-                <a href="school-admin/hostel-wardens/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Wardens</a>
+                <div style="font-weight:600;font-size:0.86rem;color:#F8FAFC;margin-bottom:2px;">Android Enterprise Kiosk</div>
+                <div style="font-size:0.76rem;color:#94A3B8;line-height:1.45;">Tamper-proof dedicated campus booth handsets with live telemetry and audit logging.</div>
               </div>
             </div>
-          </div>
-          <div class="s2d-card-footer">
-            <a href="school-admin/dashboard.html" class="btn-s2d btn-s2d-primary w-100">
-              <span>Enter School Admin Portal</span>
-              <i data-lucide="arrow-up-right"></i>
-            </a>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Backend Readiness Architecture Summary -->
-    <div class="s2d-card">
-      <div class="s2d-card-body">
-        <div class="row g-4 align-items-center">
-          <div class="col-md-8">
-            <h3 class="h3-s2d mb-1">Engineered for Seamless Django REST Framework Integration</h3>
-            <p class="text-secondary-s2d mb-0" style="font-size:0.83rem;">
-              Centralized endpoint definitions in <code>assets/js/api-config.js</code>, DRF serializer error slots on all forms, server-side pagination parameters, zero client-side persistent storage, and strict backend enforcement boundaries for RBAC, unique student calling codes, guardian whitelists, and Android Enterprise kiosk telemetry.
-            </p>
+      </div>
+
+      <!-- Left Panel Bottom Footer -->
+      <div style="position:relative;z-index:2;font-size:0.75rem;color:#64748B;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:16px;border-top:1px solid rgba(51,65,85,0.6);max-width:1100px;margin:0 auto;width:100%;">
+        <span>&copy; 2026 Source 2 Destination Systems Ltd. All rights reserved.</span>
+        <span>Enterprise Architecture · Django REST Framework (DRF) API Integration Ready</span>
+      </div>
+    </section>
+
+    <!-- 30% RIGHT PANEL: Login & Signup Forms -->
+    <section class="auth-form-30">
+      <div class="auth-card-30">
+        
+        <!-- Auth Tabs Navigation (Sign In vs Sign Up) -->
+        <div class="auth-tabs-nav" role="tablist">
+          <button type="button" class="auth-tab-btn active" id="tab-btn-signin" data-tab-target="#auth-tab-signin" role="tab" aria-selected="true">
+            <i data-lucide="log-in" style="width:15px;height:15px;"></i>
+            <span>Sign In</span>
+          </button>
+          <button type="button" class="auth-tab-btn" id="tab-btn-signup" data-tab-target="#auth-tab-signup" role="tab" aria-selected="false">
+            <i data-lucide="user-plus" style="width:15px;height:15px;"></i>
+            <span>Sign Up</span>
+          </button>
+        </div>
+
+        <!-- ==================== TAB 1: SIGN IN FORM ==================== -->
+        <div class="auth-tab-content active" id="auth-tab-signin" role="tabpanel">
+          <div class="mb-3">
+            <h2 class="h2-s2d mb-1" style="font-size:1.35rem;">Welcome back</h2>
+            <p class="text-secondary-s2d mb-0" style="font-size:0.82rem;">Sign in to your authorized institutional workspace.</p>
           </div>
-          <div class="col-md-4 text-md-end">
-            <a href="auth/login.html" class="btn-s2d btn-s2d-soft">
-              <i data-lucide="key-round"></i>
-              <span>Test Role-Based Sign In Flow</span>
-            </a>
+
+          <!-- Quick Demo Role Switcher Pills -->
+          <div class="mb-3 p-2.5 rounded-3" style="background:var(--s2d-bg);border:1px solid var(--s2d-border);">
+            <div style="font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--s2d-text-secondary);margin-bottom:6px;">
+              Quick Demo Role Presets
+            </div>
+            <div class="d-flex gap-1.5 flex-wrap">
+              <button type="button" class="btn-s2d btn-s2d-soft btn-xs-s2d" data-quick-role-fill="super-admin">Super Admin</button>
+              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d" data-quick-role-fill="franchise">Franchise</button>
+              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d" data-quick-role-fill="school-admin">School Admin</button>
+            </div>
+          </div>
+
+          <form id="s2d-auth-login-form" data-s2d-form data-redirect="super-admin/dashboard.html" data-success-title="Authenticated (Demo Mode)" data-success-desc="Routing to your role-scoped workspace...">
+            
+            <div class="s2d-field">
+              <label class="s2d-label" for="login-demo-role">Target Environment <span class="req-star">*</span></label>
+              <select id="login-demo-role" name="role_environment" class="s2d-select" required>
+                <option value="super-admin">Super Admin Dashboard (Global HQ)</option>
+                <option value="franchise">Franchise Dashboard (North-East EduNet)</option>
+                <option value="school-admin">School Admin Dashboard (Oakridge Academy)</option>
+              </select>
+            </div>
+
+            <div class="s2d-field">
+              <label class="s2d-label" for="login-email">Institutional Email <span class="req-star">*</span></label>
+              <input type="email" id="login-email" name="email" class="s2d-input" value="e.vance@source2destination.io" placeholder="name@institution.edu" required autocomplete="username">
+              <div data-drf-error="email"></div>
+            </div>
+
+            <div class="s2d-field">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="s2d-label mb-0" for="login-password">Password <span class="req-star">*</span></label>
+                <a href="auth/forgot-password.html" class="s2d-link" style="font-size:0.75rem;">Forgot password?</a>
+              </div>
+              <div style="position:relative;">
+                <input type="password" id="login-password" name="password" class="s2d-input" value="DemoPass123!" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:38px;">
+                <button type="button" class="btn" data-toggle-password="#login-password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
+                  <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.79rem;color:var(--s2d-text-secondary);cursor:pointer;">
+                <input type="checkbox" name="remember" class="s2d-checkbox" checked>
+                <span>Remember this terminal</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2.5">
+              <span>Sign In to Workspace</span>
+              <i data-lucide="arrow-right"></i>
+            </button>
+          </form>
+
+          <div class="text-center mt-3 pt-3 border-top" style="font-size:0.8rem;color:var(--s2d-text-secondary);">
+            <span>Need institutional onboarding? </span>
+            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.8rem;" onclick="switchAuthTab('signup')">Request Account / Sign Up</button>
           </div>
         </div>
+
+        <!-- ==================== TAB 2: SIGN UP FORM ==================== -->
+        <div class="auth-tab-content" id="auth-tab-signup" role="tabpanel">
+          <div class="mb-3">
+            <h2 class="h2-s2d mb-1" style="font-size:1.35rem;">Register Account</h2>
+            <p class="text-secondary-s2d mb-0" style="font-size:0.82rem;">Onboard your campus, hostel, or franchise territory.</p>
+          </div>
+
+          <form id="s2d-auth-signup-form" data-s2d-form data-redirect="index.html" data-success-title="Onboarding Request Submitted" data-success-desc="Your institutional registration has been queued for Super Admin authorization.">
+            
+            <div class="s2d-field">
+              <label class="s2d-label" for="signup-name">Full Name <span class="req-star">*</span></label>
+              <input type="text" id="signup-name" name="name" class="s2d-input" placeholder="e.g. Dr. Alistair Finch" required>
+            </div>
+
+            <div class="s2d-field">
+              <label class="s2d-label" for="signup-org">Institution / Organization Name <span class="req-star">*</span></label>
+              <input type="text" id="signup-org" name="organization" class="s2d-input" placeholder="e.g. St. Jude Residential Campus" required>
+            </div>
+
+            <div class="s2d-field">
+              <label class="s2d-label" for="signup-email">Institutional Work Email <span class="req-star">*</span></label>
+              <input type="email" id="signup-email" name="email" class="s2d-input" placeholder="admin@institution.edu" required autocomplete="username">
+            </div>
+
+            <div class="s2d-field">
+              <label class="s2d-label" for="signup-role">Institutional Role Type <span class="req-star">*</span></label>
+              <select id="signup-role" name="role_type" class="s2d-select" required>
+                <option value="school_admin">School Administrator (Residential Principal)</option>
+                <option value="franchise_partner">Franchise Partner (Territory Network)</option>
+                <option value="hostel_warden">Campus Hostel Warden / Calling Supervisor</option>
+              </select>
+            </div>
+
+            <div class="s2d-field">
+              <label class="s2d-label" for="signup-password">Create Password <span class="req-star">*</span></label>
+              <div style="position:relative;">
+                <input type="password" id="signup-password" name="password" class="s2d-input" data-password-strength placeholder="At least 8 characters" required autocomplete="new-password" style="padding-right:38px;">
+                <button type="button" class="btn" data-toggle-password="#signup-password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
+                  <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+              <div class="s2d-progress mt-2" style="height:4px;">
+                <div id="pwd-strength-bar" class="s2d-progress-bar rose" style="width:0%;"></div>
+              </div>
+              <span id="pwd-strength-label" class="field-hint" style="font-size:0.7rem;">Enter at least 8 characters with digits &amp; symbols</span>
+            </div>
+
+            <div class="s2d-field">
+              <label class="s2d-label" for="signup-password-confirm">Confirm Password <span class="req-star">*</span></label>
+              <div style="position:relative;">
+                <input type="password" id="signup-password-confirm" name="password_confirm" class="s2d-input" data-match-target="#signup-password" placeholder="Confirm password" required autocomplete="new-password" style="padding-right:38px;">
+                <button type="button" class="btn" data-toggle-password="#signup-password-confirm" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:4px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
+                  <i data-lucide="eye" style="width:16px;height:16px;"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="d-flex align-items-start gap-2 mb-0" style="font-size:0.77rem;color:var(--s2d-text-secondary);cursor:pointer;line-height:1.4;">
+                <input type="checkbox" name="terms_agreed" class="s2d-checkbox mt-0.5" required>
+                <span>I confirm institutional authority and agree to the <strong>Student Calling Privacy &amp; Whitelist Compliance Policy</strong>.</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2.5">
+              <span>Submit Registration Request</span>
+              <i data-lucide="shield-check"></i>
+            </button>
+          </form>
+
+          <div class="text-center mt-3 pt-3 border-top" style="font-size:0.8rem;color:var(--s2d-text-secondary);">
+            <span>Already have an account? </span>
+            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.8rem;" onclick="switchAuthTab('signin')">Sign In here</button>
+          </div>
+        </div>
+
       </div>
-    </div>
+    </section>
+
   </main>
 
+  <!-- =========================================================================
+       SCRIPTS & INTERACTIONS
+       ========================================================================= -->
+  <script src="assets/vendor/bootstrap.bundle.min.js"></script>
   <script src="assets/vendor/lucide.min.js"></script>
   <script src="assets/vendor/gsap.min.js"></script>
   <script src="assets/js/api-config.js"></script>
-  <script src="assets/js/demo-data.js"></script>
   <script src="assets/js/notifications.js"></script>
   <script src="assets/js/modals.js"></script>
-  <script src="assets/js/navigation.js"></script>
+  <script src="assets/js/forms.js"></script>
   <script src="assets/js/animations.js"></script>
   <script src="assets/js/app.js"></script>
+
+  <script>
+    // Tab switcher helper for Sign In and Sign Up
+    function switchAuthTab(tabKey) {
+      const signInBtn = document.getElementById('tab-btn-signin');
+      const signUpBtn = document.getElementById('tab-btn-signup');
+      const signInTab = document.getElementById('auth-tab-signin');
+      const signUpTab = document.getElementById('auth-tab-signup');
+
+      if (tabKey === 'signin') {
+        signInBtn.classList.add('active');
+        signUpBtn.classList.remove('active');
+        signInBtn.setAttribute('aria-selected', 'true');
+        signUpBtn.setAttribute('aria-selected', 'false');
+        signInTab.classList.add('active');
+        signUpTab.classList.remove('active');
+      } else {
+        signUpBtn.classList.add('active');
+        signInBtn.classList.remove('active');
+        signUpBtn.setAttribute('aria-selected', 'true');
+        signInBtn.setAttribute('aria-selected', 'false');
+        signUpTab.classList.add('active');
+        signInTab.classList.remove('active');
+      }
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    document.querySelectorAll('.auth-tab-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const target = btn.getAttribute('data-tab-target');
+        if (target === '#auth-tab-signin') {
+          switchAuthTab('signin');
+        } else {
+          switchAuthTab('signup');
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.lucide) window.lucide.createIcons();
+    });
+  </script>
 </body>
 </html>

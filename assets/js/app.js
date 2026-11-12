@@ -651,10 +651,11 @@
     const roleSelect = document.getElementById('login-demo-role');
     const emailInput = document.getElementById('login-email');
 
+    const rootPrefix = document.body.hasAttribute('data-root') ? document.body.getAttribute('data-root') : '../';
     const demoPresets = {
-      'super-admin': { email: 'e.vance@source2destination.io', target: '../super-admin/dashboard.html' },
-      'franchise':   { email: 'm.sterling@northeast-edunet.com', target: '../franchise/dashboard.html' },
-      'school-admin':{ email: 'admin@oakridge-academy.edu', target: '../school-admin/dashboard.html' }
+      'super-admin': { email: 'e.vance@source2destination.io', target: `${rootPrefix}super-admin/dashboard.html` },
+      'franchise':   { email: 'm.sterling@northeast-edunet.com', target: `${rootPrefix}franchise/dashboard.html` },
+      'school-admin':{ email: 'admin@oakridge-academy.edu', target: `${rootPrefix}school-admin/dashboard.html` }
     };
 
     if (roleSelect) {
