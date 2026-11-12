@@ -723,19 +723,20 @@ body.sidebar-collapsed .sidebar-user-card {
 
 .auth-banner-bg {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  inset: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
   object-fit: cover;
   object-position: center;
   z-index: 1;
-  filter: brightness(0.9);
+  filter: blur(2.5px) brightness(0.98); /* 20% soft blur, 80% visible clarity */
+  transform: scale(1.02);
 }
 
 .auth-banner-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(11, 17, 32, 0.75) 0%, rgba(11, 17, 32, 0.4) 40%, rgba(11, 17, 32, 0.88) 100%);
+  background: rgba(11, 17, 32, 0.2); /* 20% tint overlay, 80% visible */
   z-index: 2;
   pointer-events: none;
 }
