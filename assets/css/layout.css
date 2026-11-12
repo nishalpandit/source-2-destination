@@ -778,74 +778,28 @@ body.sidebar-collapsed .sidebar-user-card {
 
 .auth-card-30 {
   width: 100%;
-  max-width: 440px;
+  max-width: 420px;
   background: var(--s2d-surface);
   border: 1px solid var(--s2d-border);
   border-radius: 16px;
-  padding: 26px 26px 22px;
+  padding: 32px 28px;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
 }
 
 .auth-card-30 .s2d-field {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .auth-card-30 .s2d-label {
-  font-size: 0.78rem;
-  margin-bottom: 4px;
+  font-size: 0.82rem;
+  margin-bottom: 6px;
 }
 
 .auth-card-30 .s2d-input,
 .auth-card-30 .s2d-select {
-  height: 38px;
-  padding: 6px 12px;
-  font-size: 0.84rem;
-}
-
-.auth-tabs-nav {
-  display: flex;
-  padding: 3px;
-  background: var(--s2d-bg);
-  border: 1px solid var(--s2d-border);
-  border-radius: 10px;
-  margin-bottom: 18px;
-}
-
-.auth-tab-btn {
-  flex: 1;
-  padding: 7px 12px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--s2d-text-secondary);
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 160ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.auth-tab-btn.active {
-  background: var(--s2d-surface);
-  color: var(--s2d-heading);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-
-.auth-tab-content {
-  display: none;
-}
-
-.auth-tab-content.active {
-  display: block;
-  animation: fadeInAuth 180ms ease;
-}
-
-@keyframes fadeInAuth {
-  from { opacity: 0; transform: translateY(4px); }
-  to { opacity: 1; transform: translateY(0); }
+  height: 42px;
+  padding: 8px 14px;
+  font-size: 0.88rem;
 }
 
 @media (max-width: 1200px) {

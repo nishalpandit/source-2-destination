@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In &amp; Register — Source 2 Destination</title>
+  <title>Sign In — Source 2 Destination</title>
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
   <link rel="stylesheet" href="assets/vendor/bootstrap.min.css">
   <script src="assets/vendor/tailwind-config.js"></script>
@@ -129,7 +129,7 @@
   <header class="dev-top-strip">
     <div class="d-flex align-items-center gap-2">
       <span class="badge bg-warning text-dark font-monospace fw-bold" style="font-size:0.68rem;padding:3px 6px;">DEV MODE</span>
-      <span class="d-none d-lg-inline text-secondary" style="font-size:0.75rem;">Direct Portal Navigation (Temporary Dev Phase):</span>
+      <span class="d-none d-lg-inline text-secondary" style="font-size:0.75rem;">Direct Portal Navigation:</span>
     </div>
     <div class="d-flex align-items-center gap-2">
       <a href="super-admin/dashboard.html" class="dev-pill-btn super">
@@ -152,7 +152,7 @@
   </header>
 
   <!-- =========================================================================
-       70% BANNER / 30% LOGIN & SIGNUP SPLIT (ZERO SCROLL VIEWPORT)
+       70% BANNER / 30% LOGIN SPLIT (ZERO SCROLL VIEWPORT)
        ========================================================================= -->
   <main class="auth-split-70-30">
     
@@ -232,156 +232,55 @@
       </div>
     </section>
 
-    <!-- 30% RIGHT PANEL: Compact Non-Scrollable Login & Sign Up Card -->
+    <!-- 30% RIGHT PANEL: Clean Institutional Login Card (No Duplicates, No Signup) -->
     <section class="auth-form-30">
       <div class="auth-card-30">
         
-        <!-- Auth Tabs Switcher (Sign In vs Sign Up) -->
-        <div class="auth-tabs-nav" role="tablist">
-          <button type="button" class="auth-tab-btn active" id="tab-btn-signin" data-tab-target="#auth-tab-signin" role="tab" aria-selected="true">
-            <i data-lucide="log-in" style="width:14px;height:14px;"></i>
-            <span>Sign In</span>
-          </button>
-          <button type="button" class="auth-tab-btn" id="tab-btn-signup" data-tab-target="#auth-tab-signup" role="tab" aria-selected="false">
-            <i data-lucide="user-plus" style="width:14px;height:14px;"></i>
-            <span>Sign Up</span>
-          </button>
+        <div class="mb-4">
+          <div class="d-inline-flex align-items-center justify-content-center mb-3" style="width:44px;height:44px;border-radius:12px;background:rgba(99,102,241,0.12);color:var(--s2d-primary);">
+            <i data-lucide="lock" style="width:22px;height:22px;"></i>
+          </div>
+          <h2 class="h2-s2d mb-1" style="font-size:1.35rem;">Sign In</h2>
+          <p class="text-secondary-s2d mb-0" style="font-size:0.82rem;">Enter your institutional credentials to access your dashboard.</p>
         </div>
 
-        <!-- ==================== TAB 1: SIGN IN ==================== -->
-        <div class="auth-tab-content active" id="auth-tab-signin" role="tabpanel">
-          <div class="mb-2">
-            <h2 class="h2-s2d mb-0" style="font-size:1.25rem;">Workspace Sign In</h2>
-            <p class="text-secondary-s2d mb-0" style="font-size:0.78rem;">Choose a demo role preset or sign in with your email.</p>
+        <form id="s2d-auth-login-form" data-s2d-form data-redirect="super-admin/dashboard.html" data-success-title="Authenticated" data-success-desc="Opening your institutional workspace...">
+          
+          <div class="s2d-field">
+            <label class="s2d-label" for="login-email">Institutional Email <span class="req-star">*</span></label>
+            <input type="email" id="login-email" name="email" class="s2d-input" value="admin@institution.edu" placeholder="name@institution.edu" required autocomplete="username">
+            <div data-drf-error="email"></div>
           </div>
 
-          <!-- Quick Demo Role Switcher Pills -->
-          <div class="p-2 rounded-3 mb-2.5" style="background:var(--s2d-bg);border:1px solid var(--s2d-border);">
-            <div style="font-size:0.65rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--s2d-text-secondary);margin-bottom:4px;">
-              Quick Demo Role Presets
+          <div class="s2d-field">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="s2d-label mb-0" for="login-password">Password <span class="req-star">*</span></label>
+              <a href="auth/forgot-password.html" class="s2d-link" style="font-size:0.74rem;">Forgot password?</a>
             </div>
-            <div class="d-flex gap-1.5 flex-wrap">
-              <button type="button" class="btn-s2d btn-s2d-soft btn-xs-s2d py-1 px-2" style="font-size:0.72rem;" data-quick-role-fill="super-admin">Super Admin</button>
-              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d py-1 px-2" style="font-size:0.72rem;" data-quick-role-fill="franchise">Franchise</button>
-              <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d py-1 px-2" style="font-size:0.72rem;" data-quick-role-fill="school-admin">School Admin</button>
+            <div style="position:relative;">
+              <input type="password" id="login-password" name="password" class="s2d-input" value="DemoPass123!" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:38px;">
+              <button type="button" class="btn" data-toggle-password="#login-password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:3px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
+                <i data-lucide="eye" style="width:16px;height:16px;"></i>
+              </button>
             </div>
           </div>
 
-          <form id="s2d-auth-login-form" data-s2d-form data-redirect="super-admin/dashboard.html" data-success-title="Authenticated (Demo Mode)" data-success-desc="Routing to your role-scoped workspace...">
-            
-            <div class="s2d-field mb-2">
-              <label class="s2d-label" for="login-demo-role">Target Environment <span class="req-star">*</span></label>
-              <select id="login-demo-role" name="role_environment" class="s2d-select" required>
-                <option value="super-admin">Super Admin (Global HQ)</option>
-                <option value="franchise">Franchise Partner (North-East EduNet)</option>
-                <option value="school-admin">School Admin (Oakridge Academy)</option>
-              </select>
-            </div>
-
-            <div class="s2d-field mb-2">
-              <label class="s2d-label" for="login-email">Institutional Email <span class="req-star">*</span></label>
-              <input type="email" id="login-email" name="email" class="s2d-input" value="e.vance@source2destination.io" placeholder="name@institution.edu" required autocomplete="username">
-              <div data-drf-error="email"></div>
-            </div>
-
-            <div class="s2d-field mb-2">
-              <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="s2d-label mb-0" for="login-password">Password <span class="req-star">*</span></label>
-                <a href="auth/forgot-password.html" class="s2d-link" style="font-size:0.72rem;">Forgot?</a>
-              </div>
-              <div style="position:relative;">
-                <input type="password" id="login-password" name="password" class="s2d-input" value="DemoPass123!" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:34px;">
-                <button type="button" class="btn" data-toggle-password="#login-password" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);padding:2px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
-                  <i data-lucide="eye" style="width:15px;height:15px;"></i>
-                </button>
-              </div>
-            </div>
-
-            <div class="d-flex align-items-center justify-content-between mb-2.5">
-              <label class="d-flex align-items-center gap-1.5 mb-0" style="font-size:0.76rem;color:var(--s2d-text-secondary);cursor:pointer;">
-                <input type="checkbox" name="remember" class="s2d-checkbox" checked>
-                <span>Remember this terminal</span>
-              </label>
-            </div>
-
-            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2" style="font-size:0.85rem;">
-              <span>Sign In to Workspace</span>
-              <i data-lucide="arrow-right" style="width:15px;height:15px;"></i>
-            </button>
-          </form>
-
-          <div class="text-center mt-2.5 pt-2 border-top" style="font-size:0.76rem;color:var(--s2d-text-secondary);">
-            <span>New campus setup? </span>
-            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.76rem;" onclick="switchAuthTab('signup')">Register Institution</button>
-          </div>
-        </div>
-
-        <!-- ==================== TAB 2: SIGN UP ==================== -->
-        <div class="auth-tab-content" id="auth-tab-signup" role="tabpanel">
-          <div class="mb-2">
-            <h2 class="h2-s2d mb-0" style="font-size:1.25rem;">Register Account</h2>
-            <p class="text-secondary-s2d mb-0" style="font-size:0.78rem;">Onboard your campus, hostel, or franchise network.</p>
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.78rem;color:var(--s2d-text-secondary);cursor:pointer;">
+              <input type="checkbox" name="remember" class="s2d-checkbox" checked>
+              <span>Remember this terminal</span>
+            </label>
           </div>
 
-          <form id="s2d-auth-signup-form" data-s2d-form data-redirect="index.html" data-success-title="Onboarding Request Submitted" data-success-desc="Your institutional registration has been queued for Super Admin authorization.">
-            
-            <div class="s2d-field mb-2">
-              <label class="s2d-label" for="signup-name">Full Name <span class="req-star">*</span></label>
-              <input type="text" id="signup-name" name="name" class="s2d-input" placeholder="e.g. Dr. Alistair Finch" required>
-            </div>
+          <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2.5" style="font-size:0.88rem;">
+            <span>Sign In to Workspace</span>
+            <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+          </button>
+        </form>
 
-            <div class="s2d-field mb-2">
-              <label class="s2d-label" for="signup-org">Institution Name <span class="req-star">*</span></label>
-              <input type="text" id="signup-org" name="organization" class="s2d-input" placeholder="e.g. St. Jude Residential Campus" required>
-            </div>
-
-            <div class="s2d-field mb-2">
-              <label class="s2d-label" for="signup-email">Institutional Email <span class="req-star">*</span></label>
-              <input type="email" id="signup-email" name="email" class="s2d-input" placeholder="admin@institution.edu" required autocomplete="username">
-            </div>
-
-            <div class="s2d-field mb-2">
-              <label class="s2d-label" for="signup-role">Role Type <span class="req-star">*</span></label>
-              <select id="signup-role" name="role_type" class="s2d-select" required>
-                <option value="school_admin">School Admin (Residential Campus)</option>
-                <option value="franchise_partner">Franchise Partner (Territory)</option>
-                <option value="hostel_warden">Campus Hostel Warden</option>
-              </select>
-            </div>
-
-            <!-- Two-column password row to prevent overflow -->
-            <div class="row g-2 mb-2">
-              <div class="col-6">
-                <div class="s2d-field mb-0">
-                  <label class="s2d-label" for="signup-password">Password <span class="req-star">*</span></label>
-                  <input type="password" id="signup-password" name="password" class="s2d-input" placeholder="8+ chars" required autocomplete="new-password">
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="s2d-field mb-0">
-                  <label class="s2d-label" for="signup-password-confirm">Confirm <span class="req-star">*</span></label>
-                  <input type="password" id="signup-password-confirm" name="password_confirm" class="s2d-input" data-match-target="#signup-password" placeholder="Confirm" required autocomplete="new-password">
-                </div>
-              </div>
-            </div>
-
-            <div class="mb-2.5">
-              <label class="d-flex align-items-start gap-1.5 mb-0" style="font-size:0.73rem;color:var(--s2d-text-secondary);cursor:pointer;line-height:1.35;">
-                <input type="checkbox" name="terms_agreed" class="s2d-checkbox mt-0.5" required>
-                <span>I confirm institutional authority and agree to the <strong>Student Calling Privacy Policy</strong>.</span>
-              </label>
-            </div>
-
-            <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2" style="font-size:0.85rem;">
-              <span>Submit Registration</span>
-              <i data-lucide="shield-check" style="width:15px;height:15px;"></i>
-            </button>
-          </form>
-
-          <div class="text-center mt-2.5 pt-2 border-top" style="font-size:0.76rem;color:var(--s2d-text-secondary);">
-            <span>Already registered? </span>
-            <button type="button" class="btn p-0 s2d-link fw-semibold" style="font-size:0.76rem;" onclick="switchAuthTab('signin')">Sign In</button>
-          </div>
+        <div class="mt-4 pt-3 border-top text-center" style="font-size:0.74rem;color:var(--s2d-text-secondary);">
+          <i data-lucide="shield-check" style="width:14px;height:14px;color:#10B981;vertical-align:text-bottom;margin-right:3px;"></i>
+          <span>Enforced by Android Enterprise MDM &amp; Whitelist Protocol</span>
         </div>
 
       </div>
@@ -403,42 +302,6 @@
   <script src="assets/js/app.js"></script>
 
   <script>
-    // Tab switcher helper for Sign In and Sign Up
-    function switchAuthTab(tabKey) {
-      const signInBtn = document.getElementById('tab-btn-signin');
-      const signUpBtn = document.getElementById('tab-btn-signup');
-      const signInTab = document.getElementById('auth-tab-signin');
-      const signUpTab = document.getElementById('auth-tab-signup');
-
-      if (tabKey === 'signin') {
-        signInBtn.classList.add('active');
-        signUpBtn.classList.remove('active');
-        signInBtn.setAttribute('aria-selected', 'true');
-        signUpBtn.setAttribute('aria-selected', 'false');
-        signInTab.classList.add('active');
-        signUpTab.classList.remove('active');
-      } else {
-        signUpBtn.classList.add('active');
-        signInBtn.classList.remove('active');
-        signUpBtn.setAttribute('aria-selected', 'true');
-        signInBtn.setAttribute('aria-selected', 'false');
-        signUpTab.classList.add('active');
-        signInTab.classList.remove('active');
-      }
-      if (window.lucide) window.lucide.createIcons();
-    }
-
-    document.querySelectorAll('.auth-tab-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        const target = btn.getAttribute('data-tab-target');
-        if (target === '#auth-tab-signin') {
-          switchAuthTab('signin');
-        } else {
-          switchAuthTab('signup');
-        }
-      });
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
       if (window.lucide) window.lucide.createIcons();
     });
