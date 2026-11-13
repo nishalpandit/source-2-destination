@@ -32,11 +32,33 @@
         <div data-s2d-table="sch-classes-table"></div>
         <div class="s2d-modal-backdrop" id="fr-add-class-modal">
           <div class="s2d-modal-dialog"><div class="s2d-modal-header"><h3 class="s2d-card-title">Add School Class</h3><button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button></div>
-            <form data-s2d-form data-success-title="Class Created (Demo)"><div class="s2d-modal-body">
-              <div class="s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label><select class="s2d-select" required><option>Oakridge Residential Academy</option><option>Westfield Collegiate Hostel</option></select></div>
-              <div class="s2d-field"><label class="s2d-label">Class Name <span class="req-star">*</span></label><input type="text" class="s2d-input" placeholder="Grade 9" required></div>
-              <div class="s2d-field"><label class="s2d-label">Sections (Comma Separated) <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Section A, Section B" required></div>
-            </div><div class="s2d-modal-footer"><button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button><button type="submit" class="btn-s2d btn-s2d-primary">Create Class</button></div></form>
+            <form method="POST" action="index.html">
+              {% csrf_token %}
+              <div class="s2d-modal-body">
+                <div class="s2d-field">
+                  <label class="s2d-label">Assigned School <span class="req-star">*</span></label>
+                  <select name="school_id" class="s2d-select" required>
+                    {% for s in schools %}
+                    <option value="{{ s.code }}">{{ s.name }} ({{ s.code }})</option>
+                    {% empty %}
+                    <option value="SCH-1001">Oakridge Residential Academy</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label">Class Name <span class="req-star">*</span></label>
+                  <input type="text" name="class_name" class="s2d-input" placeholder="e.g. Grade 9" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label">Sections (Comma Separated) <span class="req-star">*</span></label>
+                  <input type="text" name="sections" class="s2d-input" value="Section A, Section B" required>
+                </div>
+              </div>
+              <div class="s2d-modal-footer">
+                <button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Create Class &amp; Sections</span></button>
+              </div>
+            </form>
           </div>
         </div>
     
@@ -56,6 +78,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ classes_json|safe }}) {
+      window.S2D_DEMO.classes = {{ classes_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

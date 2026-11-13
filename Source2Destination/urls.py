@@ -37,6 +37,8 @@ urlpatterns = [
     path('franchise/schools/edit.html', franchise_views.school_edit, name='franchise_school_edit'),
     path('franchise/students/', franchise_views.students_list, name='franchise_students_list'),
     path('franchise/students/list.html', franchise_views.students_list, name='franchise_students_list_html'),
+    path('franchise/classes/', franchise_views.classes_list, name='franchise_classes_list'),
+    path('franchise/classes/index.html', franchise_views.classes_list, name='franchise_classes_list_html'),
     re_path(r'^franchise/(?P<path>.+?)/?$', franchise_views.render_franchise_page, name='franchise_page'),
 
     # School Admin Environment

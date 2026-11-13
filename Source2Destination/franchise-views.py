@@ -4,12 +4,13 @@ Source 2 Destination — Regional Operations Portal
 Primary implementation source per AGENTS.md guidelines.
 """
 import os
+import json
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
-from .models import School, Franchise, Student
+from .models import School, Franchise, Student, AcademicClass, ClassSection
 
 
 def get_current_franchise(request):
@@ -171,6 +172,84 @@ def students_list(request):
         "active_students": active_students,
     }
     return render(request, 'franchise/students/list.html', context)
+
+
+def classes_list(request):
+    """Dynamic Franchise Assigned-School Classes & Sections view."""
+    franchise = get_current_franchise(request)
+    schools = School.objects.filter(franchise=franchise).order_by('name')
+
+    if request.method == "POST":
+        school_id = request.POST.get('school_id')
+        school = School.objects.filter(Q(code=school_id) | Q(name__icontains=school_id), franchise=franchise).first()
+        if not school:
+            school = schools.first()
+
+        class_name = (request.POST.get('class_name') or request.POST.get('className') or '').strip()
+        sections_str = (request.POST.get('sections') or 'Section A').strip()
+
+        if school and class_name:
+            digits = ''.join(c for c in class_name if c.isdigit())
+            code = f"CLS-{digits}" if digits else f"CLS-{AcademicClass.objects.filter(school=school).count() + 1:02d}"
+
+            cls_obj, _ = AcademicClass.objects.get_or_create(
+                school=school,
+                name=class_name,
+                defaults={
+                    "code": code,
+                    "supervisor": school.admin_name or "Faculty Coordinator",
+                    "default_daily_minutes": school.daily_duration_cap or 15,
+                    "schedule_group": "Standard Hostel Window",
+                    "status": "Active"
+                }
+            )
+
+            # Create sections from comma-separated string
+            sec_names = [s.strip() for s in sections_str.split(',') if s.strip()]
+            for sec_name in sec_names:
+                sec_letter = ''.join(c for c in sec_name if c.isalpha())
+                sec_code = f"SEC-{digits}{sec_letter[:1]}" if (digits and sec_letter) else f"SEC-{ClassSection.objects.filter(school=school).count() + 1:02d}"
+                ClassSection.objects.get_or_create(
+                    academic_class=cls_obj,
+                    name=sec_name,
+                    defaults={
+                        "school": school,
+                        "code": sec_code,
+                        "room_wing": "Campus Boarding Wing",
+                        "advisor": cls_obj.supervisor,
+                        "assigned_booth": "Main Campus Booth 1",
+                        "status": "Active"
+                    }
+                )
+
+        return redirect('/franchise/classes/index.html')
+
+    # Query all classes for the franchise's schools
+    classes_qs = AcademicClass.objects.filter(school__franchise=franchise, status='Active').select_related('school').order_by('school__name', 'name')
+
+    classes_data = [
+        {
+            "id": c.code,
+            "className": f"{c.school.name} — {c.name}" if schools.count() > 1 else c.name,
+            "supervisor": c.supervisor or "Faculty Coordinator",
+            "sectionsCount": c.sections.filter(status='Active').count(),
+            "studentsCount": Student.objects.filter(school=c.school, class_name__iexact=c.name).count(),
+            "activeAccounts": Student.objects.filter(school=c.school, class_name__iexact=c.name, status='Active').count(),
+            "defaultDailyMinutes": c.default_daily_minutes,
+            "scheduleGroup": c.schedule_group,
+            "status": c.status
+        }
+        for c in classes_qs
+    ]
+
+    context = {
+        "franchise": franchise,
+        "schools": schools,
+        "classes": classes_qs,
+        "classes_json": json.dumps(classes_data),
+        "total_classes": classes_qs.count(),
+    }
+    return render(request, 'franchise/classes/index.html', context)
 
 
 def render_franchise_page(request, path):

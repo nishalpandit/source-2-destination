@@ -162,10 +162,26 @@ def classes_list(request):
             )
         return redirect('/school-admin/classes/list.html')
 
-    classes_qs = AcademicClass.objects.filter(school=school, status='Active')
+    classes_qs = AcademicClass.objects.filter(school=school, status='Active').order_by('name')
+    classes_data = [
+        {
+            "id": c.code,
+            "className": c.name,
+            "supervisor": c.supervisor or "Faculty Coordinator",
+            "sectionsCount": c.sections.filter(status='Active').count(),
+            "studentsCount": Student.objects.filter(school=school, class_name__iexact=c.name).count(),
+            "activeAccounts": Student.objects.filter(school=school, class_name__iexact=c.name, status='Active').count(),
+            "defaultDailyMinutes": c.default_daily_minutes,
+            "scheduleGroup": c.schedule_group,
+            "status": c.status
+        }
+        for c in classes_qs
+    ]
+
     context = {
         "school": school,
         "classes": classes_qs,
+        "classes_json": json.dumps(classes_data),
         "total_classes": classes_qs.count(),
         "total_sections": ClassSection.objects.filter(school=school, status='Active').count(),
     }
@@ -208,12 +224,28 @@ def sections_list(request):
         return redirect('/school-admin/classes/sections.html')
 
     classes_qs = AcademicClass.objects.filter(school=school, status='Active').order_by('name')
-    sections_qs = ClassSection.objects.filter(school=school, status='Active')
+    sections_qs = ClassSection.objects.filter(school=school, status='Active').select_related('academic_class')
+
+    sections_data = [
+        {
+            "id": s.code,
+            "className": s.academic_class.name,
+            "sectionName": s.name,
+            "roomWing": s.room_wing or "Hostel Wing",
+            "advisor": s.advisor or s.academic_class.supervisor or "Section Advisor",
+            "studentsCount": Student.objects.filter(school=school, class_name__iexact=s.academic_class.name, section__iexact=s.name).count(),
+            "activeCallers": Student.objects.filter(school=school, class_name__iexact=s.academic_class.name, section__iexact=s.name, status='Active').count(),
+            "assignedBooth": s.assigned_booth,
+            "status": s.status
+        }
+        for s in sections_qs
+    ]
 
     context = {
         "school": school,
         "classes": classes_qs,
         "sections": sections_qs,
+        "sections_json": json.dumps(sections_data),
         "total_sections": sections_qs.count(),
     }
     return render(request, 'school-admin/classes/sections.html', context)
