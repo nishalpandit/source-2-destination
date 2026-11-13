@@ -37,10 +37,10 @@
         </div>
 
         <div class="row g-3 mb-4">
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Campuses</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">52</div><div class="kpi-meta"><span class="kpi-delta up">50 Active</span><span>2 Suspended</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Franchise Assigned</span><span class="kpi-icon emerald"><i data-lucide="network"></i></span></div><div class="kpi-value">100%</div><div class="kpi-meta"><span>4 Regional Partners</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Enrolled Students</span><span class="kpi-icon sky"><i data-lucide="users"></i></span></div><div class="kpi-value">18,430</div><div class="kpi-meta"><span>Avg 354 / campus</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Expiring Subscriptions</span><span class="kpi-icon amber"><i data-lucide="calendar-clock"></i></span></div><div class="kpi-value">4</div><div class="kpi-meta"><span class="kpi-delta warn">Action Needed</span><span>Within 30d</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Campuses</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">{{ total_campuses|default:"52" }}</div><div class="kpi-meta"><span class="kpi-delta up">{{ active_campuses|default:"50" }} Active</span><span>{{ suspended_campuses|default:"2" }} Suspended</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Franchise Assigned</span><span class="kpi-icon emerald"><i data-lucide="network"></i></span></div><div class="kpi-value">100%</div><div class="kpi-meta"><span>{{ franchise_count|default:"4" }} Regional Partners</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Enrolled Students</span><span class="kpi-icon sky"><i data-lucide="users"></i></span></div><div class="kpi-value">{{ total_enrolled|default:"18,430" }}</div><div class="kpi-meta"><span>Avg {{ avg_per_campus|default:"354" }} / campus</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Expiring Subscriptions</span><span class="kpi-icon amber"><i data-lucide="calendar-clock"></i></span></div><div class="kpi-value">{{ expiring_subs|default:"4" }}</div><div class="kpi-meta"><span class="kpi-delta warn">Action Needed</span><span>Within 30d</span></div></div></div>
         </div>
 
         <div data-s2d-table="sa-schools-table"></div>

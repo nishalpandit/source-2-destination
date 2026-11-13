@@ -33,3 +33,4 @@ def render_franchise_page(request, path):
             continue
 
     raise Http404(f"Franchise template '{clean_path}' not found")
+

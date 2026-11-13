@@ -35,7 +35,8 @@
 
         <div class="s2d-card">
           <div class="s2d-card-body">
-            <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="School Tenant Created (Demo)" data-success-desc="New school staged in session memory; ready for POST /api/v1/super-admin/schools/.">
+            <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="School Tenant Created" data-success-desc="New school registered in the database.">
+              {% csrf_token %}
               <div class="s2d-form-section">
                 <div class="form-section-meta">
                   <h3>Institution Identity</h3>
@@ -82,10 +83,14 @@
                     <label class="s2d-label" for="franchise_id">Assigned Franchise Partner <span class="req-star">*</span></label>
                     <select id="franchise_id" name="franchise_id" class="s2d-select" required>
                       <option value="">Select franchise partner...</option>
+                      {% for f in franchises %}
+                      <option value="{{ f.code }}">{{ f.code }} · {{ f.name }} ({{ f.commission_rate }}%)</option>
+                      {% empty %}
                       <option value="FRN-101">FRN-101 · North-East EduNet Partners (18%)</option>
                       <option value="FRN-102">FRN-102 · Pacific Crest Scholastic Group (16%)</option>
                       <option value="FRN-103">FRN-103 · Heartland Boarding Solutions (15%)</option>
                       <option value="FRN-104">FRN-104 · Atlantic Campus Connect (15%)</option>
+                      {% endfor %}
                     </select>
                   </div>
                   <div class="col-md-6 s2d-field">

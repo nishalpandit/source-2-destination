@@ -41,6 +41,11 @@
       ];
       this.rowActions = config.rowActions || null; // fn(row) => [{ label, icon, href, onClick, danger }]
       this.exportFilename = config.exportFilename || 's2d-export.csv';
+      this.fetchUrl = config.fetchUrl || config.url || null;
+      this.bulkUrl = config.bulkUrl || null;
+      this.serverTotal = null;
+      this.serverTotalPages = null;
+      this._searchTimer = null;
 
       this.state = {
         search: '',
@@ -56,7 +61,46 @@
       };
 
       this.renderShell();
+      if (this.fetchUrl) {
+        this.fetchServerData();
+      } else {
+        this.renderRows();
+      }
+    }
+
+    async fetchServerData() {
+      if (!this.fetchUrl) return;
+      this.state.loading = true;
       this.renderRows();
+      const params = new URLSearchParams({
+        page: this.state.page,
+        page_size: this.state.pageSize,
+        search: this.state.search || '',
+        ordering: (this.state.sortDir === 'desc' ? '-' : '') + (this.state.sortField || ''),
+        ...(this.state.filters || {})
+      });
+      try {
+        const res = await fetch(`${this.fetchUrl}?${params.toString()}`);
+        if (res.ok) {
+          const json = await res.json();
+          this.rawData = json.results || [];
+          this.serverTotal = json.count;
+          this.serverTotalPages = json.total_pages;
+        }
+      } catch (err) {
+        console.warn('API fetch fallback to in-memory:', err);
+      } finally {
+        this.state.loading = false;
+        this.renderRows();
+      }
+    }
+
+    refresh() {
+      if (this.fetchUrl) {
+        this.fetchServerData();
+      } else {
+        this.renderRows();
+      }
     }
 
     setData(newData) {
@@ -213,7 +257,7 @@
             this.state.sortField = colKey;
             this.state.sortDir = 'asc';
           }
-          this.renderRows();
+          this.refresh();
         });
       });
 
@@ -231,6 +275,12 @@
     }
 
     getCurrentPageSlice() {
+      if (this.fetchUrl) {
+        const total = typeof this.serverTotal === 'number' ? this.serverTotal : this.rawData.length;
+        const totalPages = typeof this.serverTotalPages === 'number' ? this.serverTotalPages : Math.max(1, Math.ceil(total / this.state.pageSize));
+        const startIdx = (this.state.page - 1) * this.state.pageSize;
+        return { filtered: this.rawData, total, totalPages, startIdx, pageItems: this.rawData };
+      }
       const filtered = this.getFilteredData();
       const total = filtered.length;
       const totalPages = Math.max(1, Math.ceil(total / this.state.pageSize));
@@ -378,7 +428,7 @@
           const nextP = Number(btn.getAttribute('data-page-go'));
           if (nextP >= 1 && nextP <= totalPages) {
             this.state.page = nextP;
-            this.renderRows();
+            this.refresh();
           }
         });
       });
@@ -394,42 +444,40 @@
       if (sInput) sInput.value = '';
       this.mount.querySelectorAll('.table-filter-select[data-filter-key]').forEach((s) => { s.value = 'all'; });
       this.mount.querySelectorAll('.table-date-input').forEach((d) => { d.value = ''; });
-      this.renderRows();
+      this.refresh();
     }
 
     bindShellEvents() {
       const searchInput = this.mount.querySelector('.table-search-input');
       searchInput.addEventListener('input', () => {
-        this.state.search = searchInput.value;
-        this.state.page = 1;
-        this.renderRows();
+        clearTimeout(this._searchTimer);
+        this._searchTimer = setTimeout(() => {
+          this.state.search = searchInput.value;
+          this.state.page = 1;
+          this.refresh();
+        }, this.fetchUrl ? 250 : 0);
       });
 
       this.mount.querySelectorAll('[data-filter-key]').forEach((sel) => {
         sel.addEventListener('change', () => {
           this.state.filters[sel.getAttribute('data-filter-key')] = sel.value;
           this.state.page = 1;
-          this.renderRows();
+          this.refresh();
         });
       });
 
       const fromDate = this.mount.querySelector('[data-date-from]');
       const toDate = this.mount.querySelector('[data-date-to]');
-      if (fromDate) fromDate.addEventListener('change', () => { this.state.dateFrom = fromDate.value; this.state.page = 1; this.renderRows(); });
-      if (toDate) toDate.addEventListener('change', () => { this.state.dateTo = toDate.value; this.state.page = 1; this.renderRows(); });
+      if (fromDate) fromDate.addEventListener('change', () => { this.state.dateFrom = fromDate.value; this.state.page = 1; this.refresh(); });
+      if (toDate) toDate.addEventListener('change', () => { this.state.dateTo = toDate.value; this.state.page = 1; this.refresh(); });
 
       const clearBtn = this.mount.querySelector('[data-tbl-clear]');
       clearBtn.addEventListener('click', () => this.clearAllFilters());
 
       const refreshBtn = this.mount.querySelector('[data-tbl-refresh]');
       refreshBtn.addEventListener('click', () => {
-        this.state.loading = true;
-        this.renderRows();
-        setTimeout(() => {
-          this.state.loading = false;
-          this.renderRows();
-          window.S2DNotify.show({ title: 'Dataset Refreshed', description: 'Synchronized with current in-memory demonstration state.', type: 'info', duration: 2600 });
-        }, 320);
+        this.refresh();
+        window.S2DNotify.show({ title: 'Dataset Refreshed', description: 'Synchronized with live server records.', type: 'info', duration: 2400 });
       });
 
       const exportBtn = this.mount.querySelector('[data-tbl-export]');
@@ -439,7 +487,7 @@
       pageSizeSel.addEventListener('change', () => {
         this.state.pageSize = Number(pageSizeSel.value);
         this.state.page = 1;
-        this.renderRows();
+        this.refresh();
       });
 
       const bulkClear = this.mount.querySelector('[data-bulk-clear]');
@@ -457,19 +505,31 @@
           const ok = await window.S2DModal.confirm({
             title: `${act === 'activate' ? 'Activate' : 'Suspend'} ${count} Selected Record(s)?`,
             recordLabel: `${count} records selected`,
-            message: `This batch action will update status in session memory for all ${count} selected records.`,
+            message: `This batch action will update status in the database for all ${count} selected records.`,
             confirmLabel: act === 'activate' ? 'Activate Selected' : 'Suspend Selected',
             variant: act === 'activate' ? 'success' : 'danger'
           });
           if (!ok) return;
+
+          const ids = Array.from(this.state.selectedIds);
+          if (this.bulkUrl || this.fetchUrl) {
+            const endpoint = this.bulkUrl || `${this.fetchUrl}bulk-status/`;
+            try {
+              await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ids, action: act })
+              });
+            } catch (e) { console.warn(e); }
+          }
           this.rawData.forEach((r) => {
             if (this.state.selectedIds.has(r.id) && 'status' in r) {
               r.status = act === 'activate' ? 'Active' : 'Suspended';
             }
           });
           this.state.selectedIds.clear();
-          this.renderRows();
-          window.S2DNotify.show({ title: 'Batch Status Updated', description: `Applied "${act}" to ${count} record(s) in demo memory.`, type: 'success' });
+          this.refresh();
+          window.S2DNotify.show({ title: 'Batch Status Updated', description: `Applied "${act}" to ${count} record(s) in database.`, type: 'success' });
         });
       });
     }

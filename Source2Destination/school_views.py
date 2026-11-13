@@ -33,3 +33,4 @@ def render_school_page(request, path):
             continue
 
     raise Http404(f"School Admin template '{clean_path}' not found")
+

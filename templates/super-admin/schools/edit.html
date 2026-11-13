@@ -24,19 +24,20 @@
       <main class="app-content">
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">EDIT TENANT CONFIGURATION · <span data-bind-field="id">SCH-1001</span></div>
-            <h1 class="page-title">Edit <span data-bind-field="name">Oakridge Residential Academy</span></h1>
+            <div class="page-eyebrow">EDIT TENANT CONFIGURATION · <span data-bind-field="id">{{ school.code|default:"SCH-1001" }}</span></div>
+            <h1 class="page-title">Edit <span data-bind-field="name">{{ school.name|default:"Oakridge Residential Academy" }}</span></h1>
             <p class="page-description">Modify school profile, franchise assignment, seat licensing, or account operational status.</p>
           </div>
           <div class="page-actions">
-            <a href="details.html?id=SCH-1001" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a>
+            <a href="details.html?id={{ school.code|default:'SCH-1001' }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a>
             <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Directory</span></a>
           </div>
         </div>
 
         <div class="s2d-card">
           <div class="s2d-card-body">
-            <form data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id=SCH-1001" data-success-title="School Record Updated (Demo)" data-success-desc="Changes saved to session memory.">
+            <form method="POST" action="edit.html?id={{ school.code|default:'SCH-1001' }}" data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id={{ school.code|default:'SCH-1001' }}" data-success-title="School Record Updated" data-success-desc="Changes saved to database.">
+              {% csrf_token %}
               <div class="s2d-form-section">
                 <div class="form-section-meta">
                   <h3>Institution Profile</h3>
@@ -45,19 +46,19 @@
                 <div class="row g-3">
                   <div class="col-md-8 s2d-field">
                     <label class="s2d-label">Official School Name <span class="req-star">*</span></label>
-                    <input type="text" name="name" class="s2d-input" data-bind-field="name" value="Oakridge Residential Academy" required>
+                    <input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ school.name|default:'Oakridge Residential Academy' }}" required>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label">Tenant ID (Read-Only)</label>
-                    <input type="text" class="s2d-input mono-code" data-bind-field="id" value="SCH-1001" readonly>
+                    <input type="text" class="s2d-input mono-code" data-bind-field="id" value="{{ school.code|default:'SCH-1001' }}" readonly>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">City &amp; State <span class="req-star">*</span></label>
-                    <input type="text" name="city" class="s2d-input" data-bind-field="city" value="Hartford, CT" required>
+                    <input type="text" name="city" class="s2d-input" data-bind-field="city" value="{{ school.city|default:'Hartford, CT' }}" required>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Campus Phone <span class="req-star">*</span></label>
-                    <input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="+1 (555) 210-9001" required>
+                    <input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone|default:'+1 (555) 210-9001' }}" required>
                   </div>
                 </div>
               </div>

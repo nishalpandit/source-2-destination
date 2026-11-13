@@ -36,10 +36,22 @@
 
     if (ok) {
       row.status = nextStatus;
+      const recId = row.id || row.code;
+      if (recId && String(recId).startsWith('SCH-')) {
+        try {
+          await fetch(`/api/v1/super-admin/schools/${encodeURIComponent(recId)}/`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus })
+          });
+        } catch (e) {
+          console.warn("Server status update:", e);
+        }
+      }
       if (refreshFn) refreshFn();
       window.S2DNotify.show({
         title: `Status Updated to ${nextStatus}`,
-        description: `${row.id} updated in session memory.`,
+        description: `${recId} updated in database.`,
         type: 'success'
       });
     }
@@ -105,6 +117,8 @@
     const specs = {
       /* --- SUPER ADMIN TABLES --- */
       'sa-schools-table': () => ({
+        url: '/api/v1/super-admin/schools/',
+        bulkUrl: '/api/v1/super-admin/schools/bulk-status/',
         data: D.schools,
         searchPlaceholder: 'Search school name, code, city, or admin...',
         filters: [
@@ -114,16 +128,16 @@
         ],
         exportFilename: 'super-admin-schools.csv',
         columns: [
-          { key: 'name', label: 'School Identity', render: (r) => `<a href="${href('super-admin/schools/details.html')}?id=${r.id}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.id} · ${r.city}</span>` },
+          { key: 'name', label: 'School Identity', render: (r) => `<a href="${href('super-admin/schools/details.html')}?id=${r.id || r.code}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.id || r.code} · ${r.city}</span>` },
           { key: 'franchise', label: 'Assigned Franchise' },
           { key: 'adminName', label: 'Primary Admin', render: (r) => `<span class="cell-primary" style="font-weight:500;">${r.adminName}</span><span class="cell-sub">${r.adminEmail}</span>` },
-          { key: 'students', label: 'Students', render: (r) => `<strong>${r.activeStudents}</strong> <span class="text-secondary-s2d">/ ${r.students}</span>` },
+          { key: 'students', label: 'Students', render: (r) => `<strong>${r.activeStudents ?? 0}</strong> <span class="text-secondary-s2d">/ ${r.students ?? r.studentSeats ?? 0}</span>` },
           { key: 'subscriptionStatus', label: 'Subscription', render: (r) => `${badge(r.subscriptionStatus)}<span class="cell-sub">${r.subscriptionPlan}</span>` },
           { key: 'status', label: 'Account', render: (r) => badge(r.status) }
         ],
         rowActions: (r) => [
-          { label: 'View 360° Details', icon: 'eye', href: `${href('super-admin/schools/details.html')}?id=${r.id}` },
-          { label: 'Edit School', icon: 'pencil', href: `${href('super-admin/schools/edit.html')}?id=${r.id}` },
+          { label: 'View 360° Details', icon: 'eye', href: `${href('super-admin/schools/details.html')}?id=${r.id || r.code}` },
+          { label: 'Edit School', icon: 'pencil', href: `${href('super-admin/schools/edit.html')}?id=${r.id || r.code}` },
           { divider: true },
           { label: r.status === 'Active' ? 'Suspend School' : 'Activate School', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
         ]

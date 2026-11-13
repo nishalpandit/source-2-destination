@@ -25,24 +25,24 @@
       <main class="app-content">
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">SCHOOL 360° DOSSIER · <span data-bind-field="id">SCH-1001</span></div>
-            <h1 class="page-title" data-bind-field="name">Oakridge Residential Academy</h1>
-            <p class="page-description"><span data-bind-field="city">Hartford, CT</span> · Assigned to <strong data-bind-field="franchise">North-East EduNet Partners</strong> · Primary Admin: <span data-bind-field="adminName">Dr. Arthur Pendelton</span></p>
+            <div class="page-eyebrow">SCHOOL 360° DOSSIER · <span data-bind-field="id">{{ school.code|default:"SCH-1001" }}</span></div>
+            <h1 class="page-title" data-bind-field="name">{{ school.name|default:"Oakridge Residential Academy" }}</h1>
+            <p class="page-description"><span data-bind-field="city">{{ school.city|default:"Hartford, CT" }}</span> · Assigned to <strong data-bind-field="franchise">{{ school.franchise_name_cache|default:"North-East EduNet Partners" }}</strong> · Primary Admin: <span data-bind-field="adminName">{{ school.admin_name|default:"Dr. Arthur Pendelton" }}</span></p>
           </div>
           <div class="page-actions">
-            <a href="edit.html?id=SCH-1001" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
-            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Suspend Campus Calling" data-record-label="SCH-1001 · Oakridge Residential Academy" data-confirm-prompt="Suspending this school immediately pauses outbound student calling across all 28 enrolled Android kiosks."><i data-lucide="ban"></i><span>Suspend School</span></button>
+            <a href="edit.html?id={{ school.code|default:'SCH-1001' }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
+            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Suspend Campus Calling" data-record-label="{{ school.code|default:'SCH-1001' }} · {{ school.name|default:'Oakridge Residential Academy' }}" data-confirm-prompt="Suspending this school immediately pauses outbound student calling across all {{ school.device_count|default:28 }} enrolled Android kiosks."><i data-lucide="ban"></i><span>Suspend School</span></button>
           </div>
         </div>
 
         <!-- 7 Mandatory Tabs from Section 5.2 -->
         <div class="s2d-tabs" data-s2d-tabs="school-detail-tabs" role="tablist">
           <button type="button" class="s2d-tab-btn active" data-tab-target="tab-overview">Overview</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="tab-students">Students (684)</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="tab-admins">Administrators (2)</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-students">Students ({{ school.enrolled_students|default:684 }})</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-admins">Administrators (1)</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-subscription">Subscription</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-usage">Calling Usage</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="tab-devices">Devices (28)</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-devices">Devices ({{ school.device_count|default:28 }})</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-transactions">Transactions</button>
         </div>
 
@@ -50,10 +50,10 @@
           <!-- Tab 1: Overview -->
           <div class="s2d-tab-panel active" id="tab-overview">
             <div class="row g-3 mb-4">
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Active Students</div><div class="kpi-value mt-2">658 <span class="text-secondary-s2d" style="font-size:0.9rem;">/ 684</span></div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Monthly Voice Usage</div><div class="kpi-value mt-2">42,850m</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Enrolled AE Kiosks</div><div class="kpi-value mt-2">28</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Subscription Status</div><div class="mt-2"><span class="s2d-badge s2d-badge-success">Active · Aug 2027</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Active Students</div><div class="kpi-value mt-2">{{ school.active_students|default:658 }} <span class="text-secondary-s2d" style="font-size:0.9rem;">/ {{ school.enrolled_students|default:684 }}</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Monthly Voice Usage</div><div class="kpi-value mt-2">{{ monthly_minutes|default:"42,850m" }}</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Enrolled AE Kiosks</div><div class="kpi-value mt-2">{{ school.device_count|default:28 }}</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Subscription Status</div><div class="mt-2"><span class="s2d-badge {% if school.subscription_status == 'Active' %}s2d-badge-success{% elif school.subscription_status == 'Expiring' %}s2d-badge-warning{% else %}s2d-badge-danger{% endif %}">{{ school.subscription_status|default:"Active" }} · {{ school.subscription_plan|default:"Enterprise" }}</span></div></div></div>
             </div>
             <div class="s2d-card">
               <div class="s2d-card-header"><h3 class="s2d-card-title">Institutional Metadata &amp; Governance</h3></div>
