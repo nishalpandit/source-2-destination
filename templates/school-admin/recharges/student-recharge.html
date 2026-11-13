@@ -30,12 +30,34 @@
           <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Recharge History</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-redirect="overview.html" data-success-title="Student Recharge Simulated">
+          <form method="POST" action="student-recharge.html" data-s2d-form data-redirect="overview.html" data-success-title="Student Recharge Applied" data-success-desc="Minutes and validity credited to student account.">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Student Account <span class="req-star">*</span></label><select name="student_id" class="s2d-select" required><option value="STU-4003">Noah Montgomery (S2D-OAK-8843 · 18m left · Expiring)</option><option value="STU-4005">Oliver Kingsley (S2D-OAK-8845 · 0m left · Expired)</option><option value="STU-4001">Liam Hawthorne (S2D-OAK-8841 · 142m left)</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Recharge Plan <span class="req-star">*</span></label><select name="plan_id" class="s2d-select" required><option value="RPL-02">Standard Term Calling Pack ($22.00 · +300 mins · 120d)</option><option value="RPL-01">Starter Monthly Pack ($8.00 · +90 mins · 30d)</option><option value="RPL-05">Emergency Top-Up Booster ($5.00 · +45 mins · 15d)</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Collection / Settlement Mode <span class="req-star">*</span></label><select name="payment_mode" class="s2d-select" required><option>Campus Bursar Desk Ledger</option><option>Hostel Contingency Credit</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Receipt / Voucher Reference <span class="req-star">*</span></label><input type="text" name="voucher_ref" class="s2d-input mono-code" value="OAK-DESK-2026-419" required></div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Student Account <span class="req-star">*</span></label>
+                <select name="student_id" class="s2d-select" required>
+                  {% for s in students %}
+                  <option value="{{ s.code }}">{{ s.name }} ({{ s.calling_code }} · {{ s.remaining_minutes }}m left · {{ s.validity_status }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Recharge Plan <span class="req-star">*</span></label>
+                <select name="plan_id" class="s2d-select" required>
+                  {% for p in plans %}
+                  <option value="{{ p.code }}">{{ p.name }} (${{ p.price }} · +{{ p.minutes_allocated }} mins · {{ p.validity_days }}d)</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Collection / Settlement Mode <span class="req-star">*</span></label>
+                <select name="payment_mode" class="s2d-select" required>
+                  <option value="Campus Bursar Desk Ledger">Campus Bursar Desk Ledger</option>
+                  <option value="Hostel Contingency Credit">Hostel Contingency Credit</option>
+                  <option value="Direct Guardian Deposit">Direct Guardian Deposit</option>
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Receipt / Voucher Reference <span class="req-star">*</span></label><input type="text" name="voucher_ref" class="s2d-input mono-code" placeholder="e.g. OAK-DESK-2026-419" required></div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="overview.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="zap"></i><span>Apply Recharge Credits</span></button></div></div>
           </form>

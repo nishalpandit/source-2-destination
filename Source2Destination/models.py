@@ -220,6 +220,21 @@ class Student(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def validity_status(self):
+        """Dynamic evaluation of student account validity status."""
+        if not self.validity_expiry:
+            return "Active"
+        today = timezone.now().date()
+        if today > self.validity_expiry:
+            diff_days = (today - self.validity_expiry).days
+            if diff_days <= 3:
+                return "Grace Period"
+            return "Expired"
+        elif (self.validity_expiry - today).days <= 14:
+            return "Expiring"
+        return "Active"
+
     class Meta:
         ordering = ['-id']
         indexes = [
@@ -371,3 +386,196 @@ class Guardian(models.Model):
 
     def __str__(self):
         return f"{self.code} · {self.name} ({self.student.name})"
+
+
+class GlobalDurationRule(models.Model):
+    """
+    Platform-wide global calling duration governance configured by Super Admin.
+    Serves as hard ceilings for all franchises and schools.
+    """
+    default_call_duration = models.PositiveIntegerField(default=12, help_text="Default per-call duration limit in minutes")
+    hard_max_call_duration = models.PositiveIntegerField(default=20, help_text="Hard maximum per-call duration ceiling in minutes")
+    max_daily_student_cap = models.PositiveIntegerField(default=30, help_text="Maximum daily cumulative minutes allowed per student")
+    max_weekly_student_cap = models.PositiveIntegerField(default=105, help_text="Maximum weekly cumulative minutes allowed per student")
+    low_balance_warn_sec = models.PositiveIntegerField(default=60, help_text="Audio warning threshold before auto-disconnect (seconds)")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Global Duration Rule"
+        verbose_name_plural = "Global Duration Rules"
+
+    def __str__(self):
+        return f"Global Ceiling: Max {self.hard_max_call_duration}m/call · Daily {self.max_daily_student_cap}m"
+
+
+class CampusDurationRule(models.Model):
+    """
+    Campus/wing-level duration rules configured by School Admin or Franchise Admin.
+    Strictly bounded by GlobalDurationRule hard ceilings.
+    """
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='duration_rules', db_index=True)
+    scope = models.CharField(max_length=128, default="School-Wide Default", help_text="e.g. School-Wide Default, Junior Wing, Senior Wing")
+    academic_class = models.ForeignKey(AcademicClass, on_delete=models.SET_NULL, null=True, blank=True, related_name='duration_rules')
+    max_call_duration = models.PositiveIntegerField(default=15, help_text="Per-call limit in minutes (max 20)")
+    daily_cumulative_limit = models.PositiveIntegerField(default=15, help_text="Daily cumulative minutes (max 30)")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['school', 'scope']
+        indexes = [
+            models.Index(fields=['school', 'scope']),
+        ]
+
+    def __str__(self):
+        return f"{self.school.code} · {self.scope}: {self.max_call_duration}m/call"
+
+
+class CallingScheduleRule(models.Model):
+    """
+    Time-window calling governance (Baseline Global or School-Specific Override).
+    Defines allowed, restricted (curfew/study), or warden-supervised calling windows.
+    """
+    POLICY_CHOICES = [
+        ('allowed', 'Allowed'),
+        ('restricted', 'Restricted'),
+        ('supervised', 'Supervised'),
+    ]
+
+    school = models.ForeignKey(School, on_delete=models.CASCADE, null=True, blank=True, related_name='schedules', db_index=True)
+    name = models.CharField(max_length=128, help_text="e.g. Morning Window, Academic Quiet Hours, Evening Calling Window")
+    days_of_week = models.CharField(max_length=64, default="MON,TUE,WED,THU,FRI,SAT,SUN", help_text="Comma-separated or day abbreviations")
+    start_time = models.TimeField(help_text="Window start e.g. 17:30:00")
+    end_time = models.TimeField(help_text="Window end e.g. 21:00:00")
+    policy_type = models.CharField(max_length=20, choices=POLICY_CHOICES, default='allowed', db_index=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['start_time']
+        indexes = [
+            models.Index(fields=['school', 'policy_type']),
+            models.Index(fields=['is_active']),
+        ]
+
+    def __str__(self):
+        scope_str = self.school.code if self.school else "Global Baseline"
+        return f"{scope_str} · {self.name} ({self.start_time.strftime('%H:%M')} - {self.end_time.strftime('%H:%M')}) · {self.policy_type}"
+
+
+class StudentScheduleException(models.Model):
+    """
+    Student-wise temporary schedule exception (e.g. for international students whose guardians are abroad).
+    """
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='schedule_exceptions', db_index=True)
+    allowed_window = models.CharField(max_length=64, help_text="e.g. 06:30 – 07:15")
+    valid_until = models.DateField(help_text="Expiration date of timezone exemption")
+    reason = models.CharField(max_length=255, default="International timezone guardian calling exemption")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-valid_until']
+        indexes = [
+            models.Index(fields=['student', 'valid_until']),
+        ]
+
+    def __str__(self):
+        return f"{self.student.code} · Exception {self.allowed_window} until {self.valid_until}"
+
+
+class GlobalValidityRule(models.Model):
+    """
+    Global student calling account validity, expiration, and grace-period policies.
+    """
+    grace_period_hours = models.PositiveIntegerField(default=72, help_text="Post-expiry grace window in hours")
+    reminder_days = models.CharField(max_length=64, default="14,7,3,1", help_text="Comma-separated reminder notification days before expiry")
+    preserve_unused_minutes = models.BooleanField(default=True, help_text="Preserve remaining minutes on recharge within 30 days")
+    auto_suspend_on_expiry = models.BooleanField(default=True, help_text="Auto-suspend student code on kiosk login when validity expired")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Global Validity Rule"
+        verbose_name_plural = "Global Validity Rules"
+
+    def __str__(self):
+        return f"Validity Policy: Grace {self.grace_period_hours}h · Auto-Suspend: {self.auto_suspend_on_expiry}"
+
+
+class RechargePlan(models.Model):
+    """
+    Standardized student calling recharge pack catalog.
+    """
+    code = models.CharField(max_length=32, unique=True, db_index=True, help_text="e.g. RPL-01, RPL-02")
+    name = models.CharField(max_length=128, db_index=True, help_text="e.g. Standard Term Calling Pack")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price in USD ($)")
+    minutes_allocated = models.PositiveIntegerField(help_text="Voice minutes credited")
+    validity_days = models.PositiveIntegerField(help_text="Validity extension in days")
+    per_call_cap = models.PositiveIntegerField(default=15, help_text="Per-call cap override in minutes")
+    badge_text = models.CharField(max_length=64, blank=True, help_text="e.g. MOST POPULAR, ANNUAL")
+    status = models.CharField(max_length=20, default='Active', choices=[('Active', 'Active'), ('Draft', 'Draft')], db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['price']
+        indexes = [
+            models.Index(fields=['status', 'price']),
+        ]
+
+    def __str__(self):
+        return f"{self.code} · {self.name} (${self.price} · {self.minutes_allocated}m · {self.validity_days}d)"
+
+
+class StudentRecharge(models.Model):
+    """
+    Ledger record for calling credit top-ups and recharge pack activations.
+    """
+    STATUS_CHOICES = [
+        ('Successful', 'Successful'),
+        ('Pending', 'Pending'),
+        ('Failed', 'Failed'),
+    ]
+
+    recharge_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. RCG-2026-001")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='recharges', db_index=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='recharges', db_index=True)
+    plan = models.ForeignKey(RechargePlan, on_delete=models.SET_NULL, null=True, blank=True, related_name='recharges')
+    plan_name_cache = models.CharField(max_length=128)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    minutes_added = models.PositiveIntegerField()
+    validity_days_added = models.PositiveIntegerField()
+    payment_mode = models.CharField(max_length=64, default="Campus Bursar Desk Ledger")
+    voucher_ref = models.CharField(max_length=128, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Successful', db_index=True)
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['school', 'status']),
+            models.Index(fields=['student', 'status']),
+            models.Index(fields=['created_at', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.recharge_id} · {self.student.name} · {self.plan_name_cache} (${self.amount})"
+
+
+class ValidityExtensionLog(models.Model):
+    """
+    Audit log of administrative bulk validity extensions.
+    """
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='validity_extensions')
+    target_type = models.CharField(max_length=64, default="School Cohort")
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, blank=True)
+    days_extended = models.PositiveIntegerField()
+    reason = models.CharField(max_length=255)
+    applied_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-applied_at']
+
+    def __str__(self):
+        return f"{self.school.code} extended +{self.days_extended}d ({self.reason})"
+

@@ -22,6 +22,19 @@ urlpatterns = [
     path('super-admin/schools/edit.html', admin_views.school_edit, name='super_admin_school_edit'),
     path('super-admin/schools/details.html', admin_views.school_details, name='super_admin_school_details'),
 
+    # Super Admin Calling Rules, Schedules, Validity & Recharges
+    path('super-admin/calling-duration/', admin_views.calling_duration, name='super_admin_calling_duration'),
+    path('super-admin/calling-duration/index.html', admin_views.calling_duration, name='super_admin_calling_duration_html'),
+    path('super-admin/calling-schedules/', admin_views.calling_schedules, name='super_admin_calling_schedules'),
+    path('super-admin/calling-schedules/index.html', admin_views.calling_schedules, name='super_admin_calling_schedules_html'),
+    path('super-admin/validity/', admin_views.validity_overview, name='super_admin_validity'),
+    path('super-admin/validity/overview.html', admin_views.validity_overview, name='super_admin_validity_overview_html'),
+    path('super-admin/validity/rules.html', admin_views.validity_rules, name='super_admin_validity_rules_html'),
+    path('super-admin/recharges/', admin_views.recharges_overview, name='super_admin_recharges'),
+    path('super-admin/recharges/overview.html', admin_views.recharges_overview, name='super_admin_recharges_overview_html'),
+    path('super-admin/recharges/create-plan.html', admin_views.recharge_create_plan, name='super_admin_recharge_create_plan'),
+    path('super-admin/recharges/history.html', admin_views.recharge_history, name='super_admin_recharge_history'),
+
     # Super Admin Dashboards & Subpages
     path('super-admin/', admin_views.dashboard, name='super_admin_dashboard'),
     path('super-admin/dashboard.html', admin_views.dashboard, name='super_admin_dashboard_html'),
@@ -42,6 +55,14 @@ urlpatterns = [
     path('franchise/students/edit.html', franchise_views.student_edit, name='franchise_student_edit'),
     path('franchise/classes/', franchise_views.classes_list, name='franchise_classes_list'),
     path('franchise/classes/index.html', franchise_views.classes_list, name='franchise_classes_list_html'),
+    path('franchise/calling-duration/', franchise_views.calling_duration, name='franchise_calling_duration'),
+    path('franchise/calling-duration/index.html', franchise_views.calling_duration, name='franchise_calling_duration_html'),
+    path('franchise/calling-schedules/', franchise_views.calling_schedules, name='franchise_calling_schedules'),
+    path('franchise/calling-schedules/index.html', franchise_views.calling_schedules, name='franchise_calling_schedules_html'),
+    path('franchise/validity/', franchise_views.validity_overview, name='franchise_validity'),
+    path('franchise/validity/index.html', franchise_views.validity_overview, name='franchise_validity_html'),
+    path('franchise/recharges/', franchise_views.recharges_overview, name='franchise_recharges'),
+    path('franchise/recharges/index.html', franchise_views.recharges_overview, name='franchise_recharges_html'),
     re_path(r'^franchise/(?P<path>.+?)/?$', franchise_views.render_franchise_page, name='franchise_page'),
 
     # School Admin Environment
@@ -64,6 +85,15 @@ urlpatterns = [
     path('school-admin/student-codes/index.html', school_views.student_codes, name='school_admin_student_codes_html'),
     path('school-admin/student-status/', school_views.student_status, name='school_admin_student_status'),
     path('school-admin/student-status/index.html', school_views.student_status, name='school_admin_student_status_html'),
+    path('school-admin/calling-duration/', school_views.calling_duration, name='school_admin_calling_duration'),
+    path('school-admin/calling-duration/index.html', school_views.calling_duration, name='school_admin_calling_duration_html'),
+    path('school-admin/calling-schedules/', school_views.calling_schedules, name='school_admin_calling_schedules'),
+    path('school-admin/calling-schedules/index.html', school_views.calling_schedules, name='school_admin_calling_schedules_html'),
+    path('school-admin/validity/', school_views.validity_overview, name='school_admin_validity'),
+    path('school-admin/validity/index.html', school_views.validity_overview, name='school_admin_validity_html'),
+    path('school-admin/recharges/', school_views.recharges_overview, name='school_admin_recharges'),
+    path('school-admin/recharges/overview.html', school_views.recharges_overview, name='school_admin_recharges_overview_html'),
+    path('school-admin/recharges/student-recharge.html', school_views.student_recharge, name='school_admin_student_recharge_html'),
     re_path(r'^school-admin/(?P<path>.+?)/?$', school_views.render_school_page, name='school_admin_page'),
 
     # Student Kiosk Application & Telemetry Endpoints (Api_views.py)

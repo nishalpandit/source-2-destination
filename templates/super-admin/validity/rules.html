@@ -34,14 +34,36 @@
           <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Validity Records</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-success-title="Global Validity Rules Saved (Demo)">
+          <form method="POST" action="rules.html" data-s2d-form data-success-title="Global Validity Rules Saved" data-success-desc="Validity policy and grace period thresholds updated.">
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Expiration &amp; Grace Window</h3><p>Define what happens when a student's calling validity reaches its end date.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Post-Expiry Grace Period (Hours) <span class="req-star">*</span></label><input type="number" name="grace_hours" class="s2d-input" min="0" max="168" value="72" required><span class="field-hint">Allows 1 supervised guardian notification call during grace window.</span></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Advance Reminder Dispatch <span class="req-star">*</span></label><select name="reminder_days" class="s2d-select"><option value="14,7,3,1">14d, 7d, 3d, and 24h before expiry</option><option value="7,3,1">7d, 3d, and 24h before expiry</option></select></div>
-                <div class="col-12"><div class="s2d-switch-row mb-2"><div><div class="fw-semibold text-heading">Preserve Unused Calling Minutes on Renewal Within 30 Days</div><div class="text-secondary-s2d" style="font-size:0.77rem;">Rolls over remaining balance when recharged within 30 days of expiration.</div></div><label class="s2d-switch"><input type="checkbox" checked><span class="s2d-switch-slider"></span></label></div></div>
-                <div class="col-12"><div class="s2d-switch-row"><div><div class="fw-semibold text-heading">Auto-Suspend Student Code When Validity Expires</div><div class="text-secondary-s2d" style="font-size:0.77rem;">Enforced by backend session validator on Android kiosk login.</div></div><label class="s2d-switch"><input type="checkbox" checked><span class="s2d-switch-slider"></span></label></div></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Post-Expiry Grace Period (Hours) <span class="req-star">*</span></label><input type="number" name="grace_hours" class="s2d-input" min="0" max="168" value="{{ rule.grace_period_hours }}" required><span class="field-hint">Allows 1 supervised guardian notification call during grace window.</span></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Advance Reminder Dispatch <span class="req-star">*</span></label>
+                  <select name="reminder_days" class="s2d-select">
+                    <option value="14,7,3,1" {% if rule.reminder_days == "14,7,3,1" %}selected{% endif %}>14d, 7d, 3d, and 24h before expiry</option>
+                    <option value="7,3,1" {% if rule.reminder_days == "7,3,1" %}selected{% endif %}>7d, 3d, and 24h before expiry</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <div class="s2d-switch-row mb-2">
+                    <div>
+                      <div class="fw-semibold text-heading">Preserve Unused Calling Minutes on Renewal Within 30 Days</div>
+                      <div class="text-secondary-s2d" style="font-size:0.77rem;">Rolls over remaining balance when recharged within 30 days of expiration.</div>
+                    </div>
+                    <label class="s2d-switch"><input type="checkbox" name="preserve_unused_minutes" {% if rule.preserve_unused_minutes %}checked{% endif %}><span class="s2d-switch-slider"></span></label>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="s2d-switch-row">
+                    <div>
+                      <div class="fw-semibold text-heading">Auto-Suspend Student Code When Validity Expires</div>
+                      <div class="text-secondary-s2d" style="font-size:0.77rem;">Enforced by backend session validator on Android kiosk login.</div>
+                    </div>
+                    <label class="s2d-switch"><input type="checkbox" name="auto_suspend_on_expiry" {% if rule.auto_suspend_on_expiry %}checked{% endif %}><span class="s2d-switch-slider"></span></label>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Global Validity Policy</span></button></div></div>

@@ -37,16 +37,50 @@
           </div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-md-4"><div class="s2d-card h-100"><div class="s2d-card-header"><div><span class="s2d-badge s2d-badge-neutral mb-1">RPL-01</span><h3 class="s2d-card-title">Starter Monthly Pack</h3></div><div class="h2-s2d mb-0 mono-code">$8.00</div></div><div class="s2d-card-body"><p class="text-secondary-s2d mb-3">90 calling minutes · 30 days validity · Max 10m per call.</p><a href="create-plan.html?plan=RPL-01" class="btn-s2d btn-s2d-secondary btn-sm-s2d w-100">Edit Plan</a></div></div></div>
-          <div class="col-md-4"><div class="s2d-card h-100" style="border-color:var(--s2d-primary);"><div class="s2d-card-header"><div><span class="s2d-badge s2d-badge-indigo mb-1">RPL-02 · MOST POPULAR</span><h3 class="s2d-card-title">Standard Term Calling Pack</h3></div><div class="h2-s2d mb-0 mono-code">$22.00</div></div><div class="s2d-card-body"><p class="text-secondary-s2d mb-3">300 calling minutes · 120 days validity · Max 15m per call.</p><a href="create-plan.html?plan=RPL-02" class="btn-s2d btn-s2d-primary btn-sm-s2d w-100">Edit Plan</a></div></div></div>
-          <div class="col-md-4"><div class="s2d-card h-100"><div class="s2d-card-header"><div><span class="s2d-badge s2d-badge-success mb-1">RPL-03 · ANNUAL</span><h3 class="s2d-card-title">Full Academic Year Pack</h3></div><div class="h2-s2d mb-0 mono-code">$54.00</div></div><div class="s2d-card-body"><p class="text-secondary-s2d mb-3">900 calling minutes · 300 days validity · Max 15m per call.</p><a href="create-plan.html?plan=RPL-03" class="btn-s2d btn-s2d-secondary btn-sm-s2d w-100">Edit Plan</a></div></div></div>
+          {% for p in plans %}
+          <div class="col-md-4">
+            <div class="s2d-card h-100" {% if p.badge_text == 'MOST POPULAR' %}style="border-color:var(--s2d-primary);"{% endif %}>
+              <div class="s2d-card-header">
+                <div>
+                  <span class="s2d-badge {% if p.badge_text == 'MOST POPULAR' %}s2d-badge-indigo{% elif p.badge_text == 'ANNUAL' %}s2d-badge-success{% else %}s2d-badge-neutral{% endif %} mb-1">
+                    {{ p.code }}{% if p.badge_text %} · {{ p.badge_text }}{% endif %}
+                  </span>
+                  <h3 class="s2d-card-title">{{ p.name }}</h3>
+                </div>
+                <div class="h2-s2d mb-0 mono-code">${{ p.price }}</div>
+              </div>
+              <div class="s2d-card-body">
+                <p class="text-secondary-s2d mb-3">{{ p.minutes_allocated }} calling minutes · {{ p.validity_days }} days validity · Max {{ p.per_call_cap }}m per call.</p>
+                <a href="create-plan.html?plan={{ p.code }}" class="btn-s2d {% if p.badge_text == 'MOST POPULAR' %}btn-s2d-primary{% else %}btn-s2d-secondary{% endif %} btn-sm-s2d w-100">Edit Plan</a>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
         </div>
         <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Direct Calling Credit Allocation (Campus / Student)</h3></div><div class="s2d-card-body">
-          <form data-s2d-form data-success-title="Calling Credits Allocated (Demo)">
+          <form method="POST" action="overview.html" data-s2d-form data-success-title="Calling Credits Allocated" data-success-desc="Minutes and validity topped up for target student.">
+            {% csrf_token %}
             <div class="row g-3 align-items-end">
-              <div class="col-md-4 s2d-field mb-0"><label class="s2d-label">Target School <span class="req-star">*</span></label><select name="school" class="s2d-select" required><option value="SCH-1001">Oakridge Residential Academy</option><option value="SCH-1002">Westfield Collegiate Hostel</option></select></div>
-              <div class="col-md-3 s2d-field mb-0"><label class="s2d-label">Recharge Plan <span class="req-star">*</span></label><select name="plan" class="s2d-select" required><option value="RPL-02">Standard Term ($22 · 300m)</option><option value="RPL-05">Emergency Booster ($5 · 45m)</option></select></div>
-              <div class="col-md-3 s2d-field mb-0"><label class="s2d-label">Student Code / Cohort <span class="req-star">*</span></label><input type="text" name="target_code" class="s2d-input mono-code" value="S2D-OAK-8841" required></div>
+              <div class="col-md-4 s2d-field mb-0">
+                <label class="s2d-label">Target School <span class="req-star">*</span></label>
+                <select name="school" class="s2d-select" required>
+                  {% for sch in schools %}
+                  <option value="{{ sch.code }}">{{ sch.code }} · {{ sch.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3 s2d-field mb-0">
+                <label class="s2d-label">Recharge Plan <span class="req-star">*</span></label>
+                <select name="plan" class="s2d-select" required>
+                  {% for p in plans %}
+                  <option value="{{ p.code }}">{{ p.name }} (${{ p.price }} · {{ p.minutes_allocated }}m)</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3 s2d-field mb-0">
+                <label class="s2d-label">Student Code / Cohort <span class="req-star">*</span></label>
+                <input type="text" name="target_code" class="s2d-input mono-code" placeholder="e.g. S2D-OAK-8841" required>
+              </div>
               <div class="col-md-2"><button type="submit" class="btn-s2d btn-s2d-primary w-100"><i data-lucide="zap"></i><span>Allocate</span></button></div>
             </div>
           </form>

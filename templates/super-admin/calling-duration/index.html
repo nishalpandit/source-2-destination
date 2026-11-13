@@ -29,20 +29,21 @@
           <div class="page-header-info"><div class="page-eyebrow">GLOBAL DURATION GOVERNANCE</div><h1 class="page-title">Calling Duration Configuration</h1><p class="page-description">Establish platform-wide default and maximum calling duration ceilings inherited by all franchises and schools.</p></div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Global Default Per-Call Limit</div><div class="kpi-value mt-2">12 Mins</div><div class="kpi-meta"><span>Applied when school unspecified</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Hard Maximum Per-Call Ceiling</div><div class="kpi-value mt-2">20 Mins</div><div class="kpi-meta"><span class="kpi-delta neutral">Enforced on Kiosk</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Max Daily Cumulative Cap</div><div class="kpi-value mt-2">30 Mins</div><div class="kpi-meta"><span>Across multiple sessions</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Global Default Per-Call Limit</div><div class="kpi-value mt-2">{{ rule.default_call_duration }} Mins</div><div class="kpi-meta"><span>Applied when school unspecified</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Hard Maximum Per-Call Ceiling</div><div class="kpi-value mt-2">{{ rule.hard_max_call_duration }} Mins</div><div class="kpi-meta"><span class="kpi-delta neutral">Enforced on Kiosk</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Max Daily Cumulative Cap</div><div class="kpi-value mt-2">{{ rule.max_daily_student_cap }} Mins</div><div class="kpi-meta"><span>Across multiple sessions</span></div></div></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-success-title="Global Duration Limits Updated (Demo)">
+          <form method="POST" action="index.html" data-s2d-form data-success-title="Global Duration Limits Updated" data-success-desc="Ceilings updated across all franchise and campus kiosks.">
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Default &amp; Maximum Ceilings</h3><p>Franchises and School Admins may configure stricter limits, but cannot exceed these ceilings.</p></div>
               <div class="row g-3">
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Default Per-Call Duration (Mins) <span class="req-star">*</span></label><input type="number" min="3" max="30" name="default_call" class="s2d-input" value="12" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Hard Max Per-Call Duration (Mins) <span class="req-star">*</span></label><input type="number" min="5" max="60" name="max_call" class="s2d-input" value="20" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Max Daily Student Cap (Mins) <span class="req-star">*</span></label><input type="number" min="5" max="90" name="max_daily" class="s2d-input" value="30" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Max Weekly Student Cap (Mins) <span class="req-star">*</span></label><input type="number" min="15" max="300" name="max_weekly" class="s2d-input" value="105" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Low-Balance Audio Warning Threshold (Seconds)</label><input type="number" min="15" max="180" name="warn_sec" class="s2d-input" value="60" required></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Default Per-Call Duration (Mins) <span class="req-star">*</span></label><input type="number" min="3" max="30" name="default_call" class="s2d-input" value="{{ rule.default_call_duration }}" required></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Hard Max Per-Call Duration (Mins) <span class="req-star">*</span></label><input type="number" min="5" max="60" name="max_call" class="s2d-input" value="{{ rule.hard_max_call_duration }}" required></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Max Daily Student Cap (Mins) <span class="req-star">*</span></label><input type="number" min="5" max="90" name="max_daily" class="s2d-input" value="{{ rule.max_daily_student_cap }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Max Weekly Student Cap (Mins) <span class="req-star">*</span></label><input type="number" min="15" max="300" name="max_weekly" class="s2d-input" value="{{ rule.max_weekly_student_cap }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Low-Balance Audio Warning Threshold (Seconds)</label><input type="number" min="15" max="180" name="warn_sec" class="s2d-input" value="{{ rule.low_balance_warn_sec }}" required></div>
               </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Duration Rules</span></button></div></div>

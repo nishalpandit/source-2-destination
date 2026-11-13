@@ -12,7 +12,15 @@ from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
-from .models import School, Franchise, Student, AcademicClass, ClassSection, Guardian, StudentStatusLog
+from .models import (
+    School, Franchise, Student, AcademicClass, ClassSection, Guardian, StudentStatusLog,
+    GlobalDurationRule, CampusDurationRule, CallingScheduleRule, StudentScheduleException,
+    RechargePlan, StudentRecharge
+)
+from .calling_services import (
+    get_global_duration_rule, ValidityService, RechargeService,
+    CallingDurationEngine, CallingScheduleEngine
+)
 
 
 def get_current_school(request):
@@ -563,6 +571,186 @@ def student_status(request):
         "suspended_count": students.filter(status='Suspended').count(),
     }
     return render(request, 'school-admin/student-status/index.html', context)
+
+
+def calling_duration(request):
+    """School Admin: Configure campus, wing, and class calling duration limits."""
+    school = get_current_school(request)
+    global_rule = get_global_duration_rule()
+
+    if request.method == "POST":
+        scope = request.POST.get('scope', 'School-Wide Default')
+        max_call = min(global_rule.hard_max_call_duration, int(request.POST.get('max_call', 15)))
+        daily_limit = min(global_rule.max_daily_student_cap, int(request.POST.get('daily_limit', 15)))
+
+        rule, _ = CampusDurationRule.objects.get_or_create(school=school, scope=scope)
+        rule.max_call_duration = max_call
+        rule.daily_cumulative_limit = daily_limit
+        rule.save()
+
+        if scope == 'School-Wide Default':
+            school.daily_duration_cap = daily_limit
+            school.save(update_fields=['daily_duration_cap'])
+
+        return redirect('/school-admin/calling-duration/index.html')
+
+    standard_rule = CampusDurationRule.objects.filter(school=school, scope="School-Wide Default").first()
+    junior_rule = CampusDurationRule.objects.filter(school=school, scope="Grades 7–8 (Junior Wing)").first()
+
+    context = {
+        "school": school,
+        "global_rule": global_rule,
+        "standard_cap": standard_rule.max_call_duration if standard_rule else school.daily_duration_cap or 15,
+        "junior_cap": junior_rule.max_call_duration if junior_rule else 10,
+    }
+    return render(request, 'school-admin/calling-duration/index.html', context)
+
+
+def calling_schedules(request):
+    """School Admin: School, class, and student-wise calling schedules and exception windows."""
+    school = get_current_school(request)
+
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        allowed_window = request.POST.get('allowed_window', '06:30 – 07:15').strip()
+        valid_until = request.POST.get('valid_until')
+
+        student = Student.objects.filter(
+            Q(code=student_id) | Q(calling_code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0),
+            school=school
+        ).first()
+
+        if student and allowed_window and valid_until:
+            StudentScheduleException.objects.create(
+                student=student,
+                allowed_window=allowed_window,
+                valid_until=valid_until,
+                reason="International timezone guardian calling exemption"
+            )
+        return redirect('/school-admin/calling-schedules/index.html')
+
+    students = Student.objects.filter(school=school).order_by('name')
+    classes = AcademicClass.objects.filter(school=school).order_by('name')
+    exceptions = StudentScheduleException.objects.filter(student__school=school).select_related('student')
+
+    classes_data = [
+        {
+            "id": c.code,
+            "className": c.name,
+            "supervisor": c.supervisor,
+            "sectionsCount": c.sections.filter(status='Active').count(),
+            "studentsCount": Student.objects.filter(school=school, class_name__iexact=c.name).count(),
+            "defaultDailyMinutes": c.default_daily_minutes,
+            "scheduleGroup": c.schedule_group,
+            "status": c.status
+        }
+        for c in classes
+    ]
+
+    context = {
+        "school": school,
+        "students": students,
+        "classes": classes,
+        "classes_json": json.dumps(classes_data),
+        "exceptions": exceptions,
+    }
+    return render(request, 'school-admin/calling-schedules/index.html', context)
+
+
+def validity_overview(request):
+    """School Admin: Student account validity & expiring accounts monitoring."""
+    school = get_current_school(request)
+    students_qs = Student.objects.filter(school=school).order_by('-id')
+
+    students_data = [
+        {
+            "id": s.code,
+            "name": s.name,
+            "studentCode": s.calling_code,
+            "school": school.name,
+            "validityStart": s.validity_start.strftime("%Y-%m-%d") if s.validity_start else "-",
+            "validityExpiry": s.validity_expiry.strftime("%Y-%m-%d") if s.validity_expiry else "-",
+            "remainingMinutes": s.remaining_minutes,
+            "validityStatus": ValidityService.evaluate(s)["status"],
+            "status": s.status,
+        }
+        for s in students_qs
+    ]
+
+    context = {
+        "school": school,
+        "students": students_qs,
+        "students_json": json.dumps(students_data),
+    }
+    return render(request, 'school-admin/validity/index.html', context)
+
+
+def recharges_overview(request):
+    """School Admin: Recharge desk overview and history."""
+    school = get_current_school(request)
+    recharges_qs = StudentRecharge.objects.filter(school=school).select_related('student', 'plan').order_by('-created_at')
+
+    recharges_data = [
+        {
+            "id": r.recharge_id,
+            "date": r.created_at.strftime("%Y-%m-%d %H:%M"),
+            "studentName": r.student.name,
+            "studentCode": r.student.calling_code,
+            "school": school.name,
+            "planName": r.plan_name_cache,
+            "minutesAdded": r.minutes_added,
+            "validityDays": r.validity_days_added,
+            "amount": float(r.amount),
+            "status": r.status,
+            "paymentMode": r.payment_mode,
+            "voucherRef": r.voucher_ref,
+        }
+        for r in recharges_qs
+    ]
+
+    context = {
+        "school": school,
+        "recharges": recharges_qs,
+        "recharges_json": json.dumps(recharges_data),
+    }
+    return render(request, 'school-admin/recharges/overview.html', context)
+
+
+def student_recharge(request):
+    """School Admin: Initiate student account recharge and top-up calling minutes."""
+    school = get_current_school(request)
+    students = Student.objects.filter(school=school).order_by('name')
+    plans = RechargePlan.objects.filter(status='Active').order_by('price')
+
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        plan_id = request.POST.get('plan_id')
+        payment_mode = request.POST.get('payment_mode', 'Campus Bursar Desk Ledger')
+        voucher_ref = request.POST.get('voucher_ref', '')
+
+        student = Student.objects.filter(
+            Q(code=student_id) | Q(calling_code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0),
+            school=school
+        ).first()
+        plan = RechargePlan.objects.filter(
+            Q(code=plan_id) | Q(id=plan_id if str(plan_id).isdigit() else 0)
+        ).first()
+
+        if student and plan:
+            RechargeService.process_recharge(
+                student=student,
+                plan=plan,
+                payment_mode=payment_mode,
+                voucher_ref=voucher_ref
+            )
+        return redirect('/school-admin/recharges/overview.html')
+
+    context = {
+        "school": school,
+        "students": students,
+        "plans": plans,
+    }
+    return render(request, 'school-admin/recharges/student-recharge.html', context)
 
 
 def render_school_page(request, path):

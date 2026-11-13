@@ -48,15 +48,44 @@
           </div>
           <div class="s2d-tab-panel" id="sc-class"><div data-s2d-table="sch-classes-table"></div></div>
           <div class="s2d-tab-panel" id="sc-student">
-            <div class="s2d-card"><div class="s2d-card-body">
+            <div class="s2d-card mb-4"><div class="s2d-card-body">
               <p class="text-secondary-s2d">Grant temporary time-zone exception windows for international boarding students whose parents reside abroad.</p>
-              <form data-s2d-form data-success-title="Student Exception Window Saved (Demo)" class="row g-3 align-items-end">
-                <div class="col-md-4"><label class="s2d-label">Student <span class="req-star">*</span></label><select class="s2d-select" required><option>Liam Hawthorne (S2D-OAK-8841)</option><option>Amelia Fletcher (S2D-OAK-8844)</option></select></div>
-                <div class="col-md-3"><label class="s2d-label">Allowed Window <span class="req-star">*</span></label><input type="text" class="s2d-input mono-code" value="06:30 – 07:15" required></div>
-                <div class="col-md-3"><label class="s2d-label">Valid Until <span class="req-star">*</span></label><input type="date" class="s2d-input" value="2026-12-20" required></div>
+              <form method="POST" action="index.html" data-s2d-form data-success-title="Student Exception Window Saved" data-success-desc="Temporary timezone calling rule created." class="row g-3 align-items-end">
+                {% csrf_token %}
+                <div class="col-md-4">
+                  <label class="s2d-label">Student <span class="req-star">*</span></label>
+                  <select name="student_id" class="s2d-select" required>
+                    {% for s in students %}
+                    <option value="{{ s.code }}">{{ s.name }} ({{ s.calling_code }})</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-3"><label class="s2d-label">Allowed Window <span class="req-star">*</span></label><input type="text" name="allowed_window" class="s2d-input mono-code" placeholder="06:30 – 07:15" required></div>
+                <div class="col-md-3"><label class="s2d-label">Valid Until <span class="req-star">*</span></label><input type="date" name="valid_until" class="s2d-input" required></div>
                 <div class="col-md-2"><button type="submit" class="btn-s2d btn-s2d-primary w-100">Grant Rule</button></div>
               </form>
             </div></div>
+            {% if exceptions %}
+            <div class="s2d-card">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Active Timezone Exceptions</h3></div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead><tr><th>Student</th><th>Code</th><th>Allowed Slot</th><th>Valid Until</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {% for ex in exceptions %}
+                    <tr>
+                      <td class="cell-primary">{{ ex.student.name }}</td>
+                      <td class="mono-code">{{ ex.student.calling_code }}</td>
+                      <td class="mono-code">{{ ex.allowed_window }}</td>
+                      <td class="mono-code">{{ ex.valid_until }}</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active Exception</span></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {% endif %}
           </div>
         </div>
     
@@ -76,6 +105,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ classes_json|safe }}) {
+      window.S2D_DEMO.classes = {{ classes_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

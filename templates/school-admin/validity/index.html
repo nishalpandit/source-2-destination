@@ -26,7 +26,7 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">CAMPUS VALIDITY DESK</div><h1 class="page-title">Student Account Validity &amp; Expiring Accounts</h1><p class="page-description">Monitor active, expiring (&lt;14 days), and expired student calling accounts at Oakridge Residential Academy.</p></div>
+          <div class="page-header-info"><div class="page-eyebrow">CAMPUS VALIDITY DESK</div><h1 class="page-title">Student Account Validity &amp; Expiring Accounts</h1><p class="page-description">Monitor active, expiring (&lt;14 days), and expired student calling accounts at {{ school.name|default:"Campus" }}.</p></div>
         </div>
         <div data-s2d-table="sa-validity-table"></div>
     
@@ -46,6 +46,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ students_json|safe }}) {
+      window.S2D_DEMO.students = {{ students_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

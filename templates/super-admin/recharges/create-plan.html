@@ -30,16 +30,30 @@
           <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Plans</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="overview.html" data-success-title="Recharge Plan Saved (Demo)">
+          <form method="POST" action="create-plan.html{% if plan %}?plan={{ plan.code }}{% endif %}" data-s2d-form data-warn-unsaved="true" data-redirect="overview.html" data-success-title="Recharge Plan Saved" data-success-desc="Recharge plan updated in database.">
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Plan Commercials</h3><p>Pricing and credit entitlement parameters.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Plan Name <span class="req-star">*</span></label><input type="text" name="plan_name" class="s2d-input" value="Standard Term Calling Pack" required></div>
-                <div class="col-md-3 s2d-field"><label class="s2d-label">Price (USD) <span class="req-star">*</span></label><input type="number" step="0.01" min="1" name="price" class="s2d-input" value="22.00" required></div>
-                <div class="col-md-3 s2d-field"><label class="s2d-label">Allocated Minutes <span class="req-star">*</span></label><input type="number" min="10" max="5000" name="minutes" class="s2d-input" value="300" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Validity Period (Days) <span class="req-star">*</span></label><input type="number" min="7" max="365" name="validity_days" class="s2d-input" value="120" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Per-Call Limit Override</label><select name="per_call_cap" class="s2d-select"><option value="15">15 Minutes</option><option value="10">10 Minutes</option><option value="20">20 Minutes</option></select></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Plan Status</label><select name="status" class="s2d-select"><option value="Active">Active (Published)</option><option value="Draft">Draft (Hidden)</option></select></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Plan Name <span class="req-star">*</span></label><input type="text" name="plan_name" class="s2d-input" value="{{ plan.name|default:'' }}" placeholder="e.g. Standard Term Calling Pack" required></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Price (USD) <span class="req-star">*</span></label><input type="number" step="0.01" min="1" name="price" class="s2d-input" value="{{ plan.price|default:'22.00' }}" required></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Allocated Minutes <span class="req-star">*</span></label><input type="number" min="10" max="5000" name="minutes" class="s2d-input" value="{{ plan.minutes_allocated|default:'300' }}" required></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Validity Period (Days) <span class="req-star">*</span></label><input type="number" min="7" max="365" name="validity_days" class="s2d-input" value="{{ plan.validity_days|default:'120' }}" required></div>
+                <div class="col-md-4 s2d-field">
+                  <label class="s2d-label">Per-Call Limit Override</label>
+                  <select name="per_call_cap" class="s2d-select">
+                    <option value="15" {% if plan.per_call_cap == 15 %}selected{% endif %}>15 Minutes</option>
+                    <option value="10" {% if plan.per_call_cap == 10 %}selected{% endif %}>10 Minutes</option>
+                    <option value="20" {% if plan.per_call_cap == 20 %}selected{% endif %}>20 Minutes</option>
+                  </select>
+                </div>
+                <div class="col-md-4 s2d-field">
+                  <label class="s2d-label">Plan Status</label>
+                  <select name="status" class="s2d-select">
+                    <option value="Active" {% if plan.status == 'Active' %}selected{% endif %}>Active (Published)</option>
+                    <option value="Draft" {% if plan.status == 'Draft' %}selected{% endif %}>Draft (Hidden)</option>
+                  </select>
+                </div>
               </div>
             </div>
             <div class="form-actions-bar"><div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved changes</span></div><div class="ms-auto d-flex gap-2"><a href="overview.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Recharge Plan</span></button></div></div>

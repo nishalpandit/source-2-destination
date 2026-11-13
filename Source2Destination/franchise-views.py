@@ -10,7 +10,14 @@ from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
-from .models import School, Franchise, Student, AcademicClass, ClassSection
+from .models import (
+    School, Franchise, Student, AcademicClass, ClassSection,
+    GlobalDurationRule, CampusDurationRule, CallingScheduleRule,
+    RechargePlan, StudentRecharge
+)
+from .calling_services import (
+    get_global_duration_rule, ValidityService, RechargeService
+)
 
 
 def get_current_franchise(request):
@@ -375,6 +382,123 @@ def classes_list(request):
         "total_classes": classes_qs.count(),
     }
     return render(request, 'franchise/classes/index.html', context)
+
+
+def calling_duration(request):
+    """Franchise: Configure territory calling duration limits within inherited Super Admin ceilings."""
+    franchise = get_current_franchise(request)
+    schools = School.objects.filter(franchise=franchise).order_by('name')
+    global_rule = get_global_duration_rule()
+
+    if request.method == "POST":
+        target_school = request.POST.get('target_school')
+        per_call_limit = min(global_rule.hard_max_call_duration, int(request.POST.get('per_call_limit', 15)))
+        daily_limit = min(global_rule.max_daily_student_cap, int(request.POST.get('daily_limit', 20)))
+
+        if target_school and target_school != "All Assigned Schools (Territory Default)":
+            sch = School.objects.filter(code=target_school, franchise=franchise).first() or School.objects.filter(name=target_school, franchise=franchise).first()
+            if sch:
+                sch.daily_duration_cap = daily_limit
+                sch.save(update_fields=['daily_duration_cap'])
+                rule, _ = CampusDurationRule.objects.get_or_create(school=sch, scope="School-Wide Default")
+                rule.max_call_duration = per_call_limit
+                rule.daily_cumulative_limit = daily_limit
+                rule.save()
+        else:
+            for sch in schools:
+                sch.daily_duration_cap = daily_limit
+                sch.save(update_fields=['daily_duration_cap'])
+                rule, _ = CampusDurationRule.objects.get_or_create(school=sch, scope="School-Wide Default")
+                rule.max_call_duration = per_call_limit
+                rule.daily_cumulative_limit = daily_limit
+                rule.save()
+
+        return redirect('/franchise/calling-duration/index.html')
+
+    context = {
+        "franchise": franchise,
+        "schools": schools,
+        "global_rule": global_rule,
+    }
+    return render(request, 'franchise/calling-duration/index.html', context)
+
+
+def calling_schedules(request):
+    """Franchise: Assigned-school calling schedule management."""
+    franchise = get_current_franchise(request)
+    schools = School.objects.filter(franchise=franchise).order_by('name')
+    first_school = schools.first()
+    schedules = CallingScheduleRule.objects.filter(
+        Q(school__in=schools) | Q(school__isnull=True),
+        is_active=True
+    ).order_by('start_time')
+
+    context = {
+        "franchise": franchise,
+        "schools": schools,
+        "first_school": first_school,
+        "schedules": schedules,
+    }
+    return render(request, 'franchise/calling-schedules/index.html', context)
+
+
+def validity_overview(request):
+    """Franchise: Territory student calling validity management."""
+    franchise = get_current_franchise(request)
+    students_qs = Student.objects.filter(school__franchise=franchise).select_related('school').order_by('-id')
+
+    students_data = [
+        {
+            "id": s.code,
+            "name": s.name,
+            "studentCode": s.calling_code,
+            "school": s.school.name,
+            "validityStart": s.validity_start.strftime("%Y-%m-%d") if s.validity_start else "-",
+            "validityExpiry": s.validity_expiry.strftime("%Y-%m-%d") if s.validity_expiry else "-",
+            "remainingMinutes": s.remaining_minutes,
+            "validityStatus": ValidityService.evaluate(s)["status"],
+            "status": s.status,
+        }
+        for s in students_qs
+    ]
+
+    context = {
+        "franchise": franchise,
+        "students": students_qs,
+        "students_json": json.dumps(students_data),
+    }
+    return render(request, 'franchise/validity/index.html', context)
+
+
+def recharges_overview(request):
+    """Franchise: Territory recharge requests and credit allocations."""
+    franchise = get_current_franchise(request)
+    recharges_qs = StudentRecharge.objects.filter(school__franchise=franchise).select_related('student', 'school').order_by('-created_at')
+
+    recharges_data = [
+        {
+            "id": r.recharge_id,
+            "date": r.created_at.strftime("%Y-%m-%d %H:%M"),
+            "studentName": r.student.name,
+            "studentCode": r.student.calling_code,
+            "school": r.school.name,
+            "planName": r.plan_name_cache,
+            "minutesAdded": r.minutes_added,
+            "validityDays": r.validity_days_added,
+            "amount": float(r.amount),
+            "status": r.status,
+            "paymentMode": r.payment_mode,
+            "voucherRef": r.voucher_ref,
+        }
+        for r in recharges_qs
+    ]
+
+    context = {
+        "franchise": franchise,
+        "recharges": recharges_qs,
+        "recharges_json": json.dumps(recharges_data),
+    }
+    return render(request, 'franchise/recharges/index.html', context)
 
 
 def render_franchise_page(request, path):

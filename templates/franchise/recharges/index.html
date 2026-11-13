@@ -47,6 +47,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ recharges_json|safe }}) {
+      window.S2D_DEMO.recharges = {{ recharges_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

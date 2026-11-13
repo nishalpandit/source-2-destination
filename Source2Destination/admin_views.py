@@ -10,7 +10,15 @@ from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
-from .models import School, Franchise
+from .models import (
+    School, Franchise, Student, GlobalDurationRule, CampusDurationRule,
+    CallingScheduleRule, GlobalValidityRule, RechargePlan, StudentRecharge,
+    ValidityExtensionLog
+)
+from .calling_services import (
+    get_global_duration_rule, get_global_validity_rule,
+    CallingDurationEngine, CallingScheduleEngine, ValidityService, RechargeService
+)
 
 
 def dashboard(request):
@@ -194,6 +202,212 @@ def school_details(request, school_id=None):
         "monthly_minutes": f"{school.active_students * 65:,}m" if school else "0m",
     }
     return render(request, 'super-admin/schools/details.html', context)
+
+
+def calling_duration(request):
+    """Super Admin: View & edit platform-wide calling duration ceilings."""
+    rule = get_global_duration_rule()
+
+    if request.method == "POST":
+        rule.default_call_duration = int(request.POST.get('default_call', rule.default_call_duration))
+        rule.hard_max_call_duration = int(request.POST.get('max_call', rule.hard_max_call_duration))
+        rule.max_daily_student_cap = int(request.POST.get('max_daily', rule.max_daily_student_cap))
+        rule.max_weekly_student_cap = int(request.POST.get('max_weekly', rule.max_weekly_student_cap))
+        rule.low_balance_warn_sec = int(request.POST.get('warn_sec', rule.low_balance_warn_sec))
+        rule.save()
+        return redirect('/super-admin/calling-duration/index.html')
+
+    context = {
+        "rule": rule,
+    }
+    return render(request, 'super-admin/calling-duration/index.html', context)
+
+
+def calling_schedules(request):
+    """Super Admin: Global & school calling schedule management."""
+    schools = School.objects.all().order_by('name')
+    baseline_schedules = CallingScheduleRule.objects.filter(school__isnull=True).order_by('start_time')
+
+    context = {
+        "schools": schools,
+        "baseline_schedules": baseline_schedules,
+    }
+    return render(request, 'super-admin/calling-schedules/index.html', context)
+
+
+def validity_rules(request):
+    """Super Admin: Global student validity and expiration rules."""
+    rule = get_global_validity_rule()
+
+    if request.method == "POST":
+        rule.grace_period_hours = int(request.POST.get('grace_hours', rule.grace_period_hours))
+        rule.reminder_days = request.POST.get('reminder_days', rule.reminder_days)
+        rule.preserve_unused_minutes = ('preserve_unused' in request.POST) or (request.POST.get('preserve_unused_minutes') == 'on')
+        rule.auto_suspend_on_expiry = ('auto_suspend' in request.POST) or (request.POST.get('auto_suspend_on_expiry') == 'on')
+        rule.save()
+        return redirect('/super-admin/validity/rules.html')
+
+    context = {
+        "rule": rule,
+    }
+    return render(request, 'super-admin/validity/rules.html', context)
+
+
+def validity_overview(request):
+    """Super Admin: Monitor student calling accounts validity & bulk extension."""
+    if request.method == "POST":
+        school_code = request.POST.get('school')
+        days = int(request.POST.get('days', 90))
+        reason = request.POST.get('reason', 'Administrative term extension')
+        school = School.objects.filter(code=school_code).first()
+        ValidityService.bulk_extend(school, days, reason)
+        return redirect('/super-admin/validity/overview.html')
+
+    students_qs = Student.objects.select_related('school').order_by('-id')
+    schools = School.objects.all().order_by('name')
+
+    # Compute KPI statistics dynamically
+    valid_active = 0
+    expiring_soon = 0
+    grace_period = 0
+    expired = 0
+
+    students_data = []
+    for s in students_qs:
+        v_info = ValidityService.evaluate(s)
+        status = v_info["status"]
+        if status == "Active":
+            valid_active += 1
+        elif status == "Expiring":
+            expiring_soon += 1
+        elif status == "Grace Period":
+            grace_period += 1
+        else:
+            expired += 1
+
+        students_data.append({
+            "id": s.code,
+            "name": s.name,
+            "studentCode": s.calling_code,
+            "school": s.school.name,
+            "validityStart": s.validity_start.strftime("%Y-%m-%d") if s.validity_start else "-",
+            "validityExpiry": s.validity_expiry.strftime("%Y-%m-%d") if s.validity_expiry else "-",
+            "remainingMinutes": s.remaining_minutes,
+            "validityStatus": status,
+            "status": s.status,
+        })
+
+    context = {
+        "schools": schools,
+        "students": students_qs,
+        "students_json": json.dumps(students_data),
+        "total_count": students_qs.count(),
+        "valid_active": valid_active,
+        "expiring_soon": expiring_soon,
+        "grace_period": grace_period,
+        "expired": expired,
+    }
+    return render(request, 'super-admin/validity/overview.html', context)
+
+
+def recharges_overview(request):
+    """Super Admin: Recharge plans catalog and direct credit allocation."""
+    if request.method == "POST":
+        school_code = request.POST.get('school')
+        plan_code = request.POST.get('plan')
+        target_code = request.POST.get('target_code', '').strip()
+
+        plan = RechargePlan.objects.filter(code=plan_code).first()
+        student = Student.objects.filter(
+            Q(code=target_code) | Q(calling_code=target_code)
+        ).first()
+
+        if plan and student:
+            RechargeService.process_recharge(
+                student=student,
+                plan=plan,
+                payment_mode="Super Admin Direct Credit Allocation",
+                voucher_ref=f"ALLOC-{plan.code}"
+            )
+        return redirect('/super-admin/recharges/overview.html')
+
+    plans = RechargePlan.objects.all().order_by('price')
+    schools = School.objects.all().order_by('name')
+
+    context = {
+        "plans": plans,
+        "schools": schools,
+    }
+    return render(request, 'super-admin/recharges/overview.html', context)
+
+
+def recharge_create_plan(request):
+    """Super Admin: Create or edit recharge plan."""
+    plan_code = request.GET.get('plan')
+    plan = RechargePlan.objects.filter(code=plan_code).first() if plan_code else None
+
+    if request.method == "POST":
+        name = request.POST.get('plan_name', '').strip()
+        price = float(request.POST.get('price', 22.00))
+        minutes = int(request.POST.get('minutes', 300))
+        validity_days = int(request.POST.get('validity_days', 120))
+        per_call_cap = int(request.POST.get('per_call_cap', 15))
+        status = request.POST.get('status', 'Active')
+
+        if plan:
+            plan.name = name
+            plan.price = price
+            plan.minutes_allocated = minutes
+            plan.validity_days = validity_days
+            plan.per_call_cap = per_call_cap
+            plan.status = status
+            plan.save()
+        else:
+            code = f"RPL-{RechargePlan.objects.count() + 1:02d}"
+            RechargePlan.objects.create(
+                code=code,
+                name=name,
+                price=price,
+                minutes_allocated=minutes,
+                validity_days=validity_days,
+                per_call_cap=per_call_cap,
+                status=status
+            )
+        return redirect('/super-admin/recharges/overview.html')
+
+    context = {
+        "plan": plan,
+    }
+    return render(request, 'super-admin/recharges/create-plan.html', context)
+
+
+def recharge_history(request):
+    """Super Admin: Global recharge ledger."""
+    recharges_qs = StudentRecharge.objects.select_related('student', 'school', 'plan').order_by('-created_at')
+
+    recharges_data = [
+        {
+            "id": r.recharge_id,
+            "date": r.created_at.strftime("%Y-%m-%d %H:%M"),
+            "studentName": r.student.name,
+            "studentCode": r.student.calling_code,
+            "school": r.school.name,
+            "planName": r.plan_name_cache,
+            "minutesAdded": r.minutes_added,
+            "validityDays": r.validity_days_added,
+            "amount": float(r.amount),
+            "status": r.status,
+            "paymentMode": r.payment_mode,
+            "voucherRef": r.voucher_ref,
+        }
+        for r in recharges_qs
+    ]
+
+    context = {
+        "recharges": recharges_qs,
+        "recharges_json": json.dumps(recharges_data),
+    }
+    return render(request, 'super-admin/recharges/history.html', context)
 
 
 def render_admin_page(request, path):

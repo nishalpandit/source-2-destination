@@ -28,13 +28,22 @@
         <div class="page-header">
           <div class="page-header-info"><div class="page-eyebrow">INHERITED POLICY CEILINGS</div><h1 class="page-title">Franchise Calling Duration Limits</h1><p class="page-description">Configure default calling duration for assigned schools within the global 20-minute per-call ceiling established by Super Admin.</p></div>
         </div>
-        <div class="s2d-callout indigo mb-4"><i data-lucide="shield-check"></i><div><strong>Inherited Super Admin Ceiling:</strong> Maximum Per-Call Duration cannot exceed <strong>20 minutes</strong>; Daily Cumulative Cap cannot exceed <strong>30 minutes</strong>.</div></div>
+        <div class="s2d-callout indigo mb-4"><i data-lucide="shield-check"></i><div><strong>Inherited Super Admin Ceiling:</strong> Maximum Per-Call Duration cannot exceed <strong>{{ global_rule.hard_max_call_duration }} minutes</strong>; Daily Cumulative Cap cannot exceed <strong>{{ global_rule.max_daily_student_cap }} minutes</strong>.</div></div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-success-title="Franchise Duration Defaults Saved (Demo)">
+          <form method="POST" action="index.html" data-s2d-form data-success-title="Franchise Duration Defaults Saved" data-success-desc="Applied duration policy to assigned schools.">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Target Assigned School <span class="req-star">*</span></label><select class="s2d-select" required><option>All Assigned Schools (Territory Default)</option><option>Oakridge Residential Academy</option><option>Westfield Collegiate Hostel</option></select></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Per-Call Limit (Max 20m) <span class="req-star">*</span></label><input type="number" min="3" max="20" class="s2d-input" value="15" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Daily Student Limit (Max 30m) <span class="req-star">*</span></label><input type="number" min="5" max="30" class="s2d-input" value="20" required></div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Target Assigned School <span class="req-star">*</span></label>
+                <select name="target_school" class="s2d-select" required>
+                  <option value="All Assigned Schools (Territory Default)">All Assigned Schools (Territory Default)</option>
+                  {% for sch in schools %}
+                  <option value="{{ sch.code }}">{{ sch.code }} · {{ sch.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Per-Call Limit (Max {{ global_rule.hard_max_call_duration }}m) <span class="req-star">*</span></label><input type="number" min="3" max="{{ global_rule.hard_max_call_duration }}" name="per_call_limit" class="s2d-input" value="15" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Daily Student Limit (Max {{ global_rule.max_daily_student_cap }}m) <span class="req-star">*</span></label><input type="number" min="5" max="{{ global_rule.max_daily_student_cap }}" name="daily_limit" class="s2d-input" value="20" required></div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Apply Territory Duration Rule</span></button></div></div>
           </form>

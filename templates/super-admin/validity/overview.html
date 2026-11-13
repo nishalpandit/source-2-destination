@@ -37,21 +37,29 @@
           </div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Valid Active Accounts</div><div class="kpi-value mt-2">17,210</div><div class="kpi-meta"><span class="kpi-delta up">93.4%</span><span>In good standing</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Expiring in 14 Days</div><div class="kpi-value mt-2">680</div><div class="kpi-meta"><span class="kpi-delta warn">Alerts Queued</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Grace Period (72h)</div><div class="kpi-value mt-2">112</div><div class="kpi-meta"><span>Emergency calls only</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Expired Accounts</div><div class="kpi-value mt-2">428</div><div class="kpi-meta"><span class="kpi-delta down">Paused</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Valid Active Accounts</div><div class="kpi-value mt-2">{{ valid_active }}</div><div class="kpi-meta"><span class="kpi-delta up">Active</span><span>In good standing</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Expiring in 14 Days</div><div class="kpi-value mt-2">{{ expiring_soon }}</div><div class="kpi-meta"><span class="kpi-delta warn">Alerts Queued</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Grace Period (72h)</div><div class="kpi-value mt-2">{{ grace_period }}</div><div class="kpi-meta"><span>Emergency calls only</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Expired Accounts</div><div class="kpi-value mt-2">{{ expired }}</div><div class="kpi-meta"><span class="kpi-delta down">Paused</span></div></div></div>
         </div>
         <div data-s2d-table="sa-validity-table"></div>
 
         <div class="s2d-modal-backdrop" id="extend-validity-modal">
           <div class="s2d-modal-dialog">
             <div class="s2d-modal-header"><h3 class="s2d-card-title">Extend Student Account Validity</h3><button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button></div>
-            <form data-s2d-form data-success-title="Validity Extension Applied (Demo)">
+            <form method="POST" action="overview.html" data-s2d-form data-success-title="Validity Extension Applied" data-success-desc="Validity extended for school cohort.">
+              {% csrf_token %}
               <div class="s2d-modal-body">
-                <div class="s2d-field"><label class="s2d-label">Target School / Cohort <span class="req-star">*</span></label><select name="school" class="s2d-select" required><option value="SCH-1001">Oakridge Residential Academy (Expiring Cohort)</option><option value="SCH-1003">St. Jude Boarding Institute (All Active)</option></select></div>
+                <div class="s2d-field">
+                  <label class="s2d-label">Target School / Cohort <span class="req-star">*</span></label>
+                  <select name="school" class="s2d-select" required>
+                    {% for sch in schools %}
+                    <option value="{{ sch.code }}">{{ sch.code }} · {{ sch.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
                 <div class="s2d-field"><label class="s2d-label">Extension Duration (Days) <span class="req-star">*</span></label><input type="number" name="days" class="s2d-input" min="7" max="365" value="90" required></div>
-                <div class="s2d-field"><label class="s2d-label">Administrative Justification <span class="req-star">*</span></label><input type="text" name="reason" class="s2d-input" placeholder="Spring term academic calendar extension" required></div>
+                <div class="s2d-field"><label class="s2d-label">Administrative Justification <span class="req-star">*</span></label><input type="text" name="reason" class="s2d-input" placeholder="e.g. Spring term academic calendar extension" required></div>
               </div>
               <div class="s2d-modal-footer"><button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button><button type="submit" class="btn-s2d btn-s2d-primary">Apply Extension</button></div>
             </form>
@@ -74,6 +82,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ students_json|safe }}) {
+      window.S2D_DEMO.students = {{ students_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

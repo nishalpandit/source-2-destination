@@ -66,9 +66,22 @@
             <table class="s2d-table">
               <thead><tr><th>School</th><th>Timezone</th><th>Weekday Evening Window</th><th>Sunday Window</th><th>Curfew Cutoff</th><th>Policy State</th></tr></thead>
               <tbody>
-                <tr><td class="cell-primary">Oakridge Residential Academy</td><td>EST</td><td class="mono-code">17:30 – 21:00</td><td class="mono-code">10:00 – 20:00</td><td class="mono-code">21:30</td><td><span class="s2d-badge s2d-badge-success">Active Override</span></td></tr>
-                <tr><td class="cell-primary">Westfield Collegiate Hostel</td><td>EST</td><td class="mono-code">17:00 – 20:30</td><td class="mono-code">09:00 – 20:30</td><td class="mono-code">21:00</td><td><span class="s2d-badge s2d-badge-indigo">Global Default</span></td></tr>
-                <tr><td class="cell-primary">Greenwood International Prep</td><td>PST</td><td class="mono-code">16:30 – 20:30</td><td class="mono-code">10:00 – 21:00</td><td class="mono-code">21:30</td><td><span class="s2d-badge s2d-badge-success">Active Override</span></td></tr>
+                {% for sch in schools %}
+                <tr>
+                  <td class="cell-primary">{{ sch.name }}</td>
+                  <td>{{ sch.timezone }}</td>
+                  <td class="mono-code">{{ sch.calling_window_start|time:"H:i" }} – {{ sch.calling_window_end|time:"H:i" }}</td>
+                  <td class="mono-code">10:00 – 20:00</td>
+                  <td class="mono-code">21:30</td>
+                  <td>
+                    {% if sch.calling_window_start %}
+                    <span class="s2d-badge s2d-badge-success">Active Override</span>
+                    {% else %}
+                    <span class="s2d-badge s2d-badge-indigo">Global Default</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>
