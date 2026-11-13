@@ -77,6 +77,16 @@
         } catch (e) {
           console.warn("Server section status update:", e);
         }
+      } else if (recId && String(recId).startsWith('GRD-')) {
+        try {
+          await fetch(`/api/v1/school-admin/guardians/${encodeURIComponent(recId)}/`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus })
+          });
+        } catch (e) {
+          console.warn("Server guardian status update:", e);
+        }
       }
       if (refreshFn) refreshFn();
       window.S2DNotify.show({
@@ -576,29 +586,37 @@
         };
       },
 
-      'sch-guardians-table': () => ({
-        data: D.guardians,
-        searchPlaceholder: 'Search guardian name, student, or authorized phone...',
-        filters: [
-          { key: 'relation', label: 'Relation', options: ['Father', 'Mother', 'Legal Guardian'] },
-          { key: 'status', label: 'Status', options: ['Active', 'Inactive'] }
-        ],
-        exportFilename: 'authorized-guardians.csv',
-        columns: [
-          { key: 'name', label: 'Guardian Identity', render: (r) => `<a href="${href('school-admin/guardians/details.html')}?id=${r.id}" class="cell-primary">${r.name}</a><span class="cell-sub">${r.relation} · ${r.email}</span>` },
-          { key: 'studentName', label: 'Linked Student', render: (r) => `<span class="cell-primary">${r.studentName}</span><span class="cell-sub">${r.className}</span>` },
-          { key: 'fatherPhone', label: 'Father Phone', render: (r) => `<span class="mono-code">${r.fatherPhone}</span>` },
-          { key: 'motherPhone', label: 'Mother Phone', render: (r) => `<span class="mono-code">${r.motherPhone}</span>` },
-          { key: 'verification', label: 'Whitelist & KYC', render: (r) => `${badge(r.verification)}<span class="cell-sub">${r.whitelistStatus}</span>` },
-          { key: 'status', label: 'Status', render: (r) => badge(r.status) }
-        ],
-        rowActions: (r) => [
-          { label: 'Guardian Details', icon: 'eye', href: `${href('school-admin/guardians/details.html')}?id=${r.id}` },
-          { label: 'Edit Authorized Numbers', icon: 'phone', href: `${href('school-admin/guardians/edit.html')}?id=${r.id}` },
-          { divider: true },
-          { label: r.status === 'Active' ? 'Revoke Authorization' : 'Restore Authorization', icon: 'shield-off', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
-        ]
-      }),
+      'sch-guardians-table': () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolCode = urlParams.get('school_code') || 'SCH-1001';
+        const studentFilter = urlParams.get('student') || urlParams.get('student_id') || '';
+        const fetchUrl = `/api/v1/school-admin/guardians/?school_code=${encodeURIComponent(schoolCode)}${studentFilter ? `&student=${encodeURIComponent(studentFilter)}` : ''}`;
+        return {
+          url: fetchUrl,
+          bulkUrl: '/api/v1/school-admin/guardians/bulk-status/',
+          data: D.guardians,
+          searchPlaceholder: 'Search guardian name, student, or authorized phone...',
+          filters: [
+            { key: 'relation', label: 'Relation', options: ['Father', 'Mother', 'Legal Guardian'] },
+            { key: 'status', label: 'Status', options: ['Active', 'Inactive'] }
+          ],
+          exportFilename: 'authorized-guardians.csv',
+          columns: [
+            { key: 'name', label: 'Guardian Identity', render: (r) => `<a href="${href('school-admin/guardians/details.html')}?id=${r.id || r.code}" class="cell-primary">${r.name}</a><span class="cell-sub">${r.relation} · ${r.email}</span>` },
+            { key: 'studentName', label: 'Linked Student', render: (r) => `<span class="cell-primary">${r.studentName}</span><span class="cell-sub">${r.className}</span>` },
+            { key: 'fatherPhone', label: 'Father Phone', render: (r) => `<span class="mono-code">${r.fatherPhone}</span>` },
+            { key: 'motherPhone', label: 'Mother Phone', render: (r) => `<span class="mono-code">${r.motherPhone}</span>` },
+            { key: 'verification', label: 'Whitelist & KYC', render: (r) => `${badge(r.verification)}<span class="cell-sub">${r.whitelistStatus}</span>` },
+            { key: 'status', label: 'Status', render: (r) => badge(r.status) }
+          ],
+          rowActions: (r) => [
+            { label: 'Guardian Details', icon: 'eye', href: `${href('school-admin/guardians/details.html')}?id=${r.id || r.code}` },
+            { label: 'Edit Authorized Numbers', icon: 'phone', href: `${href('school-admin/guardians/edit.html')}?id=${r.id || r.code}` },
+            { divider: true },
+            { label: r.status === 'Active' ? 'Revoke Authorization' : 'Restore Authorization', icon: 'shield-off', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+          ]
+        };
+      },
 
       'sch-codes-table': () => ({
         data: D.studentCodes,

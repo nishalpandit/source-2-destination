@@ -50,6 +50,11 @@ urlpatterns = [
     path('school-admin/classes/', school_views.classes_list, name='school_admin_classes_list'),
     path('school-admin/classes/list.html', school_views.classes_list, name='school_admin_classes_list_html'),
     path('school-admin/classes/sections.html', school_views.sections_list, name='school_admin_sections_list'),
+    path('school-admin/guardians/', school_views.guardians_list, name='school_admin_guardians_list'),
+    path('school-admin/guardians/list.html', school_views.guardians_list, name='school_admin_guardians_list_html'),
+    path('school-admin/guardians/add.html', school_views.guardian_add, name='school_admin_guardian_add'),
+    path('school-admin/guardians/details.html', school_views.guardian_details, name='school_admin_guardian_details'),
+    path('school-admin/guardians/edit.html', school_views.guardian_edit, name='school_admin_guardian_edit'),
     re_path(r'^school-admin/(?P<path>.+?)/?$', school_views.render_school_page, name='school_admin_page'),
 
     # High-Performance REST API Endpoints (Api_views.py)
@@ -71,6 +76,11 @@ urlpatterns = [
     path('api/v1/school-admin/classes/<str:class_id>/', Api_views.class_item_api, name='api_school_admin_class_item'),
     path('api/v1/school-admin/sections/', Api_views.sections_collection_api, name='api_school_admin_sections'),
     path('api/v1/school-admin/sections/<str:section_id>/', Api_views.section_item_api, name='api_school_admin_section_item'),
+
+    # Guardians APIs
+    path('api/v1/school-admin/guardians/', Api_views.guardians_collection_api, name='api_school_admin_guardians'),
+    path('api/v1/school-admin/guardians/bulk-status/', Api_views.guardians_bulk_status_api, name='api_school_admin_guardians_bulk'),
+    path('api/v1/school-admin/guardians/<str:guardian_id>/', Api_views.guardian_item_api, name='api_school_admin_guardian_item'),
 
     # Telemetry and Health
     path('api/status/', Api_views.api_status, name='api_status'),

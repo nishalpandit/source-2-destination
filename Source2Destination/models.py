@@ -286,3 +286,52 @@ class ClassSection(models.Model):
 
     def __str__(self):
         return f"{self.academic_class.name} - {self.name} ({self.school.code})"
+
+
+class Guardian(models.Model):
+    """
+    Authorized Parent / Legal Guardian Contact for a Student.
+    Enforces whitelist authorization on Android Enterprise calling kiosks.
+    """
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='guardians', db_index=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='guardian_contacts', db_index=True)
+    code = models.CharField(max_length=32, unique=True, db_index=True, help_text="e.g. GRD-501")
+    name = models.CharField(max_length=255, db_index=True, help_text="Primary Guardian Full Name")
+    relation = models.CharField(
+        max_length=64,
+        default='Father',
+        choices=[
+            ('Father', 'Father'),
+            ('Mother', 'Mother'),
+            ('Legal Guardian', 'Legal Guardian'),
+            ('Grandparent', 'Grandparent'),
+            ('Other', 'Other')
+        ]
+    )
+    father_phone = models.CharField(max_length=32, blank=True, help_text="Authorized Father Phone")
+    mother_phone = models.CharField(max_length=32, blank=True, help_text="Authorized Mother Phone")
+    emergency_phone = models.CharField(max_length=32, blank=True, help_text="Secondary/Emergency Phone")
+    email = models.EmailField(blank=True)
+    verification = models.CharField(max_length=120, default="KYC Verified", help_text="Verification status document")
+    whitelist_status = models.CharField(max_length=120, default="Authorized (2 Numbers)")
+    status = models.CharField(
+        max_length=20,
+        choices=[('Active', 'Active'), ('Inactive', 'Inactive')],
+        default='Active',
+        db_index=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-id']
+        indexes = [
+            models.Index(fields=['school', 'status']),
+            models.Index(fields=['student', 'status']),
+            models.Index(fields=['school', 'name']),
+            models.Index(fields=['father_phone', 'school']),
+            models.Index(fields=['mother_phone', 'school']),
+        ]
+
+    def __str__(self):
+        return f"{self.code} · {self.name} ({self.student.name})"

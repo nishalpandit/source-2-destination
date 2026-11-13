@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
-from .models import School, Franchise, Student, AcademicClass, ClassSection
+from .models import School, Franchise, Student, AcademicClass, ClassSection, Guardian
 
 
 def get_current_school(request):
@@ -214,6 +214,110 @@ def sections_list(request):
         "total_sections": sections_qs.count(),
     }
     return render(request, 'school-admin/classes/sections.html', context)
+
+
+def guardians_list(request):
+    """Dynamic School Admin Parents & Guardians Directory."""
+    school = get_current_school(request)
+    guardians_qs = Guardian.objects.filter(school=school)
+    total_guardians = guardians_qs.count()
+    active_guardians = guardians_qs.filter(status='Active').count()
+
+    context = {
+        "school": school,
+        "total_guardians": total_guardians,
+        "active_guardians": active_guardians,
+    }
+    return render(request, 'school-admin/guardians/list.html', context)
+
+
+def guardian_add(request):
+    """School Admin: Register & whitelist authorized parent/guardian numbers."""
+    school = get_current_school(request)
+
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        student = Student.objects.filter(Q(code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0)).first()
+        if not student:
+            student = Student.objects.filter(school=school).first()
+
+        name = (request.POST.get('name') or '').strip()
+        relation = request.POST.get('relation', 'Father')
+        father_phone = (request.POST.get('fatherPhone') or request.POST.get('father_phone') or '').strip()
+        mother_phone = (request.POST.get('motherPhone') or request.POST.get('mother_phone') or '').strip()
+        emergency_phone = (request.POST.get('emergencyPhone') or request.POST.get('emergency_phone') or '').strip()
+        email = (request.POST.get('email') or '').strip()
+        verification = request.POST.get('verification', 'KYC Verified (School Admission File)')
+
+        code = f"GRD-{Guardian.objects.count() + 501}"
+        active_numbers = [p for p in [father_phone, mother_phone, emergency_phone] if p and p != 'N/A']
+        whitelist_label = f"Authorized ({len(active_numbers)} Number{'s' if len(active_numbers) != 1 else ''})"
+
+        Guardian.objects.create(
+            school=student.school if student else school,
+            student=student,
+            code=code,
+            name=name,
+            relation=relation,
+            father_phone=father_phone,
+            mother_phone=mother_phone,
+            emergency_phone=emergency_phone,
+            email=email,
+            verification=verification,
+            whitelist_status=whitelist_label,
+            status='Active'
+        )
+        return redirect('/school-admin/guardians/list.html')
+
+    students = Student.objects.filter(school=school).order_by('name')
+    context = {
+        "school": school,
+        "students": students,
+    }
+    return render(request, 'school-admin/guardians/add.html', context)
+
+
+def guardian_details(request):
+    """School Admin: View guardian whitelist profile & verified contact details."""
+    guardian_id = request.GET.get('id')
+    guardian = Guardian.objects.filter(Q(code=guardian_id) | Q(id=guardian_id if str(guardian_id).isdigit() else 0)).select_related('student', 'school').first()
+    if not guardian:
+        guardian = Guardian.objects.first()
+
+    context = {
+        "guardian": guardian,
+        "student": guardian.student if guardian else None,
+        "school": guardian.school if guardian else get_current_school(request),
+    }
+    return render(request, 'school-admin/guardians/details.html', context)
+
+
+def guardian_edit(request):
+    """School Admin: Modify authorized phone numbers or pause dialer authorization."""
+    guardian_id = request.GET.get('id')
+    guardian = Guardian.objects.filter(Q(code=guardian_id) | Q(id=guardian_id if str(guardian_id).isdigit() else 0)).select_related('student', 'school').first()
+    if not guardian:
+        guardian = Guardian.objects.first()
+
+    if request.method == "POST":
+        guardian.name = request.POST.get('name', guardian.name)
+        guardian.email = request.POST.get('email', guardian.email)
+        guardian.father_phone = request.POST.get('fatherPhone', guardian.father_phone)
+        guardian.mother_phone = request.POST.get('motherPhone', guardian.mother_phone)
+        if 'status' in request.POST:
+            guardian.status = request.POST.get('status')
+
+        active_numbers = [p for p in [guardian.father_phone, guardian.mother_phone, guardian.emergency_phone] if p and p != 'N/A']
+        guardian.whitelist_status = f"Authorized ({len(active_numbers)} Number{'s' if len(active_numbers) != 1 else ''})"
+        guardian.save()
+        return redirect(f"/school-admin/guardians/details.html?id={guardian.code}")
+
+    context = {
+        "guardian": guardian,
+        "student": guardian.student if guardian else None,
+        "school": guardian.school if guardian else get_current_school(request),
+    }
+    return render(request, 'school-admin/guardians/edit.html', context)
 
 
 def render_school_page(request, path):

@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, F
 from django.core.paginator import Paginator, EmptyPage
-from .models import School, Franchise, Student, AcademicClass, ClassSection
+from .models import School, Franchise, Student, AcademicClass, ClassSection, Guardian
 
 
 def api_status(request):
@@ -1200,3 +1200,224 @@ def section_item_api(request, section_id):
         sec.status = "Archived"
         sec.save(update_fields=['status'])
         return JsonResponse({"message": f"Section '{sec.name}' archived", "status": "Archived"})
+
+
+# =========================================================================
+# SCHOOL ADMIN: DYNAMIC PARENTS & GUARDIANS WHITELIST API
+# =========================================================================
+
+def _serialize_guardian(g):
+    """Serialize Guardian model into JSON matching sch-guardians-table specs."""
+    return {
+        "id": g.code,
+        "db_id": g.id,
+        "schoolId": g.school.code,
+        "studentId": g.student.code,
+        "studentName": g.student.name,
+        "className": f"{g.student.class_name} · {g.student.section}",
+        "name": g.name,
+        "relation": g.relation,
+        "fatherPhone": g.father_phone or "N/A",
+        "motherPhone": g.mother_phone or "N/A",
+        "emergencyPhone": g.emergency_phone or "None",
+        "email": g.email or f"{g.name.lower().replace(' ', '.')}@example.com",
+        "verification": g.verification,
+        "whitelistStatus": g.whitelist_status,
+        "status": g.status,
+        "createdAt": g.created_at.strftime("%Y-%m-%d")
+    }
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def guardians_collection_api(request):
+    """
+    GET  /api/v1/school-admin/guardians/ -> Paginated guardian contacts with whitelist verification
+    POST /api/v1/school-admin/guardians/ -> Add new authorized guardian numbers
+    """
+    school_code = request.GET.get('school_code', 'SCH-1001').strip()
+    school = School.objects.filter(Q(code=school_code) | Q(name__icontains=school_code)).first()
+    if not school:
+        school = School.objects.first()
+
+    if request.method == "GET":
+        try:
+            page = max(1, int(request.GET.get('page', 1)))
+            page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+        except (ValueError, TypeError):
+            page = 1
+            page_size = 10
+
+        qs = Guardian.objects.filter(school=school).select_related('student', 'school')
+
+        # Filter by relation
+        relation_filter = request.GET.get('relation', '').strip()
+        if relation_filter and relation_filter.lower() != 'all':
+            qs = qs.filter(relation__iexact=relation_filter)
+
+        # Filter by status
+        status_filter = request.GET.get('status', '').strip()
+        if status_filter and status_filter.lower() != 'all':
+            qs = qs.filter(status__iexact=status_filter)
+
+        # Filter by student if specified
+        student_id = request.GET.get('student', request.GET.get('student_id', '')).strip()
+        if student_id:
+            qs = qs.filter(Q(student__code__iexact=student_id) | Q(student__name__icontains=student_id))
+
+        # Search query across indexed fields
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            qs = qs.filter(
+                Q(name__icontains=search_query) |
+                Q(code__icontains=search_query) |
+                Q(student__name__icontains=search_query) |
+                Q(father_phone__icontains=search_query) |
+                Q(mother_phone__icontains=search_query) |
+                Q(email__icontains=search_query)
+            )
+
+        paginator = Paginator(qs.order_by('-id'), page_size)
+        try:
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page_obj = []
+
+        return JsonResponse({
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": page,
+            "page_size": page_size,
+            "results": [_serialize_guardian(g) for g in page_obj]
+        })
+
+    elif request.method == "POST":
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        student_code = data.get('student_id') or data.get('studentId')
+        student = Student.objects.filter(Q(code=student_code) | Q(id=student_code if str(student_code).isdigit() else 0)).first()
+        if not student:
+            student = Student.objects.filter(school=school).first()
+
+        name = (data.get('name') or '').strip()
+        if not name:
+            return JsonResponse({"error": "Guardian name is required"}, status=400)
+
+        relation = data.get('relation', 'Father')
+        f_phone = (data.get('fatherPhone') or data.get('father_phone') or '').strip()
+        m_phone = (data.get('motherPhone') or data.get('mother_phone') or '').strip()
+        e_phone = (data.get('emergencyPhone') or data.get('emergency_phone') or '').strip()
+        email = (data.get('email') or '').strip()
+        verification = data.get('verification', 'KYC Verified (School Admission File)')
+
+        code = data.get('code') or f"GRD-{Guardian.objects.count() + 501}"
+        active_numbers = [p for p in [f_phone, m_phone, e_phone] if p and p != 'N/A']
+        whitelist_label = f"Authorized ({len(active_numbers)} Number{'s' if len(active_numbers) != 1 else ''})"
+
+        guardian = Guardian.objects.create(
+            school=student.school if student else school,
+            student=student,
+            code=code,
+            name=name,
+            relation=relation,
+            father_phone=f_phone,
+            mother_phone=m_phone,
+            emergency_phone=e_phone,
+            email=email,
+            verification=verification,
+            whitelist_status=whitelist_label,
+            status=data.get('status', 'Active')
+        )
+
+        return JsonResponse({
+            "message": "Guardian numbers whitelisted successfully",
+            "guardian": _serialize_guardian(guardian)
+        }, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "PATCH", "DELETE"])
+def guardian_item_api(request, guardian_id):
+    """
+    GET    /api/v1/school-admin/guardians/<guardian_id>/ -> Details
+    PUT    /api/v1/school-admin/guardians/<guardian_id>/ -> Update
+    PATCH  /api/v1/school-admin/guardians/<guardian_id>/ -> Update status or phone numbers
+    DELETE /api/v1/school-admin/guardians/<guardian_id>/ -> Revoke whitelist authorization
+    """
+    guardian = Guardian.objects.filter(Q(code=guardian_id) | Q(id=guardian_id if str(guardian_id).isdigit() else 0)).select_related('student', 'school').first()
+    if not guardian:
+        return JsonResponse({"error": f"Guardian '{guardian_id}' not found"}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse(_serialize_guardian(guardian))
+
+    elif request.method in ["PUT", "PATCH"]:
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        for field in ['name', 'relation', 'email', 'verification', 'status']:
+            if field in data:
+                setattr(guardian, field, data[field])
+        if 'fatherPhone' in data:
+            guardian.father_phone = data['fatherPhone']
+        elif 'father_phone' in data:
+            guardian.father_phone = data['father_phone']
+        if 'motherPhone' in data:
+            guardian.mother_phone = data['motherPhone']
+        elif 'mother_phone' in data:
+            guardian.mother_phone = data['mother_phone']
+        if 'emergencyPhone' in data:
+            guardian.emergency_phone = data['emergencyPhone']
+        elif 'emergency_phone' in data:
+            guardian.emergency_phone = data['emergency_phone']
+
+        active_numbers = [p for p in [guardian.father_phone, guardian.mother_phone, guardian.emergency_phone] if p and p != 'N/A']
+        guardian.whitelist_status = f"Authorized ({len(active_numbers)} Number{'s' if len(active_numbers) != 1 else ''})"
+
+        guardian.save()
+        return JsonResponse({"message": "Guardian updated successfully", "guardian": _serialize_guardian(guardian)})
+
+    elif request.method == "DELETE":
+        guardian.status = "Inactive"
+        guardian.save(update_fields=['status'])
+        return JsonResponse({"message": f"Guardian '{guardian.name}' authorization revoked", "status": "Inactive"})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def guardians_bulk_status_api(request):
+    """
+    POST /api/v1/school-admin/guardians/bulk-status/
+    Bulk activate / revoke guardian whitelist authorizations.
+    """
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        data = request.POST.dict()
+
+    ids = data.get('ids', [])
+    action = data.get('action', '').lower()
+
+    if not ids or action not in ['activate', 'suspend', 'revoke']:
+        return JsonResponse({"error": "ids list and valid action ('activate' or 'revoke') required"}, status=400)
+
+    new_status = 'Active' if action == 'activate' else 'Inactive'
+    updated_count = Guardian.objects.filter(Q(code__in=ids) | Q(id__in=[int(i) for i in ids if str(i).isdigit()])).update(
+        status=new_status
+    )
+
+    return JsonResponse({
+        "message": f"Bulk guardian authorizations updated to {new_status}",
+        "updated_count": updated_count
+    })

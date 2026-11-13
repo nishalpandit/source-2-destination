@@ -1,7 +1,88 @@
 import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from Source2Destination.models import Franchise, School, Student, AcademicClass, ClassSection
+from Source2Destination.models import Franchise, School, Student, AcademicClass, ClassSection, Guardian
+
+INITIAL_GUARDIANS = [
+    {
+        "code": "GRD-501",
+        "name": "Robert Hawthorne",
+        "student_code": "STU-4001",
+        "relation": "Father",
+        "father_phone": "+1 (555) 801-2210",
+        "mother_phone": "+1 (555) 801-2211",
+        "emergency_phone": "+1 (555) 801-2299",
+        "email": "r.hawthorne@example.com",
+        "verification": "KYC Verified",
+        "whitelist_status": "Authorized (2 Numbers)",
+        "status": "Active"
+    },
+    {
+        "code": "GRD-502",
+        "name": "Margaret Bennett",
+        "student_code": "STU-4002",
+        "relation": "Mother",
+        "father_phone": "+1 (555) 802-3499",
+        "mother_phone": "+1 (555) 802-3490",
+        "emergency_phone": "+1 (555) 802-3400",
+        "email": "m.bennett@example.com",
+        "verification": "KYC Verified",
+        "whitelist_status": "Authorized (2 Numbers)",
+        "status": "Active"
+    },
+    {
+        "code": "GRD-503",
+        "name": "David Montgomery",
+        "student_code": "STU-4003",
+        "relation": "Father",
+        "father_phone": "+1 (555) 803-5120",
+        "mother_phone": "+1 (555) 803-5125",
+        "emergency_phone": "+1 (555) 803-5199",
+        "email": "d.montgomery@example.com",
+        "verification": "KYC Verified",
+        "whitelist_status": "Authorized (2 Numbers)",
+        "status": "Active"
+    },
+    {
+        "code": "GRD-504",
+        "name": "Evelyn Fletcher",
+        "student_code": "STU-4004",
+        "relation": "Mother",
+        "father_phone": "+1 (555) 804-7741",
+        "mother_phone": "+1 (555) 804-7740",
+        "emergency_phone": "+1 (555) 804-7700",
+        "email": "e.fletcher@example.com",
+        "verification": "KYC Verified",
+        "whitelist_status": "Authorized (3 Numbers)",
+        "status": "Active"
+    },
+    {
+        "code": "GRD-505",
+        "name": "Henry Kingsley",
+        "student_code": "STU-4005",
+        "relation": "Father",
+        "father_phone": "+1 (555) 805-1192",
+        "mother_phone": "+1 (555) 805-1198",
+        "emergency_phone": "+1 (555) 805-1100",
+        "email": "h.kingsley@example.com",
+        "verification": "Pending Renewal",
+        "whitelist_status": "Paused (Account Expired)",
+        "status": "Inactive"
+    },
+    {
+        "code": "GRD-506",
+        "name": "Catherine Whitaker",
+        "student_code": "STU-4006",
+        "relation": "Legal Guardian",
+        "father_phone": "",
+        "mother_phone": "",
+        "emergency_phone": "+1 (555) 806-6631",
+        "email": "c.whitaker@example.com",
+        "verification": "Court Letter Verified",
+        "whitelist_status": "Authorized (1 Number)",
+        "status": "Active"
+    }
+]
 
 INITIAL_CLASSES = [
     {"code": "CLS-07", "name": "Grade 7", "supervisor": "Mrs. Nadine Wallace", "default_daily_minutes": 10, "schedule_group": "Junior Evening Window"},
@@ -574,7 +655,50 @@ class Command(BaseCommand):
                     )
                     self.stdout.write(f"{'Created' if created else 'Updated'} section: {parent_class.name} - {sec_obj.name}")
 
-        # 5. Optional bulk scale benchmark records
+        # 5. Seed Guardians for Students
+        for g_data in INITIAL_GUARDIANS:
+            stu_code = g_data.pop("student_code", None)
+            student = Student.objects.filter(code=stu_code).first()
+            if student:
+                g_obj, created = Guardian.objects.update_or_create(
+                    code=g_data["code"],
+                    defaults={
+                        **g_data,
+                        "student": student,
+                        "school": student.school
+                    }
+                )
+                self.stdout.write(f"{'Created' if created else 'Updated'} guardian: {g_obj.name} for {student.name}")
+
+        # Ensure all students of Oakridge have at least one authorized guardian
+        if oakridge:
+            students_without_guardians = oakridge.students.filter(guardian_contacts__isnull=True)
+            new_guardians = []
+            idx = 507
+            for stu in students_without_guardians:
+                g_code = f"GRD-{idx}"
+                idx += 1
+                f_phone = stu.primary_phone if stu.guardian_relation == 'Father' else ''
+                m_phone = stu.primary_phone if stu.guardian_relation == 'Mother' else ''
+                new_guardians.append(Guardian(
+                    school=oakridge,
+                    student=stu,
+                    code=g_code,
+                    name=stu.guardian_name,
+                    relation=stu.guardian_relation,
+                    father_phone=f_phone or f"+1 (555) {random.randint(801, 899):03d}-{random.randint(1000, 9999):04d}",
+                    mother_phone=m_phone or (stu.secondary_phone if stu.secondary_phone else f"+1 (555) {random.randint(801, 899):03d}-{random.randint(1000, 9999):04d}"),
+                    emergency_phone=stu.secondary_phone or "",
+                    email=f"{stu.guardian_name.lower().replace(' ', '.')}@example.com",
+                    verification="KYC Verified",
+                    whitelist_status="Authorized (2 Numbers)",
+                    status=stu.status
+                ))
+            if new_guardians:
+                Guardian.objects.bulk_create(new_guardians)
+                self.stdout.write(self.style.SUCCESS(f"Generated {len(new_guardians)} additional guardian records for {oakridge.name}."))
+
+        # 6. Optional bulk scale benchmark records
         extra_count = options.get('count', 0)
         if extra_count > 0:
             self.stdout.write(f"Generating {extra_count} bulk schools for high-scale testing...")

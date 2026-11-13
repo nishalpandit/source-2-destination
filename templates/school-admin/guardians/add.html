@@ -30,17 +30,65 @@
           <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Guardian List</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Guardian Whitelist Saved (Demo)">
+          <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Guardian Whitelist Saved" data-success-desc="Authorized numbers registered and verified in campus database.">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Linked Student <span class="req-star">*</span></label><select name="student_id" class="s2d-select" required><option value="STU-4001">STU-4001 · Liam Hawthorne (Grade 10-A)</option><option value="STU-4002">STU-4002 · Clara Bennett (Grade 9-B)</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Robert Hawthorne" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Relationship <span class="req-star">*</span></label><select name="relation" class="s2d-select" required><option>Father</option><option>Mother</option><option>Legal Guardian</option></select></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Father Authorized Number <span class="req-star">*</span></label><input type="tel" name="fatherPhone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 801-2210" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Mother Authorized Number</label><input type="tel" name="motherPhone" class="s2d-input" placeholder="+1 (555) 801-2211"></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Guardian Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" placeholder="guardian@example.com" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Verification Document Status <span class="req-star">*</span></label><select name="verification" class="s2d-select" required><option>KYC Verified (School Admission File)</option><option>Court / Legal Guardianship Letter Verified</option></select></div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label" for="add_guardian_student">Linked Student <span class="req-star">*</span></label>
+                <select id="add_guardian_student" name="student_id" class="s2d-select" required>
+                  {% for s in students %}
+                  <option value="{{ s.code }}">{{ s.code }} · {{ s.name }} ({{ s.class_name }} · {{ s.section }})</option>
+                  {% empty %}
+                  <option value="STU-4001">STU-4001 · Liam Hawthorne (Grade 10 · Sec A)</option>
+                  <option value="STU-4002">STU-4002 · Clara Bennett (Grade 9 · Sec B)</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label" for="add_guardian_name">Primary Guardian Full Name <span class="req-star">*</span></label>
+                <input type="text" id="add_guardian_name" name="name" class="s2d-input" placeholder="e.g. Robert Hawthorne" required>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label" for="add_guardian_relation">Relationship <span class="req-star">*</span></label>
+                <select id="add_guardian_relation" name="relation" class="s2d-select" required>
+                  <option value="Father">Father</option>
+                  <option value="Mother">Mother</option>
+                  <option value="Legal Guardian">Legal Guardian</option>
+                  <option value="Grandparent">Grandparent</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label" for="add_guardian_father_phone">Father Authorized Number <span class="req-star">*</span></label>
+                <input type="tel" id="add_guardian_father_phone" name="fatherPhone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 801-2210" required>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label" for="add_guardian_mother_phone">Mother Authorized Number</label>
+                <input type="tel" id="add_guardian_mother_phone" name="motherPhone" class="s2d-input" placeholder="+1 (555) 801-2211">
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label" for="add_guardian_emergency_phone">Emergency Backup Number</label>
+                <input type="tel" id="add_guardian_emergency_phone" name="emergencyPhone" class="s2d-input" placeholder="+1 (555) 801-2299">
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label" for="add_guardian_email">Guardian Email <span class="req-star">*</span></label>
+                <input type="email" id="add_guardian_email" name="email" class="s2d-input" placeholder="guardian@example.com" required>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label" for="add_guardian_verification">Verification Document Status <span class="req-star">*</span></label>
+                <select id="add_guardian_verification" name="verification" class="s2d-select" required>
+                  <option value="KYC Verified (School Admission File)">KYC Verified (School Admission File)</option>
+                  <option value="Court / Legal Guardianship Letter Verified">Court / Legal Guardianship Letter Verified</option>
+                  <option value="Identity Affidavit Verified">Identity Affidavit Verified</option>
+                </select>
+              </div>
             </div>
-            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="shield-check"></i><span>Authorize Guardian Numbers</span></button></div></div>
+            <div class="form-actions-bar">
+              <div class="ms-auto d-flex gap-2">
+                <a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="shield-check"></i><span>Authorize Guardian Numbers</span></button>
+              </div>
+            </div>
           </form>
         </div></div>
     
