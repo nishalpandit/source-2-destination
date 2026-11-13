@@ -1,7 +1,37 @@
 import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from Source2Destination.models import Franchise, School, Student
+from Source2Destination.models import Franchise, School, Student, AcademicClass, ClassSection
+
+INITIAL_CLASSES = [
+    {"code": "CLS-07", "name": "Grade 7", "supervisor": "Mrs. Nadine Wallace", "default_daily_minutes": 10, "schedule_group": "Junior Evening Window"},
+    {"code": "CLS-08", "name": "Grade 8", "supervisor": "Mr. Leonard Grant", "default_daily_minutes": 10, "schedule_group": "Junior Evening Window"},
+    {"code": "CLS-09", "name": "Grade 9", "supervisor": "Ms. Rachel Donovan", "default_daily_minutes": 15, "schedule_group": "Standard Hostel Window"},
+    {"code": "CLS-10", "name": "Grade 10", "supervisor": "Mr. Victor Sterling", "default_daily_minutes": 15, "schedule_group": "Standard Hostel Window"},
+    {"code": "CLS-11", "name": "Grade 11", "supervisor": "Dr. Helena Price", "default_daily_minutes": 15, "schedule_group": "Senior Study-Safe Window"},
+    {"code": "CLS-12", "name": "Grade 12", "supervisor": "Prof. Malcolm Reed", "default_daily_minutes": 20, "schedule_group": "Senior Study-Safe Window"},
+]
+
+INITIAL_SECTIONS = [
+    {"class_name": "Grade 7", "code": "SEC-07A", "name": "Section A", "room_wing": "Junior Wing · Floor 1", "advisor": "Mrs. Nadine Wallace", "assigned_booth": "Junior Wing Kiosk"},
+    {"class_name": "Grade 7", "code": "SEC-07B", "name": "Section B", "room_wing": "Junior Wing · Floor 1", "advisor": "Mr. Kenneth Moore", "assigned_booth": "Junior Wing Kiosk"},
+    {"class_name": "Grade 7", "code": "SEC-07C", "name": "Section C", "room_wing": "Junior Wing · Floor 2", "advisor": "Ms. Chloe Adams", "assigned_booth": "Junior Wing Kiosk"},
+    {"class_name": "Grade 8", "code": "SEC-08A", "name": "Section A", "room_wing": "Junior Wing · Floor 1", "advisor": "Mr. Leonard Grant", "assigned_booth": "Junior Wing Kiosk"},
+    {"class_name": "Grade 8", "code": "SEC-08B", "name": "Section B", "room_wing": "Junior Wing · Floor 2", "advisor": "Mrs. Abigail Evans", "assigned_booth": "Junior Wing Kiosk"},
+    {"class_name": "Grade 8", "code": "SEC-08C", "name": "Section C", "room_wing": "Junior Wing · Floor 2", "advisor": "Mr. Dennis Cole", "assigned_booth": "Junior Wing Kiosk"},
+    {"class_name": "Grade 9", "code": "SEC-09A", "name": "Section A", "room_wing": "East Gables · Floor 1", "advisor": "Mr. Ian Wright", "assigned_booth": "East Gables Booth 1"},
+    {"class_name": "Grade 9", "code": "SEC-09B", "name": "Section B", "room_wing": "East Gables · Floor 1", "advisor": "Ms. Rachel Donovan", "assigned_booth": "East Gables Booth 1"},
+    {"class_name": "Grade 9", "code": "SEC-09C", "name": "Section C", "room_wing": "East Gables · Floor 2", "advisor": "Mrs. Patricia Hall", "assigned_booth": "East Gables Booth 1"},
+    {"class_name": "Grade 10", "code": "SEC-10A", "name": "Section A", "room_wing": "North Hall · Floor 2", "advisor": "Mr. Victor Sterling", "assigned_booth": "North Hall Booth 1"},
+    {"class_name": "Grade 10", "code": "SEC-10B", "name": "Section B", "room_wing": "East Gables · Floor 2", "advisor": "Ms. Claire Sutton", "assigned_booth": "East Gables Booth 1"},
+    {"class_name": "Grade 10", "code": "SEC-10C", "name": "Section C", "room_wing": "North Hall · Floor 2", "advisor": "Dr. Alan Foster", "assigned_booth": "North Hall Booth 2"},
+    {"class_name": "Grade 11", "code": "SEC-11A", "name": "Section A", "room_wing": "North Hall · Floor 3", "advisor": "Dr. Helena Price", "assigned_booth": "North Hall Booth 2"},
+    {"class_name": "Grade 11", "code": "SEC-11B", "name": "Section B", "room_wing": "North Hall · Floor 3", "advisor": "Mr. Gregory Palmer", "assigned_booth": "North Hall Booth 2"},
+    {"class_name": "Grade 11", "code": "SEC-11C", "name": "Section C", "room_wing": "East Gables · Floor 3", "advisor": "Ms. Valerie King", "assigned_booth": "East Gables Booth 2"},
+    {"class_name": "Grade 12", "code": "SEC-12A", "name": "Section A", "room_wing": "North Hall · Floor 4", "advisor": "Prof. Malcolm Reed", "assigned_booth": "North Hall Booth 2"},
+    {"class_name": "Grade 12", "code": "SEC-12B", "name": "Section B", "room_wing": "North Hall · Floor 4", "advisor": "Dr. Timothy Vance", "assigned_booth": "North Hall Booth 2"},
+    {"class_name": "Grade 12", "code": "SEC-12C", "name": "Section C", "room_wing": "East Gables · Floor 3", "advisor": "Prof. Malcolm Reed", "assigned_booth": "East Gables Booth 2"},
+]
 
 INITIAL_STUDENTS = [
     {
@@ -509,7 +539,42 @@ class Command(BaseCommand):
                 Student.objects.bulk_create(new_students)
                 self.stdout.write(self.style.SUCCESS(f"Generated {len(new_students)} additional student records for {oakridge.name}."))
 
-        # 3. Optional bulk scale benchmark records
+        # 4. Seed Classes and Sections for Schools (starting with Oakridge)
+        if oakridge:
+            class_map = {}
+            for c_data in INITIAL_CLASSES:
+                c_obj, created = AcademicClass.objects.update_or_create(
+                    school=oakridge,
+                    name=c_data["name"],
+                    defaults={
+                        "code": c_data["code"],
+                        "supervisor": c_data["supervisor"],
+                        "default_daily_minutes": c_data["default_daily_minutes"],
+                        "schedule_group": c_data["schedule_group"],
+                        "status": "Active"
+                    }
+                )
+                class_map[c_obj.name] = c_obj
+                self.stdout.write(f"{'Created' if created else 'Updated'} class: {c_obj.name}")
+
+            for s_data in INITIAL_SECTIONS:
+                parent_class = class_map.get(s_data["class_name"])
+                if parent_class:
+                    sec_obj, created = ClassSection.objects.update_or_create(
+                        academic_class=parent_class,
+                        name=s_data["name"],
+                        defaults={
+                            "school": oakridge,
+                            "code": s_data["code"],
+                            "room_wing": s_data["room_wing"],
+                            "advisor": s_data["advisor"],
+                            "assigned_booth": s_data["assigned_booth"],
+                            "status": "Active"
+                        }
+                    )
+                    self.stdout.write(f"{'Created' if created else 'Updated'} section: {parent_class.name} - {sec_obj.name}")
+
+        # 5. Optional bulk scale benchmark records
         extra_count = options.get('count', 0)
         if extra_count > 0:
             self.stdout.write(f"Generating {extra_count} bulk schools for high-scale testing...")

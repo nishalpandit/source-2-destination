@@ -219,3 +219,70 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.code} · {self.name} ({self.school.code})"
+
+
+class AcademicClass(models.Model):
+    """
+    Campus Academic Class / Grade level.
+    Tied to a specific School campus tenant.
+    """
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='academic_classes', db_index=True)
+    code = models.CharField(max_length=32, db_index=True, help_text="e.g. CLS-07 or CLS-10")
+    name = models.CharField(max_length=64, db_index=True, help_text="e.g. Grade 10 or Class 12")
+    supervisor = models.CharField(max_length=255, blank=True, help_text="Grade Coordinator / Faculty Supervisor")
+    default_daily_minutes = models.PositiveIntegerField(default=15, help_text="Default daily call limit in minutes")
+    schedule_group = models.CharField(max_length=120, default="Standard Hostel Window")
+    status = models.CharField(
+        max_length=20,
+        choices=[('Active', 'Active'), ('Archived', 'Archived')],
+        default='Active',
+        db_index=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['name', 'id']
+        unique_together = ('school', 'name')
+        indexes = [
+            models.Index(fields=['school', 'status']),
+            models.Index(fields=['school', 'name']),
+            models.Index(fields=['code', 'school']),
+        ]
+
+    def __str__(self):
+        return f"{self.name} ({self.school.code})"
+
+
+class ClassSection(models.Model):
+    """
+    Academic Section under a Class Grade.
+    Includes hostel room/wing mapping, section advisor, and primary calling booth.
+    """
+    academic_class = models.ForeignKey(AcademicClass, on_delete=models.CASCADE, related_name='sections', db_index=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='sections', db_index=True)
+    code = models.CharField(max_length=32, db_index=True, help_text="e.g. SEC-10A")
+    name = models.CharField(max_length=64, help_text="e.g. Section A")
+    room_wing = models.CharField(max_length=128, blank=True, help_text="e.g. North Hall · Floor 2")
+    advisor = models.CharField(max_length=255, blank=True, help_text="Section Advisor")
+    assigned_booth = models.CharField(max_length=128, default="North Hall Booth 1", help_text="Primary Calling Booth")
+    status = models.CharField(
+        max_length=20,
+        choices=[('Active', 'Active'), ('Archived', 'Archived')],
+        default='Active',
+        db_index=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['academic_class', 'name']
+        unique_together = ('academic_class', 'name')
+        indexes = [
+            models.Index(fields=['school', 'status']),
+            models.Index(fields=['academic_class', 'status']),
+            models.Index(fields=['code', 'school']),
+        ]
+
+    def __str__(self):
+        return f"{self.academic_class.name} - {self.name} ({self.school.code})"

@@ -9,7 +9,7 @@ from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
-from .models import School, Franchise, Student
+from .models import School, Franchise, Student, AcademicClass, ClassSection
 
 
 def get_current_school(request):
@@ -132,6 +132,88 @@ def student_edit(request):
         "school": stu.school if stu else get_current_school(request),
     }
     return render(request, 'school-admin/students/edit.html', context)
+
+
+def classes_list(request):
+    """Dynamic School Admin Academic Classes Management."""
+    school = get_current_school(request)
+
+    if request.method == "POST":
+        name = (request.POST.get('className') or request.POST.get('name') or '').strip()
+        if name:
+            supervisor = request.POST.get('supervisor', '').strip()
+            daily_min = int(request.POST.get('defaultDailyMinutes') or request.POST.get('default_daily_minutes') or 15)
+            digits = ''.join(c for c in name if c.isdigit())
+            code = f"CLS-{digits}" if digits else f"CLS-{AcademicClass.objects.filter(school=school).count() + 1:02d}"
+
+            AcademicClass.objects.get_or_create(
+                school=school,
+                name=name,
+                defaults={
+                    "code": code,
+                    "supervisor": supervisor,
+                    "default_daily_minutes": daily_min,
+                    "schedule_group": request.POST.get('schedule_group', 'Standard Hostel Window'),
+                    "status": "Active"
+                }
+            )
+        return redirect('/school-admin/classes/list.html')
+
+    classes_qs = AcademicClass.objects.filter(school=school, status='Active')
+    context = {
+        "school": school,
+        "classes": classes_qs,
+        "total_classes": classes_qs.count(),
+        "total_sections": ClassSection.objects.filter(school=school, status='Active').count(),
+    }
+    return render(request, 'school-admin/classes/list.html', context)
+
+
+def sections_list(request):
+    """Dynamic School Admin Sections Management."""
+    school = get_current_school(request)
+
+    if request.method == "POST":
+        parent_class_name = request.POST.get('parent_class') or request.POST.get('className')
+        parent_class = AcademicClass.objects.filter(
+            Q(name__iexact=parent_class_name) | Q(code=parent_class_name),
+            school=school
+        ).first()
+        section_name = (request.POST.get('sectionName') or request.POST.get('name') or '').strip()
+
+        if parent_class and section_name:
+            room_wing = (request.POST.get('roomWing') or request.POST.get('room_wing') or '').strip()
+            advisor = (request.POST.get('advisor') or '').strip() or parent_class.supervisor
+            booth = request.POST.get('assignedBooth') or 'North Hall Booth 1'
+
+            cls_digits = ''.join(c for c in parent_class.name if c.isdigit())
+            sec_letter = ''.join(c for c in section_name if c.isalpha())
+            code = f"SEC-{cls_digits}{sec_letter[:1]}" if (cls_digits and sec_letter) else f"SEC-{ClassSection.objects.filter(school=school).count() + 1:02d}"
+
+            ClassSection.objects.get_or_create(
+                academic_class=parent_class,
+                name=section_name,
+                defaults={
+                    "school": school,
+                    "code": code,
+                    "room_wing": room_wing,
+                    "advisor": advisor,
+                    "assigned_booth": booth,
+                    "status": "Active"
+                }
+            )
+        return redirect('/school-admin/classes/sections.html')
+
+    classes_qs = AcademicClass.objects.filter(school=school, status='Active').order_by('name')
+    sections_qs = ClassSection.objects.filter(school=school, status='Active')
+
+    context = {
+        "school": school,
+        "classes": classes_qs,
+        "sections": sections_qs,
+        "total_sections": sections_qs.count(),
+    }
+    return render(request, 'school-admin/classes/sections.html', context)
 
 
 def render_school_page(request, path):

@@ -57,6 +57,26 @@
         } catch (e) {
           console.warn("Server student status update:", e);
         }
+      } else if (recId && String(recId).startsWith('CLS-')) {
+        try {
+          await fetch(`/api/v1/school-admin/classes/${encodeURIComponent(recId)}/`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus })
+          });
+        } catch (e) {
+          console.warn("Server class status update:", e);
+        }
+      } else if (recId && String(recId).startsWith('SEC-')) {
+        try {
+          await fetch(`/api/v1/school-admin/sections/${encodeURIComponent(recId)}/`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus })
+          });
+        } catch (e) {
+          console.warn("Server section status update:", e);
+        }
       }
       if (refreshFn) refreshFn();
       window.S2DNotify.show({
@@ -502,47 +522,59 @@
         };
       },
 
-      'sch-classes-table': () => ({
-        data: D.classes,
-        searchPlaceholder: 'Search class grade or faculty supervisor...',
-        exportFilename: 'school-classes.csv',
-        columns: [
-          { key: 'className', label: 'Class Grade', render: (r) => `<span class="cell-primary">${r.className}</span><span class="cell-sub mono-code">${r.id}</span>` },
-          { key: 'supervisor', label: 'Grade Coordinator' },
-          { key: 'sectionsCount', label: 'Sections' },
-          { key: 'studentsCount', label: 'Enrolled / Active', render: (r) => `<strong>${r.activeAccounts}</strong> / ${r.studentsCount} students` },
-          { key: 'defaultDailyMinutes', label: 'Daily Call Cap', render: (r) => `<span class="mono-code">${r.defaultDailyMinutes} mins/day</span>` },
-          { key: 'scheduleGroup', label: 'Schedule Policy' },
-          { key: 'status', label: 'Status', render: (r) => badge(r.status) }
-        ],
-        rowActions: (r) => [
-          { label: 'View Sections', icon: 'layout-list', href: `${href('school-admin/classes/sections.html')}?class=${r.id}` },
-          {
-            label: 'Delete / Archive Class', icon: 'trash-2', danger: true,
-            onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived')
-          }
-        ]
-      }),
+      'sch-classes-table': () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolCode = urlParams.get('school_code') || urlParams.get('id') || 'SCH-1001';
+        return {
+          url: `/api/v1/school-admin/classes/?school_code=${encodeURIComponent(schoolCode)}`,
+          data: D.classes,
+          searchPlaceholder: 'Search class grade or faculty supervisor...',
+          exportFilename: 'school-classes.csv',
+          columns: [
+            { key: 'className', label: 'Class Grade', render: (r) => `<span class="cell-primary">${r.className}</span><span class="cell-sub mono-code">${r.id}</span>` },
+            { key: 'supervisor', label: 'Grade Coordinator' },
+            { key: 'sectionsCount', label: 'Sections' },
+            { key: 'studentsCount', label: 'Enrolled / Active', render: (r) => `<strong>${r.activeAccounts ?? 0}</strong> / ${r.studentsCount ?? 0} students` },
+            { key: 'defaultDailyMinutes', label: 'Daily Call Cap', render: (r) => `<span class="mono-code">${r.defaultDailyMinutes} mins/day</span>` },
+            { key: 'scheduleGroup', label: 'Schedule Policy' },
+            { key: 'status', label: 'Status', render: (r) => badge(r.status) }
+          ],
+          rowActions: (r) => [
+            { label: 'View Sections', icon: 'layout-list', href: `${href('school-admin/classes/sections.html')}?class=${encodeURIComponent(r.className || r.id)}` },
+            {
+              label: r.status === 'Active' ? 'Archive Class' : 'Activate Class', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active',
+              onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived')
+            }
+          ]
+        };
+      },
 
-      'sch-sections-table': () => ({
-        data: D.sections,
-        searchPlaceholder: 'Search section, class, advisor, or hostel wing...',
-        filters: [
-          { key: 'className', label: 'Class', options: ['Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] }
-        ],
-        exportFilename: 'school-sections.csv',
-        columns: [
-          { key: 'sectionName', label: 'Section', render: (r) => `<span class="cell-primary">${r.className} — ${r.sectionName}</span><span class="cell-sub mono-code">${r.id}</span>` },
-          { key: 'roomWing', label: 'Hostel Wing Mapping' },
-          { key: 'advisor', label: 'Section Advisor' },
-          { key: 'studentsCount', label: 'Students', render: (r) => `${r.activeCallers} active / ${r.studentsCount}` },
-          { key: 'assignedBooth', label: 'Primary Calling Booth' },
-          { key: 'status', label: 'Status', render: (r) => badge(r.status) }
-        ],
-        rowActions: (r) => [
-          { label: 'Archive Section', icon: 'archive', danger: true, onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived') }
-        ]
-      }),
+      'sch-sections-table': () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolCode = urlParams.get('school_code') || 'SCH-1001';
+        const classFilter = urlParams.get('class') || '';
+        const fetchUrl = `/api/v1/school-admin/sections/?school_code=${encodeURIComponent(schoolCode)}${classFilter ? `&className=${encodeURIComponent(classFilter)}` : ''}`;
+        return {
+          url: fetchUrl,
+          data: D.sections,
+          searchPlaceholder: 'Search section, class, advisor, or hostel wing...',
+          filters: [
+            { key: 'className', label: 'Class', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] }
+          ],
+          exportFilename: 'school-sections.csv',
+          columns: [
+            { key: 'sectionName', label: 'Section', render: (r) => `<span class="cell-primary">${r.className} — ${r.sectionName}</span><span class="cell-sub mono-code">${r.id}</span>` },
+            { key: 'roomWing', label: 'Hostel Wing Mapping' },
+            { key: 'advisor', label: 'Section Advisor' },
+            { key: 'studentsCount', label: 'Students', render: (r) => `${r.activeCallers ?? 0} active / ${r.studentsCount ?? 0}` },
+            { key: 'assignedBooth', label: 'Primary Calling Booth' },
+            { key: 'status', label: 'Status', render: (r) => badge(r.status) }
+          ],
+          rowActions: (r) => [
+            { label: r.status === 'Active' ? 'Archive Section' : 'Activate Section', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived') }
+          ]
+        };
+      },
 
       'sch-guardians-table': () => ({
         data: D.guardians,
@@ -647,13 +679,14 @@
       })
     };
 
+    window.S2DActiveTables = window.S2DActiveTables || {};
     document.querySelectorAll('[data-s2d-table]').forEach((el) => {
       const key = el.getAttribute('data-s2d-table');
       const factory = specs[key];
       if (!factory) return;
       const cfg = factory();
       cfg.mount = el;
-      new T(cfg);
+      window.S2DActiveTables[key] = new T(cfg);
     });
   }
 

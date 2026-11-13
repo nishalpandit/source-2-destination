@@ -34,12 +34,40 @@
         </div>
         <div data-s2d-table="sch-classes-table"></div>
         <div class="s2d-modal-backdrop" id="add-class-modal">
-          <div class="s2d-modal-dialog"><div class="s2d-modal-header"><h3 class="s2d-card-title">Create New Academic Class</h3><button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button></div>
-            <form data-s2d-form data-success-title="Class Added (Demo)"><div class="s2d-modal-body">
-              <div class="s2d-field"><label class="s2d-label">Class / Grade Name <span class="req-star">*</span></label><input type="text" class="s2d-input" placeholder="Grade 6" required></div>
-              <div class="s2d-field"><label class="s2d-label">Grade Coordinator <span class="req-star">*</span></label><input type="text" class="s2d-input" placeholder="Mrs. Eleanor Hughes" required></div>
-              <div class="s2d-field"><label class="s2d-label">Default Daily Call Cap (Mins) <span class="req-star">*</span></label><input type="number" min="5" max="20" class="s2d-input" value="10" required></div>
-            </div><div class="s2d-modal-footer"><button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button><button type="submit" class="btn-s2d btn-s2d-primary">Save Class</button></div></form>
+          <div class="s2d-modal-dialog">
+            <div class="s2d-modal-header">
+              <h3 class="s2d-card-title">Create New Academic Class</h3>
+              <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button>
+            </div>
+            <form method="POST" action="list.html" data-s2d-form data-success-title="Academic Class Created" data-success-desc="Grade added to campus academic hierarchy.">
+              {% csrf_token %}
+              <div class="s2d-modal-body">
+                <div class="s2d-field">
+                  <label class="s2d-label" for="new_class_name">Class / Grade Name <span class="req-star">*</span></label>
+                  <input type="text" id="new_class_name" name="className" class="s2d-input" placeholder="e.g. Grade 6 or Class 11-Science" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="new_supervisor">Grade Coordinator / Supervisor <span class="req-star">*</span></label>
+                  <input type="text" id="new_supervisor" name="supervisor" class="s2d-input" placeholder="e.g. Mrs. Eleanor Hughes" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="new_daily_cap">Default Daily Call Cap (Mins) <span class="req-star">*</span></label>
+                  <input type="number" id="new_daily_cap" name="defaultDailyMinutes" min="5" max="60" class="s2d-input" value="15" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="new_sched_group">Calling Schedule Policy</label>
+                  <select id="new_sched_group" name="schedule_group" class="s2d-select">
+                    <option value="Standard Hostel Window">Standard Hostel Window</option>
+                    <option value="Junior Evening Window">Junior Evening Window</option>
+                    <option value="Senior Study-Safe Window">Senior Study-Safe Window</option>
+                  </select>
+                </div>
+              </div>
+              <div class="s2d-modal-footer">
+                <button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Save Class</span></button>
+              </div>
+            </form>
           </div>
         </div>
     

@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, F
 from django.core.paginator import Paginator, EmptyPage
-from .models import School, Franchise, Student
+from .models import School, Franchise, Student, AcademicClass, ClassSection
 
 
 def api_status(request):
@@ -863,3 +863,340 @@ def student_bulk_status_api(request):
         "message": f"Bulk students updated to {new_status}",
         "updated_count": updated_count
     })
+
+
+# =========================================================================
+# SCHOOL ADMIN: DYNAMIC CLASSES & SECTIONS API
+# =========================================================================
+
+def _serialize_class(c):
+    """Serialize AcademicClass model into JSON matching sch-classes-table specs."""
+    students_qs = Student.objects.filter(school=c.school, class_name=c.name)
+    total_students = students_qs.count()
+    active_students = students_qs.filter(status='Active').count()
+    sections_count = c.sections.filter(status='Active').count()
+
+    return {
+        "id": c.code,
+        "db_id": c.id,
+        "schoolId": c.school.code,
+        "className": c.name,
+        "supervisor": c.supervisor or "Faculty Supervisor",
+        "sectionsCount": sections_count,
+        "studentsCount": total_students,
+        "activeAccounts": active_students,
+        "defaultDailyMinutes": c.default_daily_minutes,
+        "scheduleGroup": c.schedule_group,
+        "status": c.status,
+        "createdAt": c.created_at.strftime("%Y-%m-%d")
+    }
+
+
+def _serialize_section(s):
+    """Serialize ClassSection model into JSON matching sch-sections-table specs."""
+    students_qs = Student.objects.filter(school=s.school, class_name=s.academic_class.name, section=s.name)
+    total_students = students_qs.count()
+    active_callers = students_qs.filter(status='Active').count()
+
+    return {
+        "id": s.code,
+        "db_id": s.id,
+        "schoolId": s.school.code,
+        "classId": s.academic_class.code,
+        "className": s.academic_class.name,
+        "sectionName": s.name,
+        "roomWing": s.room_wing or "Campus Hostel Wing",
+        "advisor": s.advisor or "Faculty Advisor",
+        "studentsCount": total_students,
+        "activeCallers": active_callers,
+        "assignedBooth": s.assigned_booth or "Hostel Kiosk Booth",
+        "status": s.status,
+        "createdAt": s.created_at.strftime("%Y-%m-%d")
+    }
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def classes_collection_api(request):
+    """
+    GET  /api/v1/school-admin/classes/ -> Paginated academic classes for campus
+    POST /api/v1/school-admin/classes/ -> Add new academic class/grade
+    """
+    school_code = request.GET.get('school_code', 'SCH-1001').strip()
+    school = School.objects.filter(Q(code=school_code) | Q(name__icontains=school_code)).first()
+    if not school:
+        school = School.objects.first()
+
+    if request.method == "GET":
+        try:
+            page = max(1, int(request.GET.get('page', 1)))
+            page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+        except (ValueError, TypeError):
+            page = 1
+            page_size = 10
+
+        qs = AcademicClass.objects.filter(school=school).select_related('school')
+
+        status_filter = request.GET.get('status', '').strip()
+        if status_filter and status_filter.lower() != 'all':
+            qs = qs.filter(status__iexact=status_filter)
+
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            qs = qs.filter(
+                Q(name__icontains=search_query) |
+                Q(code__icontains=search_query) |
+                Q(supervisor__icontains=search_query)
+            )
+
+        paginator = Paginator(qs.order_by('name', 'id'), page_size)
+        try:
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page_obj = []
+
+        return JsonResponse({
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": page,
+            "page_size": page_size,
+            "results": [_serialize_class(c) for c in page_obj]
+        })
+
+    elif request.method == "POST":
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        name = (data.get('className') or data.get('name') or '').strip()
+        if not name:
+            return JsonResponse({"error": "Class / Grade name is required"}, status=400)
+
+        # Check existing
+        existing = AcademicClass.objects.filter(school=school, name__iexact=name).first()
+        if existing:
+            return JsonResponse({"error": f"Class '{name}' already exists in this campus"}, status=400)
+
+        code = data.get('code', '').strip()
+        if not code:
+            digits = ''.join(c for c in name if c.isdigit())
+            code = f"CLS-{digits}" if digits else f"CLS-{AcademicClass.objects.filter(school=school).count() + 1:02d}"
+
+        supervisor = data.get('supervisor', '').strip()
+        daily_min = int(data.get('defaultDailyMinutes') or data.get('default_daily_minutes') or 15)
+        sched_group = data.get('scheduleGroup') or data.get('schedule_group') or 'Standard Hostel Window'
+
+        class_obj = AcademicClass.objects.create(
+            school=school,
+            code=code,
+            name=name,
+            supervisor=supervisor,
+            default_daily_minutes=daily_min,
+            schedule_group=sched_group,
+            status='Active'
+        )
+
+        return JsonResponse({
+            "message": "Class created successfully",
+            "class": _serialize_class(class_obj)
+        }, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "PATCH", "DELETE"])
+def class_item_api(request, class_id):
+    """
+    GET    /api/v1/school-admin/classes/<class_id>/ -> Details
+    PUT    /api/v1/school-admin/classes/<class_id>/ -> Update
+    PATCH  /api/v1/school-admin/classes/<class_id>/ -> Update status or fields
+    DELETE /api/v1/school-admin/classes/<class_id>/ -> Archive class
+    """
+    class_obj = AcademicClass.objects.filter(Q(code=class_id) | Q(id=class_id if str(class_id).isdigit() else 0)).select_related('school').first()
+    if not class_obj:
+        return JsonResponse({"error": f"Class '{class_id}' not found"}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse(_serialize_class(class_obj))
+
+    elif request.method in ["PUT", "PATCH"]:
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        for field in ['name', 'supervisor', 'schedule_group', 'status']:
+            if field in data:
+                setattr(class_obj, field, data[field])
+        if 'className' in data:
+            class_obj.name = data['className']
+        if 'defaultDailyMinutes' in data:
+            class_obj.default_daily_minutes = int(data['defaultDailyMinutes'])
+        elif 'default_daily_minutes' in data:
+            class_obj.default_daily_minutes = int(data['default_daily_minutes'])
+
+        class_obj.save()
+        return JsonResponse({"message": "Class updated successfully", "class": _serialize_class(class_obj)})
+
+    elif request.method == "DELETE":
+        class_obj.status = "Archived"
+        class_obj.save(update_fields=['status'])
+        return JsonResponse({"message": f"Class '{class_obj.name}' archived", "status": "Archived"})
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def sections_collection_api(request):
+    """
+    GET  /api/v1/school-admin/sections/ -> Paginated sections for campus
+    POST /api/v1/school-admin/sections/ -> Add new section under class
+    """
+    school_code = request.GET.get('school_code', 'SCH-1001').strip()
+    school = School.objects.filter(Q(code=school_code) | Q(name__icontains=school_code)).first()
+    if not school:
+        school = School.objects.first()
+
+    if request.method == "GET":
+        try:
+            page = max(1, int(request.GET.get('page', 1)))
+            page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+        except (ValueError, TypeError):
+            page = 1
+            page_size = 10
+
+        qs = ClassSection.objects.filter(school=school).select_related('academic_class', 'school')
+
+        class_filter = request.GET.get('className', request.GET.get('class', '')).strip()
+        if class_filter and class_filter.lower() != 'all':
+            qs = qs.filter(Q(academic_class__name__iexact=class_filter) | Q(academic_class__code__iexact=class_filter))
+
+        status_filter = request.GET.get('status', '').strip()
+        if status_filter and status_filter.lower() != 'all':
+            qs = qs.filter(status__iexact=status_filter)
+
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            qs = qs.filter(
+                Q(name__icontains=search_query) |
+                Q(code__icontains=search_query) |
+                Q(academic_class__name__icontains=search_query) |
+                Q(advisor__icontains=search_query) |
+                Q(room_wing__icontains=search_query)
+            )
+
+        paginator = Paginator(qs.order_by('academic_class__name', 'name'), page_size)
+        try:
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page_obj = []
+
+        return JsonResponse({
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": page,
+            "page_size": page_size,
+            "results": [_serialize_section(s) for s in page_obj]
+        })
+
+    elif request.method == "POST":
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        parent_class_id = data.get('parent_class') or data.get('className') or data.get('class')
+        parent_class = AcademicClass.objects.filter(
+            Q(code=parent_class_id) | Q(name__iexact=parent_class_id) | Q(id=parent_class_id if str(parent_class_id).isdigit() else 0),
+            school=school
+        ).first()
+
+        if not parent_class:
+            return JsonResponse({"error": "Valid parent class is required"}, status=400)
+
+        name = (data.get('sectionName') or data.get('name') or '').strip()
+        if not name:
+            return JsonResponse({"error": "Section name/label is required"}, status=400)
+
+        # Check existing
+        existing = ClassSection.objects.filter(academic_class=parent_class, name__iexact=name).first()
+        if existing:
+            return JsonResponse({"error": f"Section '{name}' already exists in {parent_class.name}"}, status=400)
+
+        code = data.get('code', '').strip()
+        if not code:
+            cls_digits = ''.join(c for c in parent_class.name if c.isdigit())
+            sec_letter = ''.join(c for c in name if c.isalpha())
+            code = f"SEC-{cls_digits}{sec_letter[:1]}" if (cls_digits and sec_letter) else f"SEC-{ClassSection.objects.filter(school=school).count() + 1:02d}"
+
+        room_wing = (data.get('roomWing') or data.get('room_wing') or '').strip()
+        advisor = (data.get('advisor') or '').strip()
+        booth = (data.get('assignedBooth') or data.get('assigned_booth') or 'North Hall Booth 1').strip()
+
+        sec_obj = ClassSection.objects.create(
+            academic_class=parent_class,
+            school=school,
+            code=code,
+            name=name,
+            room_wing=room_wing,
+            advisor=advisor,
+            assigned_booth=booth,
+            status='Active'
+        )
+
+        return JsonResponse({
+            "message": "Section created successfully",
+            "section": _serialize_section(sec_obj)
+        }, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "PATCH", "DELETE"])
+def section_item_api(request, section_id):
+    """
+    GET    /api/v1/school-admin/sections/<section_id>/ -> Details
+    PUT    /api/v1/school-admin/sections/<section_id>/ -> Update
+    PATCH  /api/v1/school-admin/sections/<section_id>/ -> Update status or fields
+    DELETE /api/v1/school-admin/sections/<section_id>/ -> Archive section
+    """
+    sec = ClassSection.objects.filter(Q(code=section_id) | Q(id=section_id if str(section_id).isdigit() else 0)).select_related('academic_class', 'school').first()
+    if not sec:
+        return JsonResponse({"error": f"Section '{section_id}' not found"}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse(_serialize_section(sec))
+
+    elif request.method in ["PUT", "PATCH"]:
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        for field in ['name', 'room_wing', 'advisor', 'assigned_booth', 'status']:
+            if field in data:
+                setattr(sec, field, data[field])
+        if 'sectionName' in data:
+            sec.name = data['sectionName']
+        if 'roomWing' in data:
+            sec.room_wing = data['roomWing']
+        if 'assignedBooth' in data:
+            sec.assigned_booth = data['assignedBooth']
+
+        sec.save()
+        return JsonResponse({"message": "Section updated successfully", "section": _serialize_section(sec)})
+
+    elif request.method == "DELETE":
+        sec.status = "Archived"
+        sec.save(update_fields=['status'])
+        return JsonResponse({"message": f"Section '{sec.name}' archived", "status": "Archived"})

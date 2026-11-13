@@ -150,7 +150,26 @@
           submitBtn.innerHTML = `<span>Processing...</span>`;
         }
 
-        setTimeout(() => {
+        const submitAction = async () => {
+          if (form.hasAttribute('action') && form.getAttribute('action') !== '#' && !form.getAttribute('action').startsWith('javascript:')) {
+            try {
+              const formData = new FormData(form);
+              await fetch(form.action, {
+                method: form.getAttribute('method') || 'POST',
+                body: formData
+              });
+              if (window.S2DActiveTables) {
+                Object.values(window.S2DActiveTables).forEach(t => t && t.refresh && t.refresh());
+              }
+            } catch (err) {
+              console.warn("Form server submit:", err);
+            }
+          }
+        };
+
+        setTimeout(async () => {
+          await submitAction();
+
           if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerHTML = origHtml;

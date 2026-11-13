@@ -34,12 +34,51 @@
         </div>
         <div data-s2d-table="sch-sections-table"></div>
         <div class="s2d-modal-backdrop" id="add-section-modal">
-          <div class="s2d-modal-dialog"><div class="s2d-modal-header"><h3 class="s2d-card-title">Add Class Section</h3><button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button></div>
-            <form data-s2d-form data-success-title="Section Created (Demo)"><div class="s2d-modal-body">
-              <div class="s2d-field"><label class="s2d-label">Parent Class <span class="req-star">*</span></label><select class="s2d-select" required><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div>
-              <div class="s2d-field"><label class="s2d-label">Section Label <span class="req-star">*</span></label><input type="text" class="s2d-input" placeholder="Section D" required></div>
-              <div class="s2d-field"><label class="s2d-label">Hostel Wing Mapping <span class="req-star">*</span></label><input type="text" class="s2d-input" placeholder="North Hall · Floor 2" required></div>
-            </div><div class="s2d-modal-footer"><button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button><button type="submit" class="btn-s2d btn-s2d-primary">Create Section</button></div></form>
+          <div class="s2d-modal-dialog">
+            <div class="s2d-modal-header">
+              <h3 class="s2d-card-title">Add Class Section</h3>
+              <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button>
+            </div>
+            <form method="POST" action="sections.html" data-s2d-form data-success-title="Section Created" data-success-desc="Section registered under selected academic grade.">
+              {% csrf_token %}
+              <div class="s2d-modal-body">
+                <div class="s2d-field">
+                  <label class="s2d-label" for="sec_parent_class">Parent Class <span class="req-star">*</span></label>
+                  <select id="sec_parent_class" name="parent_class" class="s2d-select" required>
+                    {% for c in classes %}
+                    <option value="{{ c.name }}">{{ c.name }} ({{ c.code }})</option>
+                    {% empty %}
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 9">Grade 9</option>
+                    <option value="Grade 10">Grade 10</option>
+                    <option value="Grade 11">Grade 11</option>
+                    <option value="Grade 12">Grade 12</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="sec_label">Section Label <span class="req-star">*</span></label>
+                  <input type="text" id="sec_label" name="sectionName" class="s2d-input" placeholder="e.g. Section D" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="sec_wing">Hostel Wing Mapping <span class="req-star">*</span></label>
+                  <input type="text" id="sec_wing" name="roomWing" class="s2d-input" placeholder="e.g. North Hall · Floor 2" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="sec_advisor">Section Advisor</label>
+                  <input type="text" id="sec_advisor" name="advisor" class="s2d-input" placeholder="e.g. Mr. Victor Sterling">
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="sec_booth">Primary Calling Booth</label>
+                  <input type="text" id="sec_booth" name="assignedBooth" class="s2d-input" placeholder="North Hall Booth 1" value="North Hall Booth 1">
+                </div>
+              </div>
+              <div class="s2d-modal-footer">
+                <button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Create Section</span></button>
+              </div>
+            </form>
           </div>
         </div>
     
