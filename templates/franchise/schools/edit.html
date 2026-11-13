@@ -26,18 +26,19 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">EDIT ASSIGNED CAMPUS · <span data-bind-field="id">SCH-1001</span></div><h1 class="page-title">Edit <span data-bind-field="name">Oakridge Residential Academy</span></h1><p class="page-description">Update campus contact metadata within franchise scope. Subscription contract tiers are governed by Super Admin.</p></div>
-          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back</span></a></div>
+          <div class="page-header-info"><div class="page-eyebrow">EDIT ASSIGNED CAMPUS · <span data-bind-field="id">{{ school.code }}</span></div><h1 class="page-title">Edit <span data-bind-field="name">{{ school.name }}</span></h1><p class="page-description">Update campus contact metadata within franchise scope. Subscription contract tiers are governed by Super Admin.</p></div>
+          <div class="page-actions"><a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Profile</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id=SCH-1001" data-success-title="Assigned School Updated (Demo)">
+          <form method="POST" action="edit.html?id={{ school.code }}" data-s2d-form data-warn-unsaved="true">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="Oakridge Residential Academy" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Territory Allocation (Locked)</label><input type="text" class="s2d-input" value="FRN-101 · North-East EduNet Partners" readonly></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="Dr. Arthur Pendelton" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Campus Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="+1 (555) 210-9001" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ school.name }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Territory Allocation (Locked)</label><input type="text" class="s2d-input" value="{{ school.franchise.code }} · {{ school.franchise.name }}" readonly></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Campus Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required></div>
             </div>
-            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Details</span></button></div></div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Details</span></button></div></div>
           </form>
         </div></div>
     

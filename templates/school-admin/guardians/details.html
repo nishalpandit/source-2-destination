@@ -27,20 +27,20 @@
 
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">GUARDIAN WHITELIST RECORD · <span data-bind-field="id">{{ guardian.code|default:"GRD-501" }}</span></div>
-            <h1 class="page-title" data-bind-field="name">{{ guardian.name|default:"Robert Hawthorne" }}</h1>
-            <p class="page-description">Linked Student: <strong data-bind-field="studentName">{{ student.name|default:"Liam Hawthorne" }}</strong> (<span data-bind-field="className">{{ student.class_name|default:"Grade 10" }} · {{ student.section|default:"Sec A" }}</span>) · Whitelist: <span class="s2d-badge s2d-badge-info">{{ guardian.whitelist_status|default:"Authorized (2 Numbers)" }}</span></p>
+            <div class="page-eyebrow">GUARDIAN WHITELIST RECORD · <span data-bind-field="id">{{ guardian.code }}</span></div>
+            <h1 class="page-title" data-bind-field="name">{{ guardian.name }}</h1>
+            <p class="page-description">Linked Student: <strong data-bind-field="studentName">{{ student.name }}</strong> (<span data-bind-field="className">{{ student.class_name }} · {{ student.section }}</span>) · Whitelist: <span class="s2d-badge s2d-badge-info">{{ guardian.whitelist_status }}</span></p>
           </div>
           <div class="page-actions">
-            <a href="edit.html?id={{ guardian.code|default:'GRD-501' }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Numbers</span></a>
+            <a href="edit.html?id={{ guardian.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Numbers</span></a>
             <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
           </div>
         </div>
         <div class="s2d-card mb-4"><div class="s2d-card-body"><div class="kv-grid">
-          <div><div class="kv-item-label">Father Number</div><div class="kv-item-value mono-code" data-bind-field="fatherPhone">{{ guardian.father_phone|default:"+1 (555) 801-2210" }}</div></div>
-          <div><div class="kv-item-label">Mother Number</div><div class="kv-item-value mono-code" data-bind-field="motherPhone">{{ guardian.mother_phone|default:"+1 (555) 801-2211" }}</div></div>
-          <div><div class="kv-item-label">Emergency Contact</div><div class="kv-item-value mono-code" data-bind-field="emergencyPhone">{{ guardian.emergency_phone|default:"+1 (555) 801-2299" }}</div></div>
-          <div><div class="kv-item-label">KYC Verification</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success" data-bind-field="verification">{{ guardian.verification|default:"KYC Verified" }}</span></div></div>
+          <div><div class="kv-item-label">Father Number</div><div class="kv-item-value mono-code" data-bind-field="fatherPhone">{{ guardian.father_phone|default:"None" }}</div></div>
+          <div><div class="kv-item-label">Mother Number</div><div class="kv-item-value mono-code" data-bind-field="motherPhone">{{ guardian.mother_phone|default:"None" }}</div></div>
+          <div><div class="kv-item-label">Emergency Contact</div><div class="kv-item-value mono-code" data-bind-field="emergencyPhone">{{ guardian.emergency_phone|default:"None" }}</div></div>
+          <div><div class="kv-item-label">KYC Verification</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success" data-bind-field="verification">{{ guardian.verification }}</span></div></div>
         </div></div></div>
         <div data-s2d-table="global-call-history-table"></div>
     

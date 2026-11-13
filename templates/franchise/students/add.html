@@ -30,15 +30,38 @@
           <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Student List</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Student Enrolled (Demo)">
+          <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Student Enrolled" data-success-desc="Student enrolled into territory campus.">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label><select name="school" class="s2d-select" required><option value="SCH-1001">Oakridge Residential Academy</option><option value="SCH-1002">Westfield Collegiate Hostel</option><option value="SCH-1003">St. Jude Boarding Institute</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Harrison Vance" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label><select name="className" class="s2d-select" required><option>Grade 9</option><option>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label><select name="section" class="s2d-select" required><option>Section A</option><option>Section B</option><option>Section C</option></select></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Unique Calling Code</label><input type="text" class="s2d-input mono-code" value="ISSUED-BY-BACKEND-API" readonly></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name <span class="req-star">*</span></label><input type="text" name="guardianName" class="s2d-input" placeholder="Thomas Vance (Father)" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Authorized Primary Phone <span class="req-star">*</span></label><input type="tel" name="primaryPhone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 840-1290" required></div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Assigned School <span class="req-star">*</span></label>
+                <select name="school" class="s2d-select" required>
+                  {% for sch in schools %}
+                  <option value="{{ sch.code }}">{{ sch.code }} · {{ sch.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Legal full name" required></div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Class <span class="req-star">*</span></label>
+                <select name="className" class="s2d-select" required>
+                  <option value="Grade 9">Grade 9</option>
+                  <option value="Grade 10">Grade 10</option>
+                  <option value="Grade 11">Grade 11</option>
+                  <option value="Grade 12">Grade 12</option>
+                </select>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Section <span class="req-star">*</span></label>
+                <select name="section" class="s2d-select" required>
+                  <option value="Section A">Section A</option>
+                  <option value="Section B">Section B</option>
+                  <option value="Section C">Section C</option>
+                </select>
+              </div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Unique Calling Code</label><input type="text" class="s2d-input mono-code" value="Auto-generated on save" readonly></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name <span class="req-star">*</span></label><input type="text" name="guardianName" class="s2d-input" placeholder="e.g. Thomas Vance (Father)" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Authorized Primary Phone <span class="req-star">*</span></label><input type="tel" name="primaryPhone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 000-0000" required></div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Save Student</span></button></div></div>
           </form>

@@ -25,14 +25,14 @@
       <main class="app-content">
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">STUDENT 360° PROFILE · <span data-bind-field="studentCode">S2D-OAK-8841</span></div>
-            <h1 class="page-title" data-bind-field="name">Liam Hawthorne</h1>
-            <p class="page-description"><span data-bind-field="className">Grade 10</span> · <span data-bind-field="section">Section A</span> · <span data-bind-field="hostelWing">North Hall · Rm 204</span></p>
+            <div class="page-eyebrow">STUDENT 360° PROFILE · <span data-bind-field="studentCode">{{ student.calling_code }}</span></div>
+            <h1 class="page-title" data-bind-field="name">{{ student.name }}</h1>
+            <p class="page-description"><span data-bind-field="className">{{ student.class_name }}</span> · <span data-bind-field="section">{{ student.section }}</span> · <span data-bind-field="hostelWing">{{ student.hostel_wing }}</span></p>
           </div>
           <div class="page-actions">
-            <a href="../recharges/student-recharge.html?student=STU-4001" class="btn-s2d btn-s2d-soft"><i data-lucide="zap"></i><span>Recharge Credits</span></a>
-            <a href="edit.html?id=STU-4001" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Student</span></a>
-            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Deactivate Student Calling Account" data-record-label="S2D-OAK-8841 · Liam Hawthorne" data-confirm-prompt="Deactivating this account immediately suspends booth logins for Liam Hawthorne until reactivated."><i data-lucide="power"></i><span>Deactivate</span></button>
+            <a href="../recharges/student-recharge.html?student={{ student.code }}" class="btn-s2d btn-s2d-soft"><i data-lucide="zap"></i><span>Recharge Credits</span></a>
+            <a href="edit.html?id={{ student.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Student</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
           </div>
         </div>
 
@@ -51,19 +51,19 @@
           <!-- Tab 1: Overview -->
           <div class="s2d-tab-panel active" id="stu-overview">
             <div class="row g-3 mb-4">
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Remaining Credits</div><div class="kpi-value mt-2"><span data-bind-field="remainingMinutes">142</span>m</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Daily Cap</div><div class="kpi-value mt-2"><span data-bind-field="dailyLimitMin">15</span>m</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Validity Expiry</div><div class="kpi-value mt-2 mono-code" style="font-size:1.2rem;" data-bind-field="validityExpiry">2027-05-31</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Account Status</div><div class="mt-2"><span class="s2d-badge s2d-badge-success" data-bind-field="status">Active</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Remaining Credits</div><div class="kpi-value mt-2"><span data-bind-field="remainingMinutes">{{ student.remaining_minutes }}</span>m</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Daily Cap</div><div class="kpi-value mt-2"><span data-bind-field="dailyLimitMin">{{ student.daily_limit_min }}</span>m</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Validity Expiry</div><div class="kpi-value mt-2 mono-code" style="font-size:1.2rem;" data-bind-field="validityExpiry">{{ student.validity_expiry|date:'Y-m-d' }}</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Account Status</div><div class="mt-2"><span class="s2d-badge {% if student.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}" data-bind-field="status">{{ student.status }}</span></div></div></div>
             </div>
             <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Enrollment &amp; Hostel Identity</h3></div>
               <div class="s2d-card-body"><div class="kv-grid">
-                <div><div class="kv-item-label">Student Record ID</div><div class="kv-item-value mono-code" data-bind-field="id">STU-4001</div></div>
-                <div><div class="kv-item-label">Server-Issued Calling Code</div><div class="kv-item-value mono-code" data-bind-field="studentCode">S2D-OAK-8841</div></div>
-                <div><div class="kv-item-label">School</div><div class="kv-item-value" data-bind-field="school">Oakridge Residential Academy</div></div>
-                <div><div class="kv-item-label">Class &amp; Section</div><div class="kv-item-value"><span data-bind-field="className">Grade 10</span> · <span data-bind-field="section">Section A</span></div></div>
-                <div><div class="kv-item-label">Hostel Room</div><div class="kv-item-value" data-bind-field="hostelWing">North Hall · Rm 204</div></div>
-                <div><div class="kv-item-label">Assigned Booth</div><div class="kv-item-value" data-bind-field="assignedDevice">DEV-7701 (North Hall Booth 1)</div></div>
+                <div><div class="kv-item-label">Student Record ID</div><div class="kv-item-value mono-code" data-bind-field="id">{{ student.code }}</div></div>
+                <div><div class="kv-item-label">Server-Issued Calling Code</div><div class="kv-item-value mono-code" data-bind-field="studentCode">{{ student.calling_code }}</div></div>
+                <div><div class="kv-item-label">School</div><div class="kv-item-value" data-bind-field="school">{{ student.school.name }}</div></div>
+                <div><div class="kv-item-label">Class &amp; Section</div><div class="kv-item-value"><span data-bind-field="className">{{ student.class_name }}</span> · <span data-bind-field="section">{{ student.section }}</span></div></div>
+                <div><div class="kv-item-label">Hostel Room</div><div class="kv-item-value" data-bind-field="hostelWing">{{ student.hostel_wing }}</div></div>
+                <div><div class="kv-item-label">Assigned Booth Group</div><div class="kv-item-value" data-bind-field="assignedDevice">{{ student.school.kiosk_group_tag|default:"Campus Calling Booth" }}</div></div>
               </div></div>
             </div>
           </div>
@@ -75,8 +75,17 @@
                 <table class="s2d-table">
                   <thead><tr><th>Contact Name</th><th>Relationship</th><th>Authorized Phone</th><th>Verification</th><th>Dialer Access</th></tr></thead>
                   <tbody>
-                    <tr><td class="cell-primary">Robert Hawthorne</td><td>Father (Primary)</td><td class="mono-code">+1 (555) 801-2210</td><td><span class="s2d-badge s2d-badge-success">KYC Verified</span></td><td><span class="s2d-badge s2d-badge-success">Whitelisted</span></td></tr>
-                    <tr><td class="cell-primary">Claire Hawthorne</td><td>Mother</td><td class="mono-code">+1 (555) 801-2211</td><td><span class="s2d-badge s2d-badge-success">KYC Verified</span></td><td><span class="s2d-badge s2d-badge-success">Whitelisted</span></td></tr>
+                    {% for g in student.guardian_contacts.all %}
+                    <tr>
+                      <td class="cell-primary">{{ g.name }}</td>
+                      <td>{{ g.relation }}</td>
+                      <td class="mono-code">{{ g.father_phone|default:g.mother_phone }}</td>
+                      <td><span class="s2d-badge s2d-badge-success">{{ g.verification }}</span></td>
+                      <td><span class="s2d-badge {% if g.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-secondary{% endif %}">{{ g.status }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-3">No authorized guardian contacts enrolled yet.</td></tr>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -87,10 +96,10 @@
           <div class="s2d-tab-panel" id="stu-rules">
             <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Effective Calling Rules &amp; Inherited Ceilings</h3></div>
               <div class="s2d-card-body"><div class="kv-grid">
-                <div><div class="kv-item-label">Per-Call Cap</div><div class="kv-item-value">15 Minutes (Inherited Grade 10 Policy)</div></div>
-                <div><div class="kv-item-label">Daily Cumulative Cap</div><div class="kv-item-value">15 Minutes / Day</div></div>
-                <div><div class="kv-item-label">Allowed Weekday Window</div><div class="kv-item-value mono-code">17:30 – 21:00 EST</div></div>
-                <div><div class="kv-item-label">Allowed Sunday Window</div><div class="kv-item-value mono-code">10:00 – 20:00 EST</div></div>
+                <div><div class="kv-item-label">Per-Call Cap</div><div class="kv-item-value">{{ student.daily_limit_min }} Minutes</div></div>
+                <div><div class="kv-item-label">Daily Cumulative Cap</div><div class="kv-item-value">{{ student.daily_limit_min }} Minutes / Day</div></div>
+                <div><div class="kv-item-label">Allowed Calling Days</div><div class="kv-item-value">{{ student.school.allowed_calling_days }}</div></div>
+                <div><div class="kv-item-label">Calling Window</div><div class="kv-item-value mono-code">{{ student.school.calling_window_start|time:"H:i" }} – {{ student.school.calling_window_end|time:"H:i" }}</div></div>
               </div></div>
             </div>
           </div>
@@ -102,11 +111,11 @@
 
           <!-- Tab 5: Validity -->
           <div class="s2d-tab-panel" id="stu-validity">
-            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Student Account Validity</h3><button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" data-demo-action="Validity Extended (+90 Days)">Extend +90 Days</button></div>
+            <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Student Account Validity</h3></div>
               <div class="s2d-card-body"><div class="kv-grid">
-                <div><div class="kv-item-label">Activated On</div><div class="kv-item-value mono-code" data-bind-field="validityStart">2026-08-01</div></div>
-                <div><div class="kv-item-label">Current Expiry Date</div><div class="kv-item-value mono-code" data-bind-field="validityExpiry">2027-05-31</div></div>
-                <div><div class="kv-item-label">Validity Health</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success">Active</span></div></div>
+                <div><div class="kv-item-label">Activated On</div><div class="kv-item-value mono-code" data-bind-field="validityStart">{{ student.validity_start|date:'Y-m-d' }}</div></div>
+                <div><div class="kv-item-label">Current Expiry Date</div><div class="kv-item-value mono-code" data-bind-field="validityExpiry">{{ student.validity_expiry|date:'Y-m-d' }}</div></div>
+                <div><div class="kv-item-label">Validity Status</div><div class="kv-item-value"><span class="s2d-badge {% if student.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}">{{ student.status }}</span></div></div>
               </div></div>
             </div>
           </div>

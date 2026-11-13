@@ -26,8 +26,11 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">ASSIGNED CAMPUS · <span data-bind-field="id">SCH-1001</span></div><h1 class="page-title" data-bind-field="name">Oakridge Residential Academy</h1><p class="page-description"><span data-bind-field="city">Hartford, CT</span> · Territory Allocated: <strong>FRN-101</strong> · 18% Commission Eligible</p></div>
-          <div class="page-actions"><a href="edit.html?id=SCH-1001" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Campus</span></a><a href="../students/add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="user-plus"></i><span>Add Student</span></a></div>
+          <div class="page-header-info"><div class="page-eyebrow">ASSIGNED CAMPUS · <span data-bind-field="id">{{ school.code }}</span></div><h1 class="page-title" data-bind-field="name">{{ school.name }}</h1><p class="page-description"><span data-bind-field="city">{{ school.city }}</span> · Territory Allocated: <strong>{{ school.franchise.code }}</strong> · 18% Commission Eligible</p></div>
+          <div class="page-actions">
+            <a href="edit.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Campus</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Schools</span></a>
+          </div>
         </div>
         <div class="s2d-tabs" data-s2d-tabs="fr-school-tabs">
           <button type="button" class="s2d-tab-btn active" data-tab-target="fr-tab-overview">Overview</button>
@@ -37,10 +40,10 @@
         <div id="fr-school-tabs">
           <div class="s2d-tab-panel active" id="fr-tab-overview">
             <div class="s2d-card"><div class="s2d-card-body"><div class="kv-grid">
-              <div><div class="kv-item-label">School ID</div><div class="kv-item-value mono-code" data-bind-field="id">SCH-1001</div></div>
-              <div><div class="kv-item-label">Active / Total Students</div><div class="kv-item-value">658 / 684</div></div>
-              <div><div class="kv-item-label">Monthly Calling Minutes</div><div class="kv-item-value mono-code">42,850 mins</div></div>
-              <div><div class="kv-item-label">Subscription Status</div><div class="kv-item-value"><span class="s2d-badge s2d-badge-success">Active</span></div></div>
+              <div><div class="kv-item-label">School ID</div><div class="kv-item-value mono-code" data-bind-field="id">{{ school.code }}</div></div>
+              <div><div class="kv-item-label">Active / Total Students</div><div class="kv-item-value">{{ school.active_students }} / {{ school.enrolled_students }}</div></div>
+              <div><div class="kv-item-label">Daily Call Cap</div><div class="kv-item-value mono-code">{{ school.daily_duration_cap }} mins/day</div></div>
+              <div><div class="kv-item-label">Subscription Status</div><div class="kv-item-value"><span class="s2d-badge {% if school.subscription_status == 'Active' %}s2d-badge-success{% else %}s2d-badge-warning{% endif %}">{{ school.subscription_status }}</span></div></div>
             </div></div></div>
           </div>
           <div class="s2d-tab-panel" id="fr-tab-students"><div data-s2d-table="fr-students-table"></div></div>

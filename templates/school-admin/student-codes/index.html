@@ -48,7 +48,7 @@
                     {% for s in students %}
                     <option value="{{ s.code }}">{{ s.code }} · {{ s.name }} (Current: {{ s.calling_code }})</option>
                     {% empty %}
-                    <option value="STU-4001">STU-4001 · Liam Hawthorne</option>
+                    <option value="" disabled>No enrolled students available</option>
                     {% endfor %}
                   </select>
                 </div>

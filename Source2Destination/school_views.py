@@ -44,12 +44,37 @@ def dashboard(request):
 def students_list(request):
     """Dynamic campus student directory view."""
     school = get_current_school(request)
-    students_qs = Student.objects.filter(school=school) if school else Student.objects.none()
+    students_qs = Student.objects.filter(school=school).order_by('-id') if school else Student.objects.none()
     total_students = students_qs.count()
     active_students = students_qs.filter(status='Active').count()
 
+    students_data = [
+        {
+            "id": s.code,
+            "code": s.code,
+            "studentCode": s.calling_code,
+            "name": s.name,
+            "gender": s.gender,
+            "schoolId": s.school.code,
+            "school": s.school.name,
+            "className": s.class_name,
+            "section": s.section,
+            "hostelWing": s.hostel_wing or "Boarding Wing",
+            "guardianName": s.guardian_name,
+            "guardianRelation": s.guardian_relation,
+            "primaryPhone": s.primary_phone,
+            "remainingMinutes": s.remaining_minutes,
+            "dailyLimitMin": s.daily_limit_min,
+            "validityExpiry": s.validity_expiry.strftime("%Y-%m-%d") if s.validity_expiry else "2027-05-31",
+            "status": s.status
+        }
+        for s in students_qs
+    ]
+
     context = {
         "school": school,
+        "students": students_qs,
+        "students_json": json.dumps(students_data),
         "total_students": total_students,
         "active_students": active_students,
     }
@@ -89,8 +114,13 @@ def student_add(request):
         )
         return redirect('/school-admin/students/list.html')
 
+    classes = AcademicClass.objects.filter(school=school).order_by('name') if school else AcademicClass.objects.none()
+    sections = ClassSection.objects.filter(school=school).select_related('academic_class').order_by('name') if school else ClassSection.objects.none()
+
     context = {
         "school": school,
+        "classes": classes,
+        "sections": sections,
     }
     return render(request, 'school-admin/students/add.html', context)
 
@@ -254,12 +284,32 @@ def sections_list(request):
 def guardians_list(request):
     """Dynamic School Admin Parents & Guardians Directory."""
     school = get_current_school(request)
-    guardians_qs = Guardian.objects.filter(school=school)
+    guardians_qs = Guardian.objects.filter(school=school).select_related('student')
     total_guardians = guardians_qs.count()
     active_guardians = guardians_qs.filter(status='Active').count()
 
+    guardians_data = [
+        {
+            "id": g.code,
+            "code": g.code,
+            "name": g.name,
+            "studentName": g.student.name if g.student else "Unassigned",
+            "className": f"{g.student.class_name} · {g.student.section}" if g.student else "",
+            "relation": g.relation,
+            "email": g.email,
+            "fatherPhone": g.father_phone or "N/A",
+            "motherPhone": g.mother_phone or "N/A",
+            "verification": g.verification,
+            "whitelistStatus": g.whitelist_status,
+            "status": g.status
+        }
+        for g in guardians_qs
+    ]
+
     context = {
         "school": school,
+        "guardians": guardians_qs,
+        "guardians_json": json.dumps(guardians_data),
         "total_guardians": total_guardians,
         "active_guardians": active_guardians,
     }

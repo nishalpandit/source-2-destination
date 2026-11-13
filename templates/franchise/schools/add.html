@@ -27,9 +27,9 @@
 
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">TERRITORY ONBOARDING · {{ franchise.code|default:"FRN-101" }}</div>
+            <div class="page-eyebrow">TERRITORY ONBOARDING · {{ franchise.code }}</div>
             <h1 class="page-title">Onboard New School in Territory</h1>
-            <p class="page-description">Submit a new residential boarding school registration allocated automatically under {{ franchise.name|default:"North-East EduNet Partners" }}.</p>
+            <p class="page-description">Submit a new residential boarding school registration allocated automatically under {{ franchise.name }}.</p>
           </div>
           <div class="page-actions">
             <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Assigned Schools</span></a>
@@ -50,7 +50,7 @@
                 <div class="row g-3">
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Assigned Franchise Partner</label>
-                    <input type="text" class="s2d-input" value="{{ franchise.code|default:'FRN-101' }} · {{ franchise.name|default:'North-East EduNet Partners' }}" readonly style="background:var(--s2d-surface-subtle);font-weight:600;">
+                    <input type="text" class="s2d-input" value="{{ franchise.code }} · {{ franchise.name }}" readonly style="background:var(--s2d-surface-subtle);font-weight:600;">
                     <span class="field-hint">Campuses are automatically registered within your assigned jurisdiction.</span>
                   </div>
                   <div class="col-md-6 s2d-field">

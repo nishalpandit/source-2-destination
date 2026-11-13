@@ -41,7 +41,7 @@
                     {% for s in schools %}
                     <option value="{{ s.code }}">{{ s.name }} ({{ s.code }})</option>
                     {% empty %}
-                    <option value="SCH-1001">Oakridge Residential Academy</option>
+                    <option value="" disabled>No assigned campuses available</option>
                     {% endfor %}
                   </select>
                 </div>

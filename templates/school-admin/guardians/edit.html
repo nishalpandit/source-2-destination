@@ -26,17 +26,17 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">UPDATE WHITELIST · <span data-bind-field="id">{{ guardian.code|default:"GRD-501" }}</span></div><h1 class="page-title">Edit <span data-bind-field="name">{{ guardian.name|default:"Robert Hawthorne" }}</span></h1><p class="page-description">Modify verified contact numbers or pause dialer authorization for {{ guardian.student.name|default:"student" }}.</p></div>
-          <div class="page-actions"><a href="details.html?id={{ guardian.code|default:'GRD-501' }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Profile</span></a></div>
+          <div class="page-header-info"><div class="page-eyebrow">UPDATE WHITELIST · <span data-bind-field="id">{{ guardian.code }}</span></div><h1 class="page-title">Edit <span data-bind-field="name">{{ guardian.name }}</span></h1><p class="page-description">Modify verified contact numbers or pause dialer authorization for {{ guardian.student.name }}.</p></div>
+          <div class="page-actions"><a href="details.html?id={{ guardian.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Profile</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form method="POST" action="edit.html?id={{ guardian.code|default:'GRD-501' }}" data-s2d-form data-warn-unsaved="true">
+          <form method="POST" action="edit.html?id={{ guardian.code }}" data-s2d-form data-warn-unsaved="true">
             {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Guardian Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ guardian.name|default:'' }}" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="{{ guardian.email|default:'' }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Father Authorized Phone <span class="req-star">*</span></label><input type="tel" name="fatherPhone" class="s2d-input" data-bind-field="fatherPhone" data-validate-phone="true" value="{{ guardian.father_phone|default:'' }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Mother Authorized Phone</label><input type="tel" name="motherPhone" class="s2d-input" data-bind-field="motherPhone" value="{{ guardian.mother_phone|default:'' }}"></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Guardian Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ guardian.name }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="{{ guardian.email }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Father Authorized Phone <span class="req-star">*</span></label><input type="tel" name="fatherPhone" class="s2d-input" data-bind-field="fatherPhone" data-validate-phone="true" value="{{ guardian.father_phone }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Mother Authorized Phone</label><input type="tel" name="motherPhone" class="s2d-input" data-bind-field="motherPhone" value="{{ guardian.mother_phone }}"></div>
               <div class="col-md-4 s2d-field"><label class="s2d-label">Authorization Status</label>
                 <select name="status" class="s2d-select" data-bind-field="status">
                   <option value="Active" {% if guardian.status == 'Active' %}selected{% endif %}>Active (Authorized)</option>
@@ -44,7 +44,7 @@
                 </select>
               </div>
             </div>
-            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="details.html?id={{ guardian.code|default:'GRD-501' }}" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Whitelist</span></button></div></div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="details.html?id={{ guardian.code }}" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Whitelist</span></button></div></div>
           </form>
         </div></div>
     

@@ -26,19 +26,19 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">STUDENT PROFILE · <span data-bind-field="studentCode">S2D-OAK-8841</span></div><h1 class="page-title" data-bind-field="name">Liam Hawthorne</h1><p class="page-description"><span data-bind-field="school">Oakridge Residential Academy</span> · <span data-bind-field="className">Grade 10</span> · <span data-bind-field="section">Section A</span></p></div>
+          <div class="page-header-info"><div class="page-eyebrow">STUDENT PROFILE · <span data-bind-field="studentCode">{{ student.calling_code }}</span></div><h1 class="page-title" data-bind-field="name">{{ student.name }}</h1><p class="page-description"><span data-bind-field="school">{{ student.school.name }}</span> · <span data-bind-field="className">{{ student.class_name }}</span> · <span data-bind-field="section">{{ student.section }}</span></p></div>
           <div class="page-actions">
-            <a href="edit.html?id=STU-4001" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Student</span></a>
-            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Deactivate Student Account" data-record-label="S2D-OAK-8841 · Liam Hawthorne" data-confirm-prompt="Temporarily suspends booth calling access for this student."><i data-lucide="power"></i><span>Deactivate</span></button>
+            <a href="edit.html?id={{ student.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Student</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
           </div>
         </div>
         <div class="s2d-card mb-4"><div class="s2d-card-body"><div class="kv-grid">
-          <div><div class="kv-item-label">Calling Code</div><div class="kv-item-value mono-code" data-bind-field="studentCode">S2D-OAK-8841</div></div>
-          <div><div class="kv-item-label">Guardian</div><div class="kv-item-value" data-bind-field="guardianName">Robert Hawthorne</div></div>
-          <div><div class="kv-item-label">Authorized Phone 1</div><div class="kv-item-value mono-code" data-bind-field="primaryPhone">+1 (555) 801-2210</div></div>
-          <div><div class="kv-item-label">Remaining Credits</div><div class="kv-item-value"><span data-bind-field="remainingMinutes">142</span> mins</div></div>
-          <div><div class="kv-item-label">Validity Expiry</div><div class="kv-item-value mono-code" data-bind-field="validityExpiry">2027-05-31</div></div>
-          <div><div class="kv-item-label">Assigned Booth</div><div class="kv-item-value" data-bind-field="assignedDevice">DEV-7701</div></div>
+          <div><div class="kv-item-label">Calling Code</div><div class="kv-item-value mono-code" data-bind-field="studentCode">{{ student.calling_code }}</div></div>
+          <div><div class="kv-item-label">Guardian</div><div class="kv-item-value" data-bind-field="guardianName">{{ student.guardian_name }} ({{ student.guardian_relation }})</div></div>
+          <div><div class="kv-item-label">Primary Authorized Phone</div><div class="kv-item-value mono-code" data-bind-field="primaryPhone">{{ student.primary_phone }}</div></div>
+          <div><div class="kv-item-label">Remaining Credits</div><div class="kv-item-value"><span data-bind-field="remainingMinutes">{{ student.remaining_minutes }}</span> mins</div></div>
+          <div><div class="kv-item-label">Validity Expiry</div><div class="kv-item-value mono-code" data-bind-field="validityExpiry">{{ student.validity_expiry|date:'Y-m-d' }}</div></div>
+          <div><div class="kv-item-label">Account Status</div><div class="kv-item-value"><span class="s2d-badge {% if student.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}">{{ student.status }}</span></div></div>
         </div></div></div>
         <div data-s2d-table="global-call-history-table"></div>
     

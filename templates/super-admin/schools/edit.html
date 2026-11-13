@@ -24,19 +24,19 @@
       <main class="app-content">
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">EDIT TENANT CONFIGURATION · <span data-bind-field="id">{{ school.code|default:"SCH-1001" }}</span></div>
-            <h1 class="page-title">Edit <span data-bind-field="name">{{ school.name|default:"Oakridge Residential Academy" }}</span></h1>
+            <div class="page-eyebrow">EDIT TENANT CONFIGURATION · <span data-bind-field="id">{{ school.code }}</span></div>
+            <h1 class="page-title">Edit <span data-bind-field="name">{{ school.name }}</span></h1>
             <p class="page-description">Modify school profile, franchise assignment, seat licensing, or account operational status.</p>
           </div>
           <div class="page-actions">
-            <a href="details.html?id={{ school.code|default:'SCH-1001' }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a>
+            <a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a>
             <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Directory</span></a>
           </div>
         </div>
 
         <div class="s2d-card">
           <div class="s2d-card-body">
-            <form method="POST" action="edit.html?id={{ school.code|default:'SCH-1001' }}" data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id={{ school.code|default:'SCH-1001' }}" data-success-title="School Record Updated" data-success-desc="Changes saved to database.">
+            <form method="POST" action="edit.html?id={{ school.code }}" data-s2d-form data-warn-unsaved="true">
               {% csrf_token %}
               <div class="s2d-form-section">
                 <div class="form-section-meta">
@@ -46,19 +46,19 @@
                 <div class="row g-3">
                   <div class="col-md-8 s2d-field">
                     <label class="s2d-label">Official School Name <span class="req-star">*</span></label>
-                    <input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ school.name|default:'Oakridge Residential Academy' }}" required>
+                    <input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ school.name }}" required>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label">Tenant ID (Read-Only)</label>
-                    <input type="text" class="s2d-input mono-code" data-bind-field="id" value="{{ school.code|default:'SCH-1001' }}" readonly>
+                    <input type="text" class="s2d-input mono-code" data-bind-field="id" value="{{ school.code }}" readonly>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">City &amp; State <span class="req-star">*</span></label>
-                    <input type="text" name="city" class="s2d-input" data-bind-field="city" value="{{ school.city|default:'Hartford, CT' }}" required>
+                    <input type="text" name="city" class="s2d-input" data-bind-field="city" value="{{ school.city }}" required>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Campus Phone <span class="req-star">*</span></label>
-                    <input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone|default:'+1 (555) 210-9001' }}" required>
+                    <input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required>
                   </div>
                 </div>
               </div>
@@ -72,26 +72,27 @@
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Assigned Franchise <span class="req-star">*</span></label>
                     <select name="franchise" class="s2d-select" data-bind-field="franchise" required>
-                      <option value="North-East EduNet Partners">North-East EduNet Partners</option>
-                      <option value="Pacific Crest Scholastic Group">Pacific Crest Scholastic Group</option>
-                      <option value="Heartland Boarding Solutions">Heartland Boarding Solutions</option>
-                      <option value="Atlantic Campus Connect">Atlantic Campus Connect</option>
+                      {% for f in franchises %}
+                      <option value="{{ f.name }}" {% if school.franchise.name == f.name or school.franchise_name_cache == f.name %}selected{% endif %}>{{ f.name }}</option>
+                      {% empty %}
+                      <option value="{{ school.franchise.name|default:school.franchise_name_cache }}">{{ school.franchise.name|default:school.franchise_name_cache }}</option>
+                      {% endfor %}
                     </select>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Operational Status <span class="req-star">*</span></label>
                     <select name="status" class="s2d-select" data-bind-field="status" required>
-                      <option value="Active">Active (Calling Allowed)</option>
-                      <option value="Suspended">Suspended (Pause Campus Calling)</option>
+                      <option value="Active" {% if school.status == 'Active' %}selected{% endif %}>Active (Calling Allowed)</option>
+                      <option value="Suspended" {% if school.status == 'Suspended' %}selected{% endif %}>Suspended (Pause Campus Calling)</option>
                     </select>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Primary Administrator <span class="req-star">*</span></label>
-                    <input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="Dr. Arthur Pendelton" required>
+                    <input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label">Administrator Email <span class="req-star">*</span></label>
-                    <input type="email" name="adminEmail" class="s2d-input" data-bind-field="adminEmail" value="admin@oakridge-academy.edu" required>
+                    <input type="email" name="adminEmail" class="s2d-input" data-bind-field="adminEmail" value="{{ school.admin_email }}" required>
                   </div>
                 </div>
               </div>

@@ -25,24 +25,24 @@
       <main class="app-content">
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">SCHOOL 360° DOSSIER · <span data-bind-field="id">{{ school.code|default:"SCH-1001" }}</span></div>
-            <h1 class="page-title" data-bind-field="name">{{ school.name|default:"Oakridge Residential Academy" }}</h1>
-            <p class="page-description"><span data-bind-field="city">{{ school.city|default:"Hartford, CT" }}</span> · Assigned to <strong data-bind-field="franchise">{{ school.franchise_name_cache|default:"North-East EduNet Partners" }}</strong> · Primary Admin: <span data-bind-field="adminName">{{ school.admin_name|default:"Dr. Arthur Pendelton" }}</span></p>
+            <div class="page-eyebrow">SCHOOL 360° DOSSIER · <span data-bind-field="id">{{ school.code }}</span></div>
+            <h1 class="page-title" data-bind-field="name">{{ school.name }}</h1>
+            <p class="page-description"><span data-bind-field="city">{{ school.city }}</span> · Assigned to <strong data-bind-field="franchise">{{ school.franchise.name|default:school.franchise_name_cache }}</strong> · Primary Admin: <span data-bind-field="adminName">{{ school.admin_name }}</span></p>
           </div>
           <div class="page-actions">
-            <a href="edit.html?id={{ school.code|default:'SCH-1001' }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
-            <button type="button" class="btn-s2d btn-s2d-danger-outline" data-demo-action="Suspend Campus Calling" data-record-label="{{ school.code|default:'SCH-1001' }} · {{ school.name|default:'Oakridge Residential Academy' }}" data-confirm-prompt="Suspending this school immediately pauses outbound student calling across all {{ school.device_count|default:28 }} enrolled Android kiosks."><i data-lucide="ban"></i><span>Suspend School</span></button>
+            <a href="edit.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
           </div>
         </div>
 
         <!-- 7 Mandatory Tabs from Section 5.2 -->
         <div class="s2d-tabs" data-s2d-tabs="school-detail-tabs" role="tablist">
           <button type="button" class="s2d-tab-btn active" data-tab-target="tab-overview">Overview</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="tab-students">Students ({{ school.enrolled_students|default:684 }})</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-students">Students ({{ school.enrolled_students }})</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-admins">Administrators (1)</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-subscription">Subscription</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-usage">Calling Usage</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="tab-devices">Devices ({{ school.device_count|default:28 }})</button>
+          <button type="button" class="s2d-tab-btn" data-tab-target="tab-devices">Devices ({{ school.device_count }})</button>
           <button type="button" class="s2d-tab-btn" data-tab-target="tab-transactions">Transactions</button>
         </div>
 
@@ -50,23 +50,23 @@
           <!-- Tab 1: Overview -->
           <div class="s2d-tab-panel active" id="tab-overview">
             <div class="row g-3 mb-4">
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Active Students</div><div class="kpi-value mt-2">{{ school.active_students|default:658 }} <span class="text-secondary-s2d" style="font-size:0.9rem;">/ {{ school.enrolled_students|default:684 }}</span></div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Monthly Voice Usage</div><div class="kpi-value mt-2">{{ monthly_minutes|default:"42,850m" }}</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Enrolled AE Kiosks</div><div class="kpi-value mt-2">{{ school.device_count|default:28 }}</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Subscription Status</div><div class="mt-2"><span class="s2d-badge {% if school.subscription_status == 'Active' %}s2d-badge-success{% elif school.subscription_status == 'Expiring' %}s2d-badge-warning{% else %}s2d-badge-danger{% endif %}">{{ school.subscription_status|default:"Active" }} · {{ school.subscription_plan|default:"Enterprise" }}</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Active Students</div><div class="kpi-value mt-2">{{ school.active_students }} <span class="text-secondary-s2d" style="font-size:0.9rem;">/ {{ school.enrolled_students }}</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Daily Call Cap</div><div class="kpi-value mt-2">{{ school.daily_duration_cap }} mins/day</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Enrolled AE Kiosks</div><div class="kpi-value mt-2">{{ school.device_count }}</div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Subscription Status</div><div class="mt-2"><span class="s2d-badge {% if school.subscription_status == 'Active' %}s2d-badge-success{% elif school.subscription_status == 'Expiring' %}s2d-badge-warning{% else %}s2d-badge-danger{% endif %}">{{ school.subscription_status }} · {{ school.subscription_plan }}</span></div></div></div>
             </div>
             <div class="s2d-card">
               <div class="s2d-card-header"><h3 class="s2d-card-title">Institutional Metadata &amp; Governance</h3></div>
               <div class="s2d-card-body">
                 <div class="kv-grid">
-                  <div><div class="kv-item-label">Tenant Identifier</div><div class="kv-item-value mono-code" data-bind-field="id">SCH-1001</div></div>
-                  <div><div class="kv-item-label">Short Prefix</div><div class="kv-item-value mono-code" data-bind-field="code">OAK-01</div></div>
-                  <div><div class="kv-item-label">Franchise Partner</div><div class="kv-item-value" data-bind-field="franchise">North-East EduNet Partners</div></div>
-                  <div><div class="kv-item-label">Primary Admin</div><div class="kv-item-value" data-bind-field="adminName">Dr. Arthur Pendelton</div></div>
-                  <div><div class="kv-item-label">Official Email</div><div class="kv-item-value" data-bind-field="adminEmail">admin@oakridge-academy.edu</div></div>
-                  <div><div class="kv-item-label">Campus Telephone</div><div class="kv-item-value mono-code" data-bind-field="phone">+1 (555) 210-9001</div></div>
-                  <div><div class="kv-item-label">Default Per-Call Limit</div><div class="kv-item-value">15 Minutes (Global Cap: 20m)</div></div>
-                  <div><div class="kv-item-label">Allowed Schedule Window</div><div class="kv-item-value">Mon–Fri 17:30–21:00 · Sun 10:00–20:00</div></div>
+                  <div><div class="kv-item-label">Tenant Identifier</div><div class="kv-item-value mono-code" data-bind-field="id">{{ school.code }}</div></div>
+                  <div><div class="kv-item-label">Campus Name</div><div class="kv-item-value" data-bind-field="name">{{ school.name }}</div></div>
+                  <div><div class="kv-item-label">Franchise Partner</div><div class="kv-item-value" data-bind-field="franchise">{{ school.franchise.name|default:school.franchise_name_cache }}</div></div>
+                  <div><div class="kv-item-label">Primary Admin</div><div class="kv-item-value" data-bind-field="adminName">{{ school.admin_name }}</div></div>
+                  <div><div class="kv-item-label">Official Email</div><div class="kv-item-value" data-bind-field="adminEmail">{{ school.admin_email }}</div></div>
+                  <div><div class="kv-item-label">Campus Telephone</div><div class="kv-item-value mono-code" data-bind-field="phone">{{ school.admin_phone }}</div></div>
+                  <div><div class="kv-item-label">Default Per-Call Limit</div><div class="kv-item-value">{{ school.daily_duration_cap }} Minutes / Day</div></div>
+                  <div><div class="kv-item-label">Allowed Schedule Window</div><div class="kv-item-value">{{ school.allowed_calling_days }} ({{ school.calling_window_start|time:"H:i" }}–{{ school.calling_window_end|time:"H:i" }})</div></div>
                 </div>
               </div>
             </div>
@@ -86,10 +86,24 @@
               </div>
               <div class="s2d-table-wrap">
                 <table class="s2d-table">
-                  <thead><tr><th>Name</th><th>Email</th><th>Designation</th><th>MFA</th><th>Last Active</th><th>Status</th></tr></thead>
+                  <thead><tr><th>Name</th><th>Email</th><th>Designation</th><th>MFA</th><th>Status</th></tr></thead>
                   <tbody>
-                    <tr><td class="cell-primary">Dr. Arthur Pendelton</td><td>admin@oakridge-academy.edu</td><td>Principal &amp; Primary Admin</td><td><span class="s2d-badge s2d-badge-success">Enabled</span></td><td class="mono-code">2026-11-10 08:42</td><td><span class="s2d-badge s2d-badge-success">Active</span></td></tr>
-                    <tr><td class="cell-primary">Clarissa Sterling</td><td>c.sterling@oakridge-academy.edu</td><td>Hostel Operations Coordinator</td><td><span class="s2d-badge s2d-badge-success">Enabled</span></td><td class="mono-code">2026-11-10 07:55</td><td><span class="s2d-badge s2d-badge-success">Active</span></td></tr>
+                    <tr>
+                      <td class="cell-primary">{{ school.admin_name }}</td>
+                      <td>{{ school.admin_email }}</td>
+                      <td>Principal &amp; Primary Admin</td>
+                      <td><span class="s2d-badge s2d-badge-success">Enabled</span></td>
+                      <td><span class="s2d-badge s2d-badge-success">{{ school.status }}</span></td>
+                    </tr>
+                    {% if school.secondary_contact_name %}
+                    <tr>
+                      <td class="cell-primary">{{ school.secondary_contact_name }}</td>
+                      <td>{{ school.secondary_contact_email }}</td>
+                      <td>Hostel Operations In-charge</td>
+                      <td><span class="s2d-badge s2d-badge-success">Enabled</span></td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    {% endif %}
                   </tbody>
                 </table>
               </div>

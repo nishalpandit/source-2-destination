@@ -44,13 +44,36 @@ def dashboard(request):
 def schools_list(request):
     """Dynamic franchise assigned schools list view."""
     franchise = get_current_franchise(request)
-    schools_qs = School.objects.filter(franchise=franchise)
+    schools_qs = School.objects.filter(franchise=franchise).order_by('-id')
     total_campuses = schools_qs.count()
     active_campuses = schools_qs.filter(status='Active').count()
     total_students = schools_qs.aggregate(total=Sum('enrolled_students'))['total'] or 0
 
+    schools_data = [
+        {
+            "id": s.code,
+            "code": s.code,
+            "name": s.name,
+            "city": s.city,
+            "franchiseId": s.franchise.code if s.franchise else "",
+            "franchise": s.franchise.name if s.franchise else "",
+            "adminName": s.admin_name,
+            "adminEmail": s.admin_email,
+            "students": s.enrolled_students or s.student_seats,
+            "studentSeats": s.student_seats,
+            "activeStudents": s.active_students,
+            "callingMinutes": s.active_students * 45,
+            "subscriptionPlan": s.subscription_plan,
+            "subscriptionStatus": s.subscription_status,
+            "status": s.status
+        }
+        for s in schools_qs
+    ]
+
     context = {
         "franchise": franchise,
+        "schools": schools_qs,
+        "schools_json": json.dumps(schools_data),
         "total_campuses": total_campuses,
         "active_campuses": active_campuses,
         "total_students": total_students,
@@ -162,16 +185,118 @@ def school_edit(request):
 def students_list(request):
     """Dynamic franchise student directory view."""
     franchise = get_current_franchise(request)
-    students_qs = Student.objects.filter(school__franchise=franchise)
+    students_qs = Student.objects.filter(school__franchise=franchise).select_related('school').order_by('-id')
     total_students = students_qs.count()
     active_students = students_qs.filter(status='Active').count()
 
+    students_data = [
+        {
+            "id": s.code,
+            "code": s.code,
+            "studentCode": s.calling_code,
+            "name": s.name,
+            "gender": s.gender,
+            "schoolId": s.school.code,
+            "school": s.school.name,
+            "franchiseId": franchise.code,
+            "className": s.class_name,
+            "section": s.section,
+            "primaryPhone": s.primary_phone,
+            "guardianName": s.guardian_name,
+            "remainingMinutes": s.remaining_minutes,
+            "status": s.status
+        }
+        for s in students_qs
+    ]
+
     context = {
         "franchise": franchise,
+        "students": students_qs,
+        "students_json": json.dumps(students_data),
         "total_students": total_students,
         "active_students": active_students,
     }
     return render(request, 'franchise/students/list.html', context)
+
+
+def student_details(request):
+    """Franchise: Student profile details view."""
+    student_id = request.GET.get('id')
+    stu = Student.objects.filter(Q(code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0)).select_related('school').first()
+    if not stu:
+        stu = Student.objects.first()
+
+    context = {
+        "student": stu,
+        "school": stu.school if stu else None,
+        "franchise": stu.school.franchise if stu and stu.school else get_current_franchise(request),
+    }
+    return render(request, 'franchise/students/details.html', context)
+
+
+def student_edit(request):
+    """Franchise: Edit student calling profile and guardian contact numbers."""
+    student_id = request.GET.get('id')
+    stu = Student.objects.filter(Q(code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0)).select_related('school').first()
+    if not stu:
+        stu = Student.objects.first()
+
+    if request.method == "POST":
+        stu.name = request.POST.get('name', stu.name)
+        stu.class_name = request.POST.get('className', stu.class_name)
+        stu.section = request.POST.get('section', stu.section)
+        stu.primary_phone = request.POST.get('primaryPhone', stu.primary_phone)
+        stu.secondary_phone = request.POST.get('secondaryPhone', stu.secondary_phone)
+        if 'status' in request.POST:
+            stu.status = request.POST['status']
+        stu.save()
+        return redirect(f"/franchise/students/details.html?id={stu.code}")
+
+    context = {
+        "student": stu,
+        "school": stu.school if stu else None,
+        "franchise": stu.school.franchise if stu and stu.school else get_current_franchise(request),
+    }
+    return render(request, 'franchise/students/edit.html', context)
+
+
+def student_add(request):
+    """Franchise: Enroll new student under assigned franchise schools."""
+    franchise = get_current_franchise(request)
+    schools = School.objects.filter(franchise=franchise).order_by('name')
+
+    if request.method == "POST":
+        school_code = request.POST.get('school')
+        school = School.objects.filter(code=school_code, franchise=franchise).first() or schools.first()
+        name = request.POST.get('name', '').strip()
+        if not name:
+            return HttpResponseBadRequest("Student name is required.")
+
+        code = f"STU-{Student.objects.count() + 4001}"
+        calling_code = f"S2D-{school.code[:3] if school else 'SCH'}-{Student.objects.count() + 8801}"
+
+        Student.objects.create(
+            code=code,
+            calling_code=calling_code,
+            name=name,
+            gender=request.POST.get('gender', 'Male'),
+            school=school,
+            class_name=request.POST.get('className', 'Grade 10'),
+            section=request.POST.get('section', 'Section A'),
+            guardian_name=request.POST.get('guardianName', 'Authorized Guardian'),
+            primary_phone=request.POST.get('primaryPhone', ''),
+            remaining_minutes=120,
+            daily_limit_min=school.daily_duration_cap if school else 15,
+            wallet_balance=50.00,
+            status='Active'
+        )
+        return redirect('/franchise/students/list.html')
+
+    context = {
+        "franchise": franchise,
+        "schools": schools,
+    }
+    return render(request, 'franchise/students/add.html', context)
 
 
 def classes_list(request):

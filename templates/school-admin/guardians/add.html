@@ -39,8 +39,7 @@
                   {% for s in students %}
                   <option value="{{ s.code }}">{{ s.code }} · {{ s.name }} ({{ s.class_name }} · {{ s.section }})</option>
                   {% empty %}
-                  <option value="STU-4001">STU-4001 · Liam Hawthorne (Grade 10 · Sec A)</option>
-                  <option value="STU-4002">STU-4002 · Clara Bennett (Grade 9 · Sec B)</option>
+                  <option value="" disabled>No enrolled students available</option>
                   {% endfor %}
                 </select>
               </div>

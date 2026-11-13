@@ -26,20 +26,27 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">UPDATE STUDENT · <span data-bind-field="studentCode">S2D-OAK-8841</span></div><h1 class="page-title">Edit <span data-bind-field="name">Liam Hawthorne</span></h1><p class="page-description">Update academic placement, hostel wing, guardian phones, validity date, or booth mapping.</p></div>
-          <div class="page-actions"><a href="details.html?id=STU-4001" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>360° Details</span></a></div>
+          <div class="page-header-info"><div class="page-eyebrow">UPDATE STUDENT · <span data-bind-field="studentCode">{{ student.calling_code }}</span></div><h1 class="page-title">Edit <span data-bind-field="name">{{ student.name }}</span></h1><p class="page-description">Update academic placement, hostel wing, guardian phones, validity date, or booth mapping.</p></div>
+          <div class="page-actions"><a href="details.html?id={{ student.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>360° Details</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id=STU-4001" data-success-title="Student Profile Saved (Demo)">
+          <form method="POST" action="edit.html?id={{ student.code }}" data-s2d-form data-warn-unsaved="true">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Student Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="Liam Hawthorne" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Unique Calling Code (Server Immutable)</label><input type="text" class="s2d-input mono-code" data-bind-field="studentCode" value="S2D-OAK-8841" readonly></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label><input type="text" name="className" class="s2d-input" data-bind-field="className" value="Grade 10" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label><input type="text" name="section" class="s2d-input" data-bind-field="section" value="Section A" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Wing / Room <span class="req-star">*</span></label><input type="text" name="hostelWing" class="s2d-input" data-bind-field="hostelWing" value="North Hall · Rm 204" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Primary Guardian Phone <span class="req-star">*</span></label><input type="tel" name="primaryPhone" class="s2d-input" data-bind-field="primaryPhone" data-validate-phone="true" value="+1 (555) 801-2210" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Validity Expiry <span class="req-star">*</span></label><input type="date" name="validityExpiry" class="s2d-input" data-bind-field="validityExpiry" value="2027-05-31" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label><select name="status" class="s2d-select" data-bind-field="status"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Student Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ student.name }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Unique Calling Code (Server Immutable)</label><input type="text" class="s2d-input mono-code" data-bind-field="studentCode" value="{{ student.calling_code }}" readonly></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label><input type="text" name="className" class="s2d-input" data-bind-field="className" value="{{ student.class_name }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label><input type="text" name="section" class="s2d-input" data-bind-field="section" value="{{ student.section }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Wing / Room <span class="req-star">*</span></label><input type="text" name="hostelWing" class="s2d-input" data-bind-field="hostelWing" value="{{ student.hostel_wing }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Primary Guardian Phone <span class="req-star">*</span></label><input type="tel" name="primaryPhone" class="s2d-input" data-bind-field="primaryPhone" data-validate-phone="true" value="{{ student.primary_phone }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Validity Expiry <span class="req-star">*</span></label><input type="date" name="validityExpiry" class="s2d-input" data-bind-field="validityExpiry" value="{{ student.validity_expiry|date:'Y-m-d' }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label>
+                <select name="status" class="s2d-select" data-bind-field="status">
+                  <option value="Active" {% if student.status == 'Active' %}selected{% endif %}>Active</option>
+                  <option value="Inactive" {% if student.status == 'Inactive' %}selected{% endif %}>Inactive</option>
+                  <option value="Suspended" {% if student.status == 'Suspended' %}selected{% endif %}>Suspended</option>
+                </select>
+              </div>
             </div>
             <div class="form-actions-bar"><div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved changes</span></div><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Student Record</span></button></div></div>
           </form>

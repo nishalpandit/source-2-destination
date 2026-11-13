@@ -127,11 +127,6 @@
                       <option value="">Select franchise partner...</option>
                       {% for f in franchises %}
                       <option value="{{ f.code }}">{{ f.code }} · {{ f.name }} ({{ f.commission_rate }}%)</option>
-                      {% empty %}
-                      <option value="FRN-101">FRN-101 · North-East EduNet Partners (18%)</option>
-                      <option value="FRN-102">FRN-102 · Pacific Crest Scholastic Group (16%)</option>
-                      <option value="FRN-103">FRN-103 · Heartland Boarding Solutions (15%)</option>
-                      <option value="FRN-104">FRN-104 · Atlantic Campus Connect (15%)</option>
                       {% endfor %}
                     </select>
                   </div>

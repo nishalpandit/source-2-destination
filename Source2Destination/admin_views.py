@@ -4,6 +4,7 @@ Source 2 Destination — Global Governance Portal
 Handles all Super Admin UI views, dynamic school management, and institutional KPI metrics.
 """
 import os
+import json
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
@@ -42,8 +43,30 @@ def schools_list(request):
     avg_per_campus = int(total_enrolled / total_campuses) if total_campuses > 0 else 0
     expiring_subs = School.objects.filter(subscription_status='Expiring').count()
     franchises = list(Franchise.objects.filter(status='Active').values('code', 'name'))
+    schools_qs = School.objects.select_related('franchise').order_by('-id')
+
+    schools_data = [
+        {
+            "id": s.code,
+            "code": s.code,
+            "name": s.name,
+            "city": s.city,
+            "franchise": s.franchise.name if s.franchise else s.franchise_name_cache or "Unassigned",
+            "adminName": s.admin_name,
+            "adminEmail": s.admin_email,
+            "students": s.enrolled_students or s.student_seats,
+            "studentSeats": s.student_seats,
+            "activeStudents": s.active_students,
+            "subscriptionPlan": s.subscription_plan,
+            "subscriptionStatus": s.subscription_status,
+            "status": s.status
+        }
+        for s in schools_qs
+    ]
 
     context = {
+        "schools": schools_qs,
+        "schools_json": json.dumps(schools_data),
         "total_campuses": total_campuses,
         "active_campuses": active_campuses,
         "suspended_campuses": suspended_campuses,

@@ -30,32 +30,50 @@
           <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Student List</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Student Enrolled (Demo)">
+          <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Student Enrolled" data-success-desc="Student added to campus database.">
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Student &amp; Academic Placement</h3><p>Student Code is issued strictly by the Django backend upon enrollment.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Theodore Sterling" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Calling Code (Backend Issued)</label><input type="text" name="student_code" class="s2d-input mono-code" value="AWAITING-DRF-SERVER-ISSUANCE" readonly></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">School (Locked)</label><input type="text" class="s2d-input" value="Oakridge Residential Academy" readonly></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label><select name="className" class="s2d-select" required><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option selected>Grade 10</option><option>Grade 11</option><option>Grade 12</option></select></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label><select name="section" class="s2d-select" required><option>Section A</option><option>Section B</option><option>Section C</option></select></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Full legal name" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Calling Code (Backend Issued)</label><input type="text" name="student_code" class="s2d-input mono-code" value="Auto-generated on save" readonly></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">School (Locked)</label><input type="text" class="s2d-input" value="{{ school.name|default:'Assigned Campus' }}" readonly></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label>
+                  <select name="className" class="s2d-select" required>
+                    {% for c in classes %}
+                    <option value="{{ c.name }}">{{ c.name }}</option>
+                    {% empty %}
+                    <option value="Grade 10">Grade 10</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label>
+                  <select name="section" class="s2d-select" required>
+                    {% for s in sections %}
+                    <option value="{{ s.name }}">{{ s.name }} ({{ s.academic_class.name }})</option>
+                    {% empty %}
+                    <option value="Section A">Section A</option>
+                    <option value="Section B">Section B</option>
+                    {% endfor %}
+                  </select>
+                </div>
               </div>
             </div>
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Authorized Guardian Contacts</h3><p>Only numbers listed here can be dialed from the restricted Android calling app.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name &amp; Relation <span class="req-star">*</span></label><input type="text" name="guardian_name" class="s2d-input" placeholder="Richard Sterling (Father)" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Authorized Phone <span class="req-star">*</span></label><input type="tel" name="primary_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 809-3310" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Guardian Name</label><input type="text" name="secondary_guardian" class="s2d-input" placeholder="Helen Sterling (Mother)"></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Authorized Phone</label><input type="tel" name="secondary_phone" class="s2d-input" placeholder="+1 (555) 809-3311"></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name &amp; Relation <span class="req-star">*</span></label><input type="text" name="guardian_name" class="s2d-input" placeholder="e.g. Richard Sterling (Father)" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Authorized Phone <span class="req-star">*</span></label><input type="tel" name="primary_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 000-0000" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Guardian Name</label><input type="text" name="secondary_guardian" class="s2d-input" placeholder="e.g. Helen Sterling (Mother)"></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Authorized Phone</label><input type="tel" name="secondary_phone" class="s2d-input" placeholder="+1 (555) 000-0001"></div>
               </div>
             </div>
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Account Status, Validity &amp; Device</h3><p>Link initial calling validity and primary hostel booth device.</p></div>
               <div class="row g-3">
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label><select name="status" class="s2d-select" required><option value="Active">Active</option><option value="Inactive">Inactive (Hold)</option></select></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Calling Validity Expiry <span class="req-star">*</span></label><input type="date" name="validity_expiry" class="s2d-input" value="2027-05-31" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Booth Assignment <span class="req-star">*</span></label><select name="device_id" class="s2d-select" required><option value="DEV-7701">DEV-7701 · North Hall Booth 1 (Online)</option><option value="DEV-7702">DEV-7702 · East Gables Booth 1 (Online)</option><option value="DEV-7709">DEV-7709 · Oakridge Spare Unit 05</option></select></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Calling Validity Expiry <span class="req-star">*</span></label><input type="date" name="validity_expiry" class="s2d-input" required></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Booth Assignment <span class="req-star">*</span></label><select name="device_id" class="s2d-select" required><option value="DEV-7701">DEV-7701 · Primary Hostel Booth</option><option value="DEV-7702">DEV-7702 · Secondary Booth</option></select></div>
               </div>
             </div>
             <div class="form-actions-bar"><div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved changes</span></div><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Create Student Account</span></button></div></div>
