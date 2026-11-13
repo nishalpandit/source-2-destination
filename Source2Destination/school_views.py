@@ -4,12 +4,15 @@ Source 2 Destination — Campus & Hostel Operations Portal
 Handles campus-level student management, call allowances, and hostel phone operations.
 """
 import os
+import random
+import json
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
-from .models import School, Franchise, Student, AcademicClass, ClassSection, Guardian
+from django.utils import timezone
+from .models import School, Franchise, Student, AcademicClass, ClassSection, Guardian, StudentStatusLog
 
 
 def get_current_school(request):
@@ -318,6 +321,166 @@ def guardian_edit(request):
         "school": guardian.school if guardian else get_current_school(request),
     }
     return render(request, 'school-admin/guardians/edit.html', context)
+
+
+def student_codes(request):
+    """
+    School Admin: Unique Student Calling Codes Management.
+    Atomically generates, rotates, and assigns collision-free kiosk login codes.
+    """
+    school = get_current_school(request)
+    students = Student.objects.filter(school=school).order_by('name')
+
+    issued_info = None
+
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        pin_policy = request.POST.get('pin_policy', 'Unique Code + 4-Digit Student PIN')
+        action = request.POST.get('action', 'issue')
+
+        student = Student.objects.filter(
+            Q(code=student_id) | Q(calling_code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0),
+            school=school
+        ).first()
+
+        if student:
+            if action in ['suspend', 'suspend_code']:
+                student.code_status = 'Suspended'
+                student.save(update_fields=['code_status'])
+            elif action in ['activate', 'activate_code']:
+                student.code_status = 'Active'
+                student.save(update_fields=['code_status'])
+            else:
+                # Generate collision-free calling code (e.g. S2D-OAK-XXXX)
+                campus_tag = "OAK"
+                if school and school.name:
+                    words = [w for w in school.name.split() if w.upper() not in ['ACADEMY', 'SCHOOL', 'COLLEGIATE', 'CAMPUS', 'HOSTEL', 'RESIDENTIAL']]
+                    if words:
+                        campus_tag = words[0][:3].upper()
+
+                while True:
+                    candidate_code = f"S2D-{campus_tag}-{random.randint(1000, 9999)}"
+                    if not Student.objects.filter(calling_code=candidate_code).exists():
+                        break
+
+                student.calling_code = candidate_code
+                student.pin_policy = pin_policy
+                student.code_status = 'Active'
+                student.code_issued_at = timezone.now()
+                student.save()
+                issued_info = {
+                    "student_name": student.name,
+                    "code": candidate_code,
+                    "pin_policy": pin_policy
+                }
+
+    # Prepare client-side payload matching table specs
+    student_codes_data = [
+        {
+            "id": f"COD-{s.id}",
+            "code": s.calling_code,
+            "studentId": s.code,
+            "studentName": s.name,
+            "className": f"{s.class_name} · {s.section}",
+            "issuedBy": "Backend Auth Engine",
+            "issuedAt": s.code_issued_at.strftime("%Y-%m-%d %H:%M") if s.code_issued_at else "2026-08-01 10:00",
+            "lastUsed": s.code_last_used.strftime("%Y-%m-%d %H:%M") if s.code_last_used else "Never",
+            "pinPolicy": s.pin_policy,
+            "status": s.code_status
+        }
+        for s in students
+    ]
+
+    context = {
+        "school": school,
+        "students": students,
+        "student_codes_json": json.dumps(student_codes_data),
+        "issued_info": issued_info,
+        "total_codes": students.count(),
+        "active_codes": students.filter(code_status='Active').count(),
+        "suspended_codes": students.filter(code_status='Suspended').count(),
+    }
+    return render(request, 'school-admin/student-codes/index.html', context)
+
+
+def student_status(request):
+    """
+    School Admin: Student Account Lifecycle & Activation / Deactivation.
+    Handles activation, temporary suspension, disciplinary holds, and audit logging.
+    """
+    school = get_current_school(request)
+    students = Student.objects.filter(school=school).order_by('name')
+
+    status_message = None
+
+    if request.method == "POST":
+        student_id = request.POST.get('student_id')
+        new_status = request.POST.get('status', 'Active')
+        reason = (request.POST.get('reason') or 'Administrative review').strip()
+        authorized_by = (request.POST.get('authorized_by') or 'School Administrator').strip()
+
+        student = Student.objects.filter(
+            Q(code=student_id) | Q(calling_code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0),
+            school=school
+        ).first()
+
+        if student and new_status in ['Active', 'Inactive', 'Suspended']:
+            prev_status = student.status
+            student.status = new_status
+            if new_status == 'Suspended':
+                student.code_status = 'Suspended'
+            elif new_status == 'Active':
+                student.code_status = 'Active'
+            student.save()
+
+            StudentStatusLog.objects.create(
+                student=student,
+                school=school,
+                previous_status=prev_status,
+                new_status=new_status,
+                reason=reason,
+                authorized_by=authorized_by
+            )
+            status_message = f"Status for {student.name} transitioned from {prev_status} to {new_status}."
+
+    status_logs = StudentStatusLog.objects.filter(school=school).select_related('student').order_by('-timestamp')[:50]
+
+    # Prepare students data for table
+    students_data = [
+        {
+            "id": s.code,
+            "code": s.code,
+            "studentCode": s.calling_code,
+            "name": s.name,
+            "gender": s.gender,
+            "schoolId": s.school.code,
+            "school": s.school.name,
+            "className": s.class_name,
+            "section": s.section,
+            "hostelWing": s.hostel_wing or "Boarding Wing",
+            "guardianName": s.guardian_name,
+            "guardianRelation": s.guardian_relation,
+            "primaryPhone": s.primary_phone,
+            "remainingMinutes": s.remaining_minutes,
+            "dailyLimitMin": s.daily_limit_min,
+            "validityExpiry": s.validity_expiry.strftime("%Y-%m-%d") if s.validity_expiry else "2027-05-31",
+            "status": s.status
+        }
+        for s in students
+    ]
+
+    context = {
+        "school": school,
+        "students": students,
+        "status_logs": status_logs,
+        "students_json": json.dumps(students_data),
+        "status_message": status_message,
+        "total_students": students.count(),
+        "active_count": students.filter(status='Active').count(),
+        "inactive_count": students.filter(status='Inactive').count(),
+        "suspended_count": students.filter(status='Suspended').count(),
+    }
+    return render(request, 'school-admin/student-status/index.html', context)
 
 
 def render_school_page(request, path):

@@ -198,6 +198,18 @@ class Student(models.Model):
     validity_start = models.DateField(default=timezone.now)
     validity_expiry = models.DateField(null=True, blank=True)
 
+    # Unique Calling Code Security & Authentication
+    pin_policy = models.CharField(max_length=128, default="Unique Code + 4-Digit Student PIN")
+    pin = models.CharField(max_length=16, default="1234", blank=True)
+    code_status = models.CharField(
+        max_length=20,
+        default='Active',
+        choices=[('Active', 'Active'), ('Suspended', 'Suspended'), ('Pending', 'Pending')],
+        db_index=True
+    )
+    code_issued_at = models.DateTimeField(default=timezone.now)
+    code_last_used = models.DateTimeField(null=True, blank=True)
+
     status = models.CharField(
         max_length=20,
         choices=[('Active', 'Active'), ('Inactive', 'Inactive'), ('Suspended', 'Suspended')],
@@ -219,6 +231,30 @@ class Student(models.Model):
 
     def __str__(self):
         return f"{self.code} · {self.name} ({self.school.code})"
+
+
+class StudentStatusLog(models.Model):
+    """
+    Audit log for student account lifecycle status transitions.
+    Tracks status changes (Active -> Inactive / Suspended) with reasons and authorizing actor.
+    """
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='status_logs', db_index=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='student_status_logs', db_index=True)
+    previous_status = models.CharField(max_length=32)
+    new_status = models.CharField(max_length=32, db_index=True)
+    reason = models.CharField(max_length=255, default="Administrative update")
+    authorized_by = models.CharField(max_length=128, default="School Administrator")
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['school', '-timestamp']),
+            models.Index(fields=['student', '-timestamp']),
+        ]
+
+    def __str__(self):
+        return f"{self.student.name}: {self.previous_status} -> {self.new_status} ({self.timestamp.strftime('%Y-%m-%d %H:%M')})"
 
 
 class AcademicClass(models.Model):

@@ -55,6 +55,10 @@ urlpatterns = [
     path('school-admin/guardians/add.html', school_views.guardian_add, name='school_admin_guardian_add'),
     path('school-admin/guardians/details.html', school_views.guardian_details, name='school_admin_guardian_details'),
     path('school-admin/guardians/edit.html', school_views.guardian_edit, name='school_admin_guardian_edit'),
+    path('school-admin/student-codes/', school_views.student_codes, name='school_admin_student_codes'),
+    path('school-admin/student-codes/index.html', school_views.student_codes, name='school_admin_student_codes_html'),
+    path('school-admin/student-status/', school_views.student_status, name='school_admin_student_status'),
+    path('school-admin/student-status/index.html', school_views.student_status, name='school_admin_student_status_html'),
     re_path(r'^school-admin/(?P<path>.+?)/?$', school_views.render_school_page, name='school_admin_page'),
 
     # Student Kiosk Application & Telemetry Endpoints (Api_views.py)

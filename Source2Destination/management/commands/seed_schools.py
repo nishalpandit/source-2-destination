@@ -1,7 +1,7 @@
 import random
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from Source2Destination.models import Franchise, School, Student, AcademicClass, ClassSection, Guardian
+from Source2Destination.models import Franchise, School, Student, AcademicClass, ClassSection, Guardian, StudentStatusLog
 
 INITIAL_GUARDIANS = [
     {
@@ -697,6 +697,30 @@ class Command(BaseCommand):
             if new_guardians:
                 Guardian.objects.bulk_create(new_guardians)
                 self.stdout.write(self.style.SUCCESS(f"Generated {len(new_guardians)} additional guardian records for {oakridge.name}."))
+
+        # 6. Seed Status Logs if empty
+        if not StudentStatusLog.objects.exists() and oakridge:
+            stu_liam = Student.objects.filter(code='STU-4001').first()
+            stu_oliver = Student.objects.filter(code='STU-4005').first()
+            if stu_oliver:
+                StudentStatusLog.objects.create(
+                    student=stu_oliver,
+                    school=oakridge,
+                    previous_status="Active",
+                    new_status="Inactive",
+                    reason="Term validity expired",
+                    authorized_by="Policy Worker"
+                )
+            if stu_liam:
+                StudentStatusLog.objects.create(
+                    student=stu_liam,
+                    school=oakridge,
+                    previous_status="Inactive",
+                    new_status="Active",
+                    reason="Returned from medical leave",
+                    authorized_by="Dr. Arthur Pendelton"
+                )
+            self.stdout.write(self.style.SUCCESS("Seeded initial StudentStatusLog transition audit history."))
 
         # 6. Optional bulk scale benchmark records
         extra_count = options.get('count', 0)
