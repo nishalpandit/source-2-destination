@@ -37,61 +37,10 @@
     if (ok) {
       row.status = nextStatus;
       const recId = row.id || row.code;
-      if (recId && String(recId).startsWith('SCH-')) {
-        try {
-          await fetch(`/api/v1/super-admin/schools/${encodeURIComponent(recId)}/`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: nextStatus })
-          });
-        } catch (e) {
-          console.warn("Server status update:", e);
-        }
-      } else if (recId && String(recId).startsWith('STU-')) {
-        try {
-          await fetch(`/api/v1/students/${encodeURIComponent(recId)}/`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: nextStatus })
-          });
-        } catch (e) {
-          console.warn("Server student status update:", e);
-        }
-      } else if (recId && String(recId).startsWith('CLS-')) {
-        try {
-          await fetch(`/api/v1/school-admin/classes/${encodeURIComponent(recId)}/`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: nextStatus })
-          });
-        } catch (e) {
-          console.warn("Server class status update:", e);
-        }
-      } else if (recId && String(recId).startsWith('SEC-')) {
-        try {
-          await fetch(`/api/v1/school-admin/sections/${encodeURIComponent(recId)}/`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: nextStatus })
-          });
-        } catch (e) {
-          console.warn("Server section status update:", e);
-        }
-      } else if (recId && String(recId).startsWith('GRD-')) {
-        try {
-          await fetch(`/api/v1/school-admin/guardians/${encodeURIComponent(recId)}/`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ status: nextStatus })
-          });
-        } catch (e) {
-          console.warn("Server guardian status update:", e);
-        }
-      }
       if (refreshFn) refreshFn();
       window.S2DNotify.show({
         title: `Status Updated to ${nextStatus}`,
-        description: `${recId} updated in database.`,
+        description: `${recId || 'Record'} marked ${nextStatus}.`,
         type: 'success'
       });
     }
@@ -157,8 +106,6 @@
     const specs = {
       /* --- SUPER ADMIN TABLES --- */
       'sa-schools-table': () => ({
-        url: '/api/v1/super-admin/schools/',
-        bulkUrl: '/api/v1/super-admin/schools/bulk-status/',
         data: D.schools,
         searchPlaceholder: 'Search school name, code, city, or admin...',
         filters: [
@@ -406,8 +353,6 @@
 
       /* --- FRANCHISE TABLES (SCOPED TO FRN-101) --- */
       'fr-schools-table': () => ({
-        url: '/api/v1/franchise/schools/',
-        bulkUrl: '/api/v1/super-admin/schools/bulk-status/',
         data: D.schools.filter((s) => s.franchiseId === 'FRN-101'),
         searchPlaceholder: 'Search assigned school name, city, or admin...',
         filters: [
@@ -432,12 +377,7 @@
       'fr-students-table': () => {
         const urlParams = new URLSearchParams(window.location.search);
         const schoolCode = urlParams.get('id') || '';
-        const fetchUrl = schoolCode 
-          ? `/api/v1/franchise/students/?school=${encodeURIComponent(schoolCode)}`
-          : '/api/v1/franchise/students/';
         return {
-          url: fetchUrl,
-          bulkUrl: '/api/v1/students/bulk-status/',
           data: D.students.filter((s) => s.franchiseId === 'FRN-101' && (!schoolCode || s.schoolId === schoolCode)),
           searchPlaceholder: 'Search student name, calling code, or guardian...',
           filters: [
@@ -504,8 +444,6 @@
         const urlParams = new URLSearchParams(window.location.search);
         const schoolCode = urlParams.get('id') || urlParams.get('school_code') || 'SCH-1001';
         return {
-          url: `/api/v1/school-admin/students/?school_code=${encodeURIComponent(schoolCode)}`,
-          bulkUrl: '/api/v1/students/bulk-status/',
           data: D.students.filter((s) => s.schoolId === schoolCode),
           searchPlaceholder: 'Search student name, calling code, room, or guardian...',
           filters: [
@@ -533,10 +471,7 @@
       },
 
       'sch-classes-table': () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const schoolCode = urlParams.get('school_code') || urlParams.get('id') || 'SCH-1001';
         return {
-          url: `/api/v1/school-admin/classes/?school_code=${encodeURIComponent(schoolCode)}`,
           data: D.classes,
           searchPlaceholder: 'Search class grade or faculty supervisor...',
           exportFilename: 'school-classes.csv',
@@ -560,12 +495,7 @@
       },
 
       'sch-sections-table': () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const schoolCode = urlParams.get('school_code') || 'SCH-1001';
-        const classFilter = urlParams.get('class') || '';
-        const fetchUrl = `/api/v1/school-admin/sections/?school_code=${encodeURIComponent(schoolCode)}${classFilter ? `&className=${encodeURIComponent(classFilter)}` : ''}`;
         return {
-          url: fetchUrl,
           data: D.sections,
           searchPlaceholder: 'Search section, class, advisor, or hostel wing...',
           filters: [
@@ -587,13 +517,7 @@
       },
 
       'sch-guardians-table': () => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const schoolCode = urlParams.get('school_code') || 'SCH-1001';
-        const studentFilter = urlParams.get('student') || urlParams.get('student_id') || '';
-        const fetchUrl = `/api/v1/school-admin/guardians/?school_code=${encodeURIComponent(schoolCode)}${studentFilter ? `&student=${encodeURIComponent(studentFilter)}` : ''}`;
         return {
-          url: fetchUrl,
-          bulkUrl: '/api/v1/school-admin/guardians/bulk-status/',
           data: D.guardians,
           searchPlaceholder: 'Search guardian name, student, or authorized phone...',
           filters: [

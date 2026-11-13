@@ -57,32 +57,7 @@ urlpatterns = [
     path('school-admin/guardians/edit.html', school_views.guardian_edit, name='school_admin_guardian_edit'),
     re_path(r'^school-admin/(?P<path>.+?)/?$', school_views.render_school_page, name='school_admin_page'),
 
-    # High-Performance REST API Endpoints (Api_views.py)
-    # Schools APIs
-    path('api/v1/super-admin/schools/', Api_views.schools_collection_api, name='api_super_admin_schools'),
-    path('api/v1/super-admin/schools/bulk-status/', Api_views.school_bulk_status_api, name='api_super_admin_schools_bulk'),
-    path('api/v1/super-admin/schools/<str:school_id>/', Api_views.school_item_api, name='api_super_admin_school_item'),
-    path('api/v1/franchise/schools/', Api_views.franchise_schools_api, name='api_franchise_schools'),
-
-    # Students APIs
-    path('api/v1/students/', Api_views.students_collection_api, name='api_students_collection'),
-    path('api/v1/students/bulk-status/', Api_views.student_bulk_status_api, name='api_students_bulk_status'),
-    path('api/v1/students/<str:student_id>/', Api_views.student_item_api, name='api_student_item'),
-    path('api/v1/franchise/students/', Api_views.franchise_students_api, name='api_franchise_students'),
-    path('api/v1/school-admin/students/', Api_views.school_admin_students_api, name='api_school_admin_students'),
-
-    # Classes & Sections APIs
-    path('api/v1/school-admin/classes/', Api_views.classes_collection_api, name='api_school_admin_classes'),
-    path('api/v1/school-admin/classes/<str:class_id>/', Api_views.class_item_api, name='api_school_admin_class_item'),
-    path('api/v1/school-admin/sections/', Api_views.sections_collection_api, name='api_school_admin_sections'),
-    path('api/v1/school-admin/sections/<str:section_id>/', Api_views.section_item_api, name='api_school_admin_section_item'),
-
-    # Guardians APIs
-    path('api/v1/school-admin/guardians/', Api_views.guardians_collection_api, name='api_school_admin_guardians'),
-    path('api/v1/school-admin/guardians/bulk-status/', Api_views.guardians_bulk_status_api, name='api_school_admin_guardians_bulk'),
-    path('api/v1/school-admin/guardians/<str:guardian_id>/', Api_views.guardian_item_api, name='api_school_admin_guardian_item'),
-
-    # Telemetry and Health
+    # Student Kiosk Application & Telemetry Endpoints (Api_views.py)
     path('api/status/', Api_views.api_status, name='api_status'),
     path('api/whitelist/<str:student_id>/', Api_views.student_whitelist_check, name='api_whitelist_check'),
     path('api/kiosk/heartbeat/', Api_views.device_heartbeat, name='api_device_heartbeat'),
