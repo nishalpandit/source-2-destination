@@ -344,3 +344,4 @@ class CallAuthorizationEngine:
 
         max_seconds = effective_minutes * 60
         return True, max_seconds, f"Authorized: Call granted for up to {effective_minutes} minutes ({window_type})."
+

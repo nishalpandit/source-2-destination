@@ -35,8 +35,11 @@ def dashboard(request):
     schools_qs = School.objects.filter(franchise=franchise)
     total_campuses = schools_qs.count()
     active_campuses = schools_qs.filter(status='Active').count()
-    total_students = schools_qs.aggregate(total=Sum('enrolled_students'))['total'] or 0
-    active_students = schools_qs.aggregate(total=Sum('active_students'))['total'] or 0
+    students_qs = Student.objects.filter(school__franchise=franchise)
+    db_students = students_qs.count()
+    total_students = db_students if db_students > 0 else (schools_qs.aggregate(total=Sum('enrolled_students'))['total'] or 0)
+    db_active = students_qs.filter(status='Active').count()
+    active_students = db_active if db_active > 0 else (schools_qs.aggregate(total=Sum('active_students'))['total'] or 0)
 
     context = {
         "franchise": franchise,

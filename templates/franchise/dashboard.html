@@ -41,19 +41,19 @@
         <!-- 10 Mandatory KPI Cards (Section 6.1) -->
         <div class="row g-3 mb-4">
           <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Assigned Schools</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">18</div><div class="kpi-meta"><span class="kpi-delta up">+2 YTD</span><span>Northeast</span></div></div>
+            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Assigned Schools</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">{{ total_campuses }}</div><div class="kpi-meta"><span class="kpi-delta up">Active</span><span>Territory</span></div></div>
           </div>
           <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Schools</span><span class="kpi-icon emerald"><i data-lucide="check-circle-2"></i></span></div><div class="kpi-value">17</div><div class="kpi-meta"><span class="kpi-delta warn">1 Suspended</span></div></div>
+            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Schools</span><span class="kpi-icon emerald"><i data-lucide="check-circle-2"></i></span></div><div class="kpi-value">{{ active_campuses }}</div><div class="kpi-meta"><span class="kpi-delta up">Operational</span></div></div>
           </div>
           <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon sky"><i data-lucide="users"></i></span></div><div class="kpi-value">6,420</div><div class="kpi-meta"><span class="kpi-delta up">+9.1%</span></div></div>
+            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon sky"><i data-lucide="users"></i></span></div><div class="kpi-value">{{ total_students }}</div><div class="kpi-meta"><span class="kpi-delta up">Enrolled</span></div></div>
           </div>
           <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">6,018</div><div class="kpi-meta"><span>93.7% active</span></div></div>
+            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">{{ active_students }}</div><div class="kpi-meta"><span>Calling Enabled</span></div></div>
           </div>
           <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Calls (MTD)</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">15,480</div><div class="kpi-meta"><span class="kpi-delta up">+12.4%</span></div></div>
+            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Partner Commission</span><span class="kpi-icon"><i data-lucide="percent"></i></span></div><div class="kpi-value">{{ franchise.commission_rate }}%</div><div class="kpi-meta"><span class="kpi-delta up">Active Rate</span></div></div>
           </div>
         </div>
 

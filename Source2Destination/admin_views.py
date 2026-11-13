@@ -25,9 +25,12 @@ def dashboard(request):
     """Render Super Admin Primary Dashboard with live system metrics."""
     total_campuses = School.objects.count()
     active_campuses = School.objects.filter(status='Active').count()
-    total_students = School.objects.aggregate(total=Sum('enrolled_students'))['total'] or 0
-    active_students = School.objects.aggregate(total=Sum('active_students'))['total'] or 0
+    db_students_count = Student.objects.count()
+    total_students = db_students_count if db_students_count > 0 else (School.objects.aggregate(total=Sum('enrolled_students'))['total'] or 0)
+    db_active_count = Student.objects.filter(status='Active').count()
+    active_students = db_active_count if db_active_count > 0 else (School.objects.aggregate(total=Sum('active_students'))['total'] or 0)
     franchises_count = Franchise.objects.filter(status='Active').count()
+    recent_students = Student.objects.select_related('school').order_by('-id')[:5]
 
     context = {
         "total_campuses": total_campuses,
@@ -35,6 +38,7 @@ def dashboard(request):
         "total_students": total_students,
         "active_students": active_students,
         "franchises_count": franchises_count,
+        "recent_students": recent_students,
     }
     return render(request, 'super-admin/dashboard.html', context)
 

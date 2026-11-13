@@ -27,7 +27,7 @@
         <!-- Page Header -->
         <div class="page-header">
           <div class="page-header-info">
-            <div class="page-eyebrow">OAKRIDGE RESIDENTIAL ACADEMY (SCH-1001) · HARTFORD, CT</div>
+            <div class="page-eyebrow">{{ school.name|upper }} ({{ school.code }}) · {{ school.city|upper }}{% if school.state %}, {{ school.state|upper }}{% endif %}</div>
             <h1 class="page-title">Campus &amp; Hostel Calling Operations</h1>
             <p class="page-description">Daily operational command for enrolled boarding students, verified guardian phone whitelists, hostel calling windows, credit recharges, booth devices, and duty wardens.</p>
           </div>
@@ -40,19 +40,19 @@
 
         <!-- 12 Mandatory KPI Cards (Section 7.1) -->
         <div class="row g-3 mb-4">
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="graduation-cap"></i></span></div><div class="kpi-value">684</div><div class="kpi-meta"><span>Grades 7–12</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">658</div><div class="kpi-meta"><span class="kpi-delta up">96.2%</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Inactive Students</span><span class="kpi-icon rose"><i data-lucide="user-x"></i></span></div><div class="kpi-value">26</div><div class="kpi-meta"><span>Paused / Expired</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon sky"><i data-lucide="book-open"></i></span></div><div class="kpi-value">6</div><div class="kpi-meta"><span>Grades 7 to 12</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon slate"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">20</div><div class="kpi-meta"><span>Avg 34 / section</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Guardians</span><span class="kpi-icon emerald"><i data-lucide="heart-handshake"></i></span></div><div class="kpi-value">1,290</div><div class="kpi-meta"><span>KYC Whitelisted</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="graduation-cap"></i></span></div><div class="kpi-value">{{ total_students }}</div><div class="kpi-meta"><span>Enrolled</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">{{ active_students }}</div><div class="kpi-meta"><span class="kpi-delta up">{{ active_percent }}%</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Inactive Students</span><span class="kpi-icon rose"><i data-lucide="user-x"></i></span></div><div class="kpi-value">{{ inactive_students }}</div><div class="kpi-meta"><span>Paused / Expired</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon sky"><i data-lucide="book-open"></i></span></div><div class="kpi-value">{{ total_classes }}</div><div class="kpi-meta"><span>Academic Grades</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon slate"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">{{ total_sections }}</div><div class="kpi-meta"><span>Active Sections</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Guardians</span><span class="kpi-icon emerald"><i data-lucide="heart-handshake"></i></span></div><div class="kpi-value">{{ total_guardians }}</div><div class="kpi-meta"><span>KYC Whitelisted</span></div></div></div>
 
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Registered Devices</span><span class="kpi-icon"><i data-lucide="tablet-smartphone"></i></span></div><div class="kpi-value">28</div><div class="kpi-meta"><span class="kpi-delta up">27 Online</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon emerald"><i data-lucide="key-round"></i></span></div><div class="kpi-value">658</div><div class="kpi-meta"><span>Codes issued</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Calls Today</span><span class="kpi-icon sky"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">142</div><div class="kpi-meta"><span class="kpi-delta up">+10.1%</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Minutes Used (MTD)</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div><div class="kpi-value">42,850</div><div class="kpi-meta"><span>1,595m today</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon amber"><i data-lucide="calendar-clock"></i></span></div><div class="kpi-value">14</div><div class="kpi-meta"><span class="kpi-delta warn">&lt;14 days</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Recent Recharges</span><span class="kpi-icon emerald"><i data-lucide="zap"></i></span></div><div class="kpi-value">91</div><div class="kpi-meta"><span class="kpi-delta up">Last 30d</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Registered Devices</span><span class="kpi-icon"><i data-lucide="tablet-smartphone"></i></span></div><div class="kpi-value">{{ school.hostel_blocks_count|default:"4" }}</div><div class="kpi-meta"><span class="kpi-delta up">Hostel Booths</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon emerald"><i data-lucide="key-round"></i></span></div><div class="kpi-value">{{ active_accounts }}</div><div class="kpi-meta"><span>Codes issued</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Calls Today</span><span class="kpi-icon sky"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">{{ recent_recharges_count|default:"0" }}</div><div class="kpi-meta"><span class="kpi-delta up">Logged Sessions</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Available Minutes</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div><div class="kpi-value">{{ total_minutes }}</div><div class="kpi-meta"><span>Voice Balance</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon amber"><i data-lucide="calendar-clock"></i></span></div><div class="kpi-value">{{ expiring_count }}</div><div class="kpi-meta"><span class="kpi-delta warn">&lt;14 days</span></div></div></div>
+          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Recent Recharges</span><span class="kpi-icon emerald"><i data-lucide="zap"></i></span></div><div class="kpi-value">{{ recent_recharges_count }}</div><div class="kpi-meta"><span class="kpi-delta up">Total Top-Ups</span></div></div></div>
         </div>
 
         <!-- 6 Mandatory School Admin Charts (Section 7.1) -->
@@ -125,14 +125,29 @@
         <div class="row g-4">
           <div class="col-xl-6">
             <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Recently Added Students &amp; Expiring Validities</h3><a href="validity/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity Desk</a></div>
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Recently Added Students &amp; Calling Status</h3><a href="validity/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity Desk</a></div>
               <div class="s2d-table-wrap">
                 <table class="s2d-table">
                   <thead><tr><th>Student</th><th>Code</th><th>Class</th><th>Validity</th></tr></thead>
                   <tbody>
-                    <tr><td><a href="students/details.html?id=STU-4003" class="cell-primary">Noah Montgomery</a></td><td class="mono-code">S2D-OAK-8843</td><td>Grade 11 · A</td><td><span class="s2d-badge s2d-badge-warning">Exp Nov 18</span></td></tr>
-                    <tr><td><a href="students/details.html?id=STU-4006" class="cell-primary">Sophia Whitaker</a></td><td class="mono-code">S2D-OAK-8846</td><td>Grade 10 · B</td><td><span class="s2d-badge s2d-badge-warning">Exp Nov 22</span></td></tr>
-                    <tr><td><a href="students/details.html?id=STU-4011" class="cell-primary">Benjamin Mercer</a></td><td class="mono-code">S2D-OAK-8847</td><td>Grade 7 · B</td><td><span class="s2d-badge s2d-badge-success">Active</span></td></tr>
+                    {% for s in recent_students %}
+                    <tr>
+                      <td><a href="students/details.html?id={{ s.code }}" class="cell-primary">{{ s.name }}</a></td>
+                      <td class="mono-code">{{ s.calling_code }}</td>
+                      <td>{{ s.class_name }} · {{ s.section }}</td>
+                      <td>
+                        {% if s.validity_status == 'Active' %}
+                        <span class="s2d-badge s2d-badge-success">Active</span>
+                        {% elif s.validity_status == 'Expiring' %}
+                        <span class="s2d-badge s2d-badge-warning">Expiring ({{ s.validity_expiry }})</span>
+                        {% else %}
+                        <span class="s2d-badge s2d-badge-danger">{{ s.validity_status }}</span>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-secondary-s2d text-center py-3">No student records enrolled yet.</td></tr>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -140,14 +155,21 @@
           </div>
           <div class="col-xl-6">
             <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Today's Call Activity &amp; Recent Recharges</h3><a href="call-history/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Call History</a></div>
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Recent Campus Recharges &amp; Credit Allocations</h3><a href="recharges/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Recharge Ledger</a></div>
               <div class="s2d-table-wrap">
                 <table class="s2d-table">
-                  <thead><tr><th>Time</th><th>Student</th><th>Event</th><th>Detail</th></tr></thead>
+                  <thead><tr><th>Time</th><th>Student</th><th>Plan / Event</th><th>Credits</th></tr></thead>
                   <tbody>
-                    <tr><td class="mono-code">08:30</td><td class="cell-primary">Liam Hawthorne</td><td>Term Pack Recharge</td><td><span class="s2d-badge s2d-badge-success">+300 mins ($22)</span></td></tr>
-                    <tr><td class="mono-code">07:45</td><td class="cell-primary">Clara Bennett</td><td>Starter Recharge</td><td><span class="s2d-badge s2d-badge-success">+90 mins ($8)</span></td></tr>
-                    <tr><td class="mono-code">07:40</td><td class="cell-primary">Clara Bennett</td><td>Call to Mother</td><td><span class="s2d-badge s2d-badge-info">08m 42s</span></td></tr>
+                    {% for r in recent_recharges %}
+                    <tr>
+                      <td class="mono-code">{{ r.created_at|date:"M d, H:i" }}</td>
+                      <td class="cell-primary"><a href="students/details.html?id={{ r.student.code }}">{{ r.student.name }}</a></td>
+                      <td>{{ r.plan_name_cache }}</td>
+                      <td><span class="s2d-badge s2d-badge-success">+{{ r.minutes_added }} mins (${{ r.amount }})</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-secondary-s2d text-center py-3">No recent recharge transactions recorded.</td></tr>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -169,6 +191,15 @@
   <script src="{% static 'js/sidebar.js' %}"></script>
   <script src="{% static 'js/tables.js' %}"></script>
   <script src="{% static 'js/forms.js' %}"></script>
+  <script>
+    window.S2D_SCHOOL_STATS = {
+      total_students: {{ total_students|default:0 }},
+      active_students: {{ active_students|default:0 }},
+      inactive_students: {{ inactive_students|default:0 }},
+      expiring_count: {{ expiring_count|default:0 }},
+      school_name: "{{ school.name|default:'Campus'|escapejs }}"
+    };
+  </script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>

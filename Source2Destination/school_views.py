@@ -38,13 +38,38 @@ def dashboard(request):
     students_qs = Student.objects.filter(school=school) if school else Student.objects.none()
     total_students = students_qs.count()
     active_students = students_qs.filter(status='Active').count()
+    inactive_students = students_qs.filter(status__in=['Inactive', 'Suspended']).count()
+    active_percent = round((active_students / total_students * 100), 1) if total_students > 0 else 0
+
+    total_classes = AcademicClass.objects.filter(school=school).count()
+    total_sections = ClassSection.objects.filter(school=school).count()
+    total_guardians = Guardian.objects.filter(school=school).count()
+    active_accounts = students_qs.filter(code_status='Active').count()
     total_minutes = students_qs.aggregate(total=Sum('remaining_minutes'))['total'] or 0
+
+    # Expiring & grace accounts
+    expiring_count = sum(1 for s in students_qs if s.validity_status in ['Expiring', 'Grace Period'])
+
+    # Recent student additions and recharges
+    recent_students = students_qs.order_by('-id')[:5]
+    recent_recharges = StudentRecharge.objects.filter(school=school).select_related('student', 'plan').order_by('-created_at')[:5]
+    recent_recharges_count = StudentRecharge.objects.filter(school=school).count()
 
     context = {
         "school": school,
         "total_students": total_students,
         "active_students": active_students,
+        "inactive_students": inactive_students,
+        "active_percent": active_percent,
+        "total_classes": total_classes,
+        "total_sections": total_sections,
+        "total_guardians": total_guardians,
+        "active_accounts": active_accounts,
         "total_minutes": total_minutes,
+        "expiring_count": expiring_count,
+        "recent_students": recent_students,
+        "recent_recharges": recent_recharges,
+        "recent_recharges_count": recent_recharges_count,
     }
     return render(request, 'school-admin/dashboard.html', context)
 

@@ -357,18 +357,20 @@
                 <a href="call-history/index.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Call Logs</a>
               </div>
               <div class="s2d-card-body d-grid gap-3">
+                {% for s in recent_students %}
                 <div class="d-flex justify-content-between align-items-start border-bottom border-s2d pb-2">
-                  <div><div class="fw-semibold text-heading">Clara Bennett &rarr; Mother</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Oakridge · +1 (555) 802-3490</div></div>
-                  <div class="text-end"><span class="s2d-badge s2d-badge-success">08m 42s</span><div class="mono-code text-muted-s2d mt-1">07:40</div></div>
+                  <div>
+                    <div class="fw-semibold text-heading"><a href="schools/details.html?id={{ s.school.code }}">{{ s.name }}</a> &rarr; {{ s.guardian_relation }}</div>
+                    <div class="text-secondary-s2d" style="font-size:0.75rem;">{{ s.school.name }} · {{ s.primary_phone }}</div>
+                  </div>
+                  <div class="text-end">
+                    <span class="s2d-badge {% if s.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}">{{ s.status }}</span>
+                    <div class="mono-code text-muted-s2d mt-1">{{ s.calling_code }}</div>
+                  </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-start border-bottom border-s2d pb-2">
-                  <div><div class="fw-semibold text-heading">Amelia Fletcher &rarr; Mother</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Oakridge · +1 (555) 804-7740</div></div>
-                  <div class="text-end"><span class="s2d-badge s2d-badge-success">14m 58s</span><div class="mono-code text-muted-s2d mt-1">20:45</div></div>
-                </div>
-                <div class="d-flex justify-content-between align-items-start">
-                  <div><div class="fw-semibold text-heading">Noah Montgomery &rarr; Father</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Blocked outside calling hours</div></div>
-                  <div class="text-end"><span class="s2d-badge s2d-badge-danger">Restricted</span><div class="mono-code text-muted-s2d mt-1">14:12</div></div>
-                </div>
+                {% empty %}
+                <div class="text-secondary-s2d text-center py-2">No active students recorded.</div>
+                {% endfor %}
               </div>
             </div>
           </div>

@@ -271,17 +271,25 @@
     },
 
     'sch-active-donut': {
-      build: () => ({
-        chart: { type: 'donut', height: 260, fontFamily: BASE_FONT },
-        colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
-        labels: ['Active Accounts (644)', 'Expiring Soon (14)', 'Inactive / Expired (26)'],
-        series: [644, 14, 26],
-        stroke: { width: 2, colors: ['#FFFFFF'] },
-        dataLabels: { enabled: false },
-        plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Oakridge Total', fontSize: '11.5px', formatter: () => '684' } } } } },
-        legend: { position: 'bottom', fontSize: '11.5px' },
-        tooltip: { theme: 'dark' }
-      })
+      build: () => {
+        const stats = window.S2D_SCHOOL_STATS || {};
+        const active = stats.active_students !== undefined ? stats.active_students : 644;
+        const expiring = stats.expiring_count !== undefined ? stats.expiring_count : 14;
+        const inactive = stats.inactive_students !== undefined ? stats.inactive_students : 26;
+        const total = stats.total_students !== undefined ? stats.total_students : 684;
+        const campusName = stats.school_name ? `${stats.school_name} Total` : 'Campus Total';
+        return {
+          chart: { type: 'donut', height: 260, fontFamily: BASE_FONT },
+          colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
+          labels: [`Active Accounts (${active})`, `Expiring Soon (${expiring})`, `Inactive / Expired (${inactive})`],
+          series: [active, expiring, inactive],
+          stroke: { width: 2, colors: ['#FFFFFF'] },
+          dataLabels: { enabled: false },
+          plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: campusName, fontSize: '11.5px', formatter: () => String(total) } } } } },
+          legend: { position: 'bottom', fontSize: '11.5px' },
+          tooltip: { theme: 'dark' }
+        };
+      }
     },
 
     'sch-usage-by-class': {
