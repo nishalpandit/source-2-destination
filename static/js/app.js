@@ -47,6 +47,16 @@
         } catch (e) {
           console.warn("Server status update:", e);
         }
+      } else if (recId && String(recId).startsWith('STU-')) {
+        try {
+          await fetch(`/api/v1/students/${encodeURIComponent(recId)}/`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: nextStatus })
+          });
+        } catch (e) {
+          console.warn("Server student status update:", e);
+        }
       }
       if (refreshFn) refreshFn();
       window.S2DNotify.show({
@@ -366,6 +376,8 @@
 
       /* --- FRANCHISE TABLES (SCOPED TO FRN-101) --- */
       'fr-schools-table': () => ({
+        url: '/api/v1/franchise/schools/',
+        bulkUrl: '/api/v1/super-admin/schools/bulk-status/',
         data: D.schools.filter((s) => s.franchiseId === 'FRN-101'),
         searchPlaceholder: 'Search assigned school name, city, or admin...',
         filters: [
@@ -374,43 +386,52 @@
         ],
         exportFilename: 'franchise-assigned-schools.csv',
         columns: [
-          { key: 'name', label: 'Assigned School', render: (r) => `<a href="${href('franchise/schools/details.html')}?id=${r.id}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.id} · Territory Allocated</span>` },
+          { key: 'name', label: 'Assigned School', render: (r) => `<a href="${href('franchise/schools/details.html')}?id=${r.id || r.code}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.id || r.code} · Territory Allocated</span>` },
           { key: 'city', label: 'Location' },
           { key: 'adminName', label: 'Campus Admin', render: (r) => `${r.adminName}<span class="cell-sub">${r.adminEmail}</span>` },
-          { key: 'students', label: 'Students', render: (r) => `<strong>${r.activeStudents}</strong> / ${r.students}` },
-          { key: 'callingMinutes', label: 'Monthly Usage', render: (r) => `<span class="mono-code">${r.callingMinutes.toLocaleString()} mins</span>` },
+          { key: 'students', label: 'Students', render: (r) => `<strong>${r.activeStudents ?? 0}</strong> / ${r.students ?? r.studentSeats ?? 0}` },
+          { key: 'callingMinutes', label: 'Monthly Usage', render: (r) => `<span class="mono-code">${(r.callingMinutes || (r.activeStudents || 0) * 45).toLocaleString()} mins</span>` },
           { key: 'status', label: 'Status', render: (r) => badge(r.status) }
         ],
         rowActions: (r) => [
-          { label: 'School Details', icon: 'eye', href: `${href('franchise/schools/details.html')}?id=${r.id}` },
-          { label: 'Edit Campus Info', icon: 'pencil', href: `${href('franchise/schools/edit.html')}?id=${r.id}` }
+          { label: 'School Details', icon: 'eye', href: `${href('franchise/schools/details.html')}?id=${r.id || r.code}` },
+          { label: 'Edit Campus Info', icon: 'pencil', href: `${href('franchise/schools/edit.html')}?id=${r.id || r.code}` }
         ]
       }),
 
-      'fr-students-table': () => ({
-        data: D.students.filter((s) => s.franchiseId === 'FRN-101'),
-        searchPlaceholder: 'Search student name, calling code, or guardian...',
-        filters: [
-          { key: 'school', label: 'Assigned School', options: ['Oakridge Residential Academy', 'Westfield Collegiate Hostel', 'St. Jude Boarding Institute'] },
-          { key: 'className', label: 'Class', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] },
-          { key: 'status', label: 'Status', options: ['Active', 'Inactive'] }
-        ],
-        exportFilename: 'franchise-students.csv',
-        columns: [
-          { key: 'name', label: 'Student', render: (r) => `<a href="${href('franchise/students/details.html')}?id=${r.id}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.studentCode}</span>` },
-          { key: 'school', label: 'Assigned School' },
-          { key: 'className', label: 'Class & Section', render: (r) => `${r.className} · ${r.section}` },
-          { key: 'primaryPhone', label: 'Primary Guardian', render: (r) => `<span class="mono-code">${r.primaryPhone}</span><span class="cell-sub">${r.guardianName}</span>` },
-          { key: 'remainingMinutes', label: 'Credits', render: (r) => `<span class="mono-code">${r.remainingMinutes} mins</span>` },
-          { key: 'status', label: 'Status', render: (r) => badge(r.status) }
-        ],
-        rowActions: (r) => [
-          { label: 'Student Profile', icon: 'user', href: `${href('franchise/students/details.html')}?id=${r.id}` },
-          { label: 'Edit Student', icon: 'pencil', href: `${href('franchise/students/edit.html')}?id=${r.id}` },
-          { divider: true },
-          { label: r.status === 'Active' ? 'Deactivate Student' : 'Activate Student', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
-        ]
-      }),
+      'fr-students-table': () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolCode = urlParams.get('id') || '';
+        const fetchUrl = schoolCode 
+          ? `/api/v1/franchise/students/?school=${encodeURIComponent(schoolCode)}`
+          : '/api/v1/franchise/students/';
+        return {
+          url: fetchUrl,
+          bulkUrl: '/api/v1/students/bulk-status/',
+          data: D.students.filter((s) => s.franchiseId === 'FRN-101' && (!schoolCode || s.schoolId === schoolCode)),
+          searchPlaceholder: 'Search student name, calling code, or guardian...',
+          filters: [
+            { key: 'school', label: 'Assigned School', options: ['Oakridge Residential Academy', 'Westfield Collegiate Hostel', 'St. Jude Boarding Institute'] },
+            { key: 'className', label: 'Class', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] },
+            { key: 'status', label: 'Status', options: ['Active', 'Inactive'] }
+          ],
+          exportFilename: 'franchise-students.csv',
+          columns: [
+            { key: 'name', label: 'Student', render: (r) => `<a href="${href('franchise/students/details.html')}?id=${r.id || r.code}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.studentCode || r.code}</span>` },
+            { key: 'school', label: 'Assigned School' },
+            { key: 'className', label: 'Class & Section', render: (r) => `${r.className} · ${r.section}` },
+            { key: 'primaryPhone', label: 'Primary Guardian', render: (r) => `<span class="mono-code">${r.primaryPhone}</span><span class="cell-sub">${r.guardianName}</span>` },
+            { key: 'remainingMinutes', label: 'Credits', render: (r) => `<span class="mono-code">${r.remainingMinutes} mins</span>` },
+            { key: 'status', label: 'Status', render: (r) => badge(r.status) }
+          ],
+          rowActions: (r) => [
+            { label: 'Student Profile', icon: 'user', href: `${href('franchise/students/details.html')}?id=${r.id || r.code}` },
+            { label: 'Edit Student', icon: 'pencil', href: `${href('franchise/students/edit.html')}?id=${r.id || r.code}` },
+            { divider: true },
+            { label: r.status === 'Active' ? 'Deactivate Student' : 'Activate Student', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+          ]
+        };
+      },
 
       'fr-commissions-table': () => ({
         data: D.commissions,
@@ -448,32 +469,38 @@
         ]
       }),
 
-      /* --- SCHOOL ADMIN TABLES (SCOPED TO OAKRIDGE SCH-1001) --- */
-      'sch-students-table': () => ({
-        data: D.students.filter((s) => s.schoolId === 'SCH-1001'),
-        searchPlaceholder: 'Search student name, calling code, room, or guardian...',
-        filters: [
-          { key: 'className', label: 'Class', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] },
-          { key: 'section', label: 'Section', options: ['Section A', 'Section B', 'Section C'] },
-          { key: 'status', label: 'Account', options: ['Active', 'Inactive'] }
-        ],
-        exportFilename: 'oakridge-students.csv',
-        columns: [
-          { key: 'name', label: 'Student', render: (r) => `<a href="${href('school-admin/students/details.html')}?id=${r.id}" class="cell-primary">${r.name}</a><span class="cell-sub">${r.hostelWing}</span>` },
-          { key: 'studentCode', label: 'Calling Code', render: (r) => `<span class="mono-code" style="padding:3px 7px;background:#EEF2FF;color:#3730A3;border-radius:5px;font-weight:600;">${r.studentCode}</span>` },
-          { key: 'className', label: 'Class / Sec', render: (r) => `${r.className}<span class="cell-sub">${r.section}</span>` },
-          { key: 'guardianName', label: 'Authorized Guardian', render: (r) => `${r.guardianName} (${r.guardianRelation})<span class="cell-sub mono-code">${r.primaryPhone}</span>` },
-          { key: 'remainingMinutes', label: 'Credits & Validity', render: (r) => `<strong>${r.remainingMinutes}m</strong> left<span class="cell-sub">Exp: ${r.validityExpiry}</span>` },
-          { key: 'status', label: 'Status', render: (r) => badge(r.status) }
-        ],
-        rowActions: (r) => [
-          { label: 'View 360° Profile', icon: 'eye', href: `${href('school-admin/students/details.html')}?id=${r.id}` },
-          { label: 'Edit Student', icon: 'pencil', href: `${href('school-admin/students/edit.html')}?id=${r.id}` },
-          { label: 'Recharge Credits', icon: 'zap', href: `${href('school-admin/recharges/student-recharge.html')}?student=${r.id}` },
-          { divider: true },
-          { label: r.status === 'Active' ? 'Deactivate Account' : 'Activate Account', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
-        ]
-      }),
+      /* --- SCHOOL ADMIN TABLES (SCOPED TO OAKRIDGE SCH-1001 OR CURRENT SCHOOL) --- */
+      'sch-students-table': () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const schoolCode = urlParams.get('id') || urlParams.get('school_code') || 'SCH-1001';
+        return {
+          url: `/api/v1/school-admin/students/?school_code=${encodeURIComponent(schoolCode)}`,
+          bulkUrl: '/api/v1/students/bulk-status/',
+          data: D.students.filter((s) => s.schoolId === schoolCode),
+          searchPlaceholder: 'Search student name, calling code, room, or guardian...',
+          filters: [
+            { key: 'className', label: 'Class', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] },
+            { key: 'section', label: 'Section', options: ['Section A', 'Section B', 'Section C'] },
+            { key: 'status', label: 'Account', options: ['Active', 'Inactive'] }
+          ],
+          exportFilename: `${schoolCode}-students.csv`,
+          columns: [
+            { key: 'name', label: 'Student', render: (r) => `<a href="${href('school-admin/students/details.html')}?id=${r.id || r.code}" class="cell-primary">${r.name}</a><span class="cell-sub">${r.hostelWing}</span>` },
+            { key: 'studentCode', label: 'Calling Code', render: (r) => `<span class="mono-code" style="padding:3px 7px;background:#EEF2FF;color:#3730A3;border-radius:5px;font-weight:600;">${r.studentCode || r.code}</span>` },
+            { key: 'className', label: 'Class / Sec', render: (r) => `${r.className}<span class="cell-sub">${r.section}</span>` },
+            { key: 'guardianName', label: 'Authorized Guardian', render: (r) => `${r.guardianName} (${r.guardianRelation})<span class="cell-sub mono-code">${r.primaryPhone}</span>` },
+            { key: 'remainingMinutes', label: 'Credits & Validity', render: (r) => `<strong>${r.remainingMinutes}m</strong> left<span class="cell-sub">Exp: ${r.validityExpiry}</span>` },
+            { key: 'status', label: 'Status', render: (r) => badge(r.status) }
+          ],
+          rowActions: (r) => [
+            { label: 'View 360° Profile', icon: 'eye', href: `${href('school-admin/students/details.html')}?id=${r.id || r.code}` },
+            { label: 'Edit Student', icon: 'pencil', href: `${href('school-admin/students/edit.html')}?id=${r.id || r.code}` },
+            { label: 'Recharge Credits', icon: 'zap', href: `${href('school-admin/recharges/student-recharge.html')}?student=${r.id || r.code}` },
+            { divider: true },
+            { label: r.status === 'Active' ? 'Deactivate Account' : 'Activate Account', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+          ]
+        };
+      },
 
       'sch-classes-table': () => ({
         data: D.classes,

@@ -39,8 +39,8 @@
               {% csrf_token %}
               <div class="s2d-form-section">
                 <div class="form-section-meta">
-                  <h3>Institution Identity</h3>
-                  <p>Official boarding school or residential hostel registration details and unique campus code prefix.</p>
+                  <h3>Institution Identity &amp; Campus Profile</h3>
+                  <p>Official boarding school or residential hostel registration details, institutional affiliations, and location specifications.</p>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-8 s2d-field">
@@ -53,33 +53,75 @@
                     <input type="text" id="school_code" name="code" class="s2d-input mono-code" placeholder="HWT-09" required>
                     <span class="field-hint">Used as prefix in server-issued student codes.</span>
                   </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="city_state">City &amp; State / Region <span class="req-star">*</span></label>
-                    <input type="text" id="city_state" name="city" class="s2d-input" placeholder="New Haven, CT" required>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="campus_type">Campus Governance Model <span class="req-star">*</span></label>
+                    <select id="campus_type" name="campus_type" class="s2d-select" required>
+                      <option value="Co-ed Residential Boarding">Co-ed Residential Boarding</option>
+                      <option value="All-Boys Boarding School">All-Boys Boarding School</option>
+                      <option value="All-Girls Boarding School">All-Girls Boarding School</option>
+                      <option value="Day-cum-Residential Hostel">Day-cum-Residential Hostel</option>
+                      <option value="Military / Preparatory Academy">Military / Preparatory Academy</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="affiliation_board">Educational Affiliation Board</label>
+                    <select id="affiliation_board" name="affiliation_board" class="s2d-select">
+                      <option value="CBSE">CBSE (Central Board)</option>
+                      <option value="ICSE">ICSE / ISC</option>
+                      <option value="IB World">International Baccalaureate (IB)</option>
+                      <option value="Cambridge">Cambridge International (CIE)</option>
+                      <option value="State Board">State Board of Education</option>
+                      <option value="NEASC">NEASC Accredited</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="website">Institutional Website</label>
+                    <input type="url" id="website" name="website" class="s2d-input" placeholder="https://www.hawthorneprep.edu">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="city">City <span class="req-star">*</span></label>
+                    <input type="text" id="city" name="city" class="s2d-input" placeholder="New Haven" required>
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="state">State / Province <span class="req-star">*</span></label>
+                    <input type="text" id="state" name="state" class="s2d-input" placeholder="CT" value="CT" required>
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="postal_code">Postal / Zip Code</label>
+                    <input type="text" id="postal_code" name="postal_code" class="s2d-input" placeholder="06511">
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="country">Country</label>
+                    <input type="text" id="country" name="country" class="s2d-input" value="United States">
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="hostel_blocks_count">Hostel Blocks</label>
+                    <input type="number" id="hostel_blocks_count" name="hostel_blocks_count" class="s2d-input" min="1" max="50" value="4">
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label" for="timezone">Campus Timezone <span class="req-star">*</span></label>
                     <select id="timezone" name="timezone" class="s2d-select" required>
                       <option value="America/New_York">America/New_York (EST/EDT)</option>
                       <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                      <option value="America/Denver">America/Denver (MST/MDT)</option>
                       <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
                       <option value="UTC">UTC Standard</option>
                     </select>
                   </div>
-                  <div class="col-12 s2d-field">
+                  <div class="col-md-6 s2d-field">
                     <label class="s2d-label" for="campus_address">Physical Campus Address <span class="req-star">*</span></label>
-                    <textarea id="campus_address" name="address" class="s2d-textarea" placeholder="400 Academic Way, Residential North Campus..." required></textarea>
+                    <input type="text" id="campus_address" name="address" class="s2d-input" placeholder="400 Academic Way, Residential North Campus..." required>
                   </div>
                 </div>
               </div>
 
               <div class="s2d-form-section">
                 <div class="form-section-meta">
-                  <h3>Franchise &amp; Primary Administrator</h3>
-                  <p>Allocate the campus to an authorized regional franchise and designate the primary School Admin contact.</p>
+                  <h3>Franchise &amp; Campus Leadership</h3>
+                  <p>Allocate the campus to an authorized regional franchise partner and designate primary and secondary administrators.</p>
                 </div>
                 <div class="row g-3">
-                  <div class="col-md-6 s2d-field">
+                  <div class="col-md-12 s2d-field">
                     <label class="s2d-label" for="franchise_id">Assigned Franchise Partner <span class="req-star">*</span></label>
                     <select id="franchise_id" name="franchise_id" class="s2d-select" required>
                       <option value="">Select franchise partner...</option>
@@ -93,17 +135,29 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="admin_name">Primary Administrator Full Name <span class="req-star">*</span></label>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="admin_name">Primary Admin (Principal) Full Name <span class="req-star">*</span></label>
                     <input type="text" id="admin_name" name="admin_name" class="s2d-input" placeholder="Dr. Jonathan Sterling" required>
                   </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="admin_email">Administrator Official Email <span class="req-star">*</span></label>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="admin_email">Principal Official Email <span class="req-star">*</span></label>
                     <input type="email" id="admin_email" name="admin_email" class="s2d-input" placeholder="principal@hawthorneprep.edu" required>
                   </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="admin_phone">Official Contact Phone <span class="req-star">*</span></label>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="admin_phone">Principal Contact Phone <span class="req-star">*</span></label>
                     <input type="tel" id="admin_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 290-4100" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_contact_name">Secondary Admin / Chief Warden</label>
+                    <input type="text" id="secondary_contact_name" name="secondary_contact_name" class="s2d-input" placeholder="Matron Eleanor Vance">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_contact_email">Secondary Admin Email</label>
+                    <input type="email" id="secondary_contact_email" name="secondary_contact_email" class="s2d-input" placeholder="warden@hawthorneprep.edu">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_contact_phone">Secondary Admin Phone</label>
+                    <input type="tel" id="secondary_contact_phone" name="secondary_contact_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 290-4109">
                   </div>
                 </div>
               </div>
@@ -111,15 +165,23 @@
               <div class="s2d-form-section">
                 <div class="form-section-meta">
                   <h3>Subscription &amp; Calling Policy Defaults</h3>
-                  <p>Set seat capacity, subscription tier, and default daily calling ceiling inherited by campus students.</p>
+                  <p>Set seat capacity, subscription tier, calling window hours, allowed calling days, and Android Enterprise policy tags.</p>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="sub_plan">Initial Subscription Plan <span class="req-star">*</span></label>
+                    <label class="s2d-label" for="sub_plan">Subscription Plan <span class="req-star">*</span></label>
                     <select id="sub_plan" name="subscription_plan" class="s2d-select" required>
                       <option value="Enterprise Boarding Annual">Enterprise Boarding Annual ($8,400 / yr · 850 seats)</option>
                       <option value="Campus Growth Annual">Campus Growth Annual ($5,900 / yr · 550 seats)</option>
                       <option value="Standard Hostel Quarterly">Standard Hostel Quarterly ($1,850 / qtr · 300 seats)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="billing_cycle">Billing Cycle</label>
+                    <select id="billing_cycle" name="billing_cycle" class="s2d-select">
+                      <option value="Annually">Annually</option>
+                      <option value="Quarterly">Quarterly</option>
+                      <option value="Monthly">Monthly</option>
                     </select>
                   </div>
                   <div class="col-md-3 s2d-field">
@@ -129,6 +191,34 @@
                   <div class="col-md-3 s2d-field">
                     <label class="s2d-label" for="default_daily_cap">Default Daily Cap (Mins) <span class="req-star">*</span></label>
                     <input type="number" id="default_daily_cap" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="15" required>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="calling_window_start">Calling Window Start</label>
+                    <input type="time" id="calling_window_start" name="calling_window_start" class="s2d-input" value="17:00">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="calling_window_end">Calling Window End</label>
+                    <input type="time" id="calling_window_end" name="calling_window_end" class="s2d-input" value="19:30">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="allowed_calling_days">Allowed Calling Days</label>
+                    <select id="allowed_calling_days" name="allowed_calling_days" class="s2d-select">
+                      <option value="All 7 Days">All 7 Days</option>
+                      <option value="Weekdays Only (Mon-Fri)">Weekdays Only (Mon-Fri)</option>
+                      <option value="Weekends Only (Sat-Sun)">Weekends Only (Sat-Sun)</option>
+                      <option value="Mon / Wed / Fri / Sun">Mon / Wed / Fri / Sun</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="kiosk_group_tag">Android Enterprise Kiosk Group Tag</label>
+                    <input type="text" id="kiosk_group_tag" name="kiosk_group_tag" class="s2d-input mono-code" value="AE-HOSTEL-BOOTH">
+                    <span class="field-hint">Enforces remote MDM lockdown profile on campus booth tablets.</span>
+                  </div>
+                  <div class="col-md-6 s2d-field d-flex align-items-center pt-3">
+                    <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                      <input type="checkbox" name="emergency_calling_allowed" class="s2d-checkbox" checked>
+                      <span>Enable 24/7 Emergency Outbound Calling Bypass</span>
+                    </label>
                   </div>
                   <div class="col-12">
                     <div class="s2d-switch-row">

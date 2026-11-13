@@ -1,36 +1,15 @@
 """
-Franchise Partner Views
+Franchise Partner Views Bridge (franchise_views.py)
 Source 2 Destination — Regional Operations Portal
+Imports and bridges to franchise-views.py per AGENTS.md specification.
 """
-import os
-from django.shortcuts import render
-from django.http import Http404
-from django.template.loader import get_template
-from django.template import TemplateDoesNotExist
+import importlib
+import sys
 
-def dashboard(request):
-    """Render Franchise Partner Dashboard."""
-    return render(request, 'franchise/dashboard.html')
+# Import implementation source module with hyphenated name
+_impl = importlib.import_module("Source2Destination.franchise-views")
 
-def render_franchise_page(request, path):
-    """Render any Franchise subpage dynamically."""
-    clean_path = os.path.normpath(path).replace('\\', '/').strip('/')
-    if clean_path.startswith('..'):
-        raise Http404("Invalid template path")
-
-    candidates = [
-        f"franchise/{clean_path}",
-        f"franchise/{clean_path}.html",
-    ]
-    if not clean_path.endswith('.html'):
-        candidates.append(f"franchise/{clean_path}/index.html")
-
-    for template_name in candidates:
-        try:
-            get_template(template_name)
-            return render(request, template_name)
-        except TemplateDoesNotExist:
-            continue
-
-    raise Http404(f"Franchise template '{clean_path}' not found")
-
+# Forward all public symbols from franchise-views into franchise_views namespace
+for _attr in dir(_impl):
+    if not _attr.startswith("__"):
+        globals()[_attr] = getattr(_impl, _attr)

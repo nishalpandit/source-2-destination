@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.db.models import Q, F
 from django.core.paginator import Paginator, EmptyPage
-from .models import School, Franchise
+from .models import School, Franchise, Student
 
 
 def api_status(request):
@@ -136,21 +136,36 @@ def schools_collection_api(request):
                 "db_id": s.id,
                 "code": s.code,
                 "name": s.name,
+                "campusType": s.campus_type,
+                "affiliationBoard": s.affiliation_board,
+                "website": s.website,
                 "city": s.city,
+                "state": s.state,
+                "postalCode": s.postal_code,
+                "country": s.country,
                 "address": s.address,
                 "timezone": s.timezone,
+                "hostelBlocksCount": s.hostel_blocks_count,
                 "franchiseId": s.franchise.code if s.franchise else "",
                 "franchise": s.franchise_name_cache or (s.franchise.name if s.franchise else "Unassigned"),
                 "adminName": s.admin_name,
                 "adminEmail": s.admin_email,
                 "phone": s.admin_phone,
+                "secondaryContactName": s.secondary_contact_name,
+                "secondaryContactEmail": s.secondary_contact_email,
+                "secondaryContactPhone": s.secondary_contact_phone,
                 "students": s.enrolled_students,
                 "activeStudents": s.active_students,
                 "studentSeats": s.student_seats,
                 "devices": s.device_count,
                 "dailyDurationCap": s.daily_duration_cap,
+                "allowedCallingDays": s.allowed_calling_days,
+                "emergencyCallingAllowed": s.emergency_calling_allowed,
+                "kioskGroupTag": s.kiosk_group_tag,
                 "subscriptionPlan": s.subscription_plan,
+                "billingCycle": s.billing_cycle,
                 "subscriptionStatus": s.subscription_status,
+                "callingMinutes": s.active_students * 45,
                 "status": s.status,
                 "createdAt": s.created_at.strftime("%Y-%m-%d")
             })
@@ -189,28 +204,42 @@ def schools_collection_api(request):
         franchise_id = data.get('franchise_id') or data.get('franchiseId')
         franchise = None
         if franchise_id:
-            franchise = Franchise.objects.filter(Q(code=franchise_id) | Q(id=franchise_id) | Q(name=franchise_id)).first()
+            franchise = Franchise.objects.filter(Q(code=franchise_id) | Q(id=franchise_id if str(franchise_id).isdigit() else 0) | Q(name=franchise_id)).first()
 
-        seats = int(data.get('student_seats') or data.get('student_cap') or 550)
+        seats = int(data.get('student_seats') or data.get('student_cap') or data.get('students') or 550)
         daily_cap = int(data.get('daily_duration_cap') or data.get('default_daily_cap') or 15)
         status = "Active" if str(data.get('activate_immediately', 'true')).lower() in ['true', 'on', '1'] else "Suspended"
 
         school = School.objects.create(
             code=code,
             name=name,
+            campus_type=data.get('campus_type', 'Co-ed Residential Boarding'),
+            affiliation_board=data.get('affiliation_board', 'CBSE'),
+            website=data.get('website', ''),
             city=city,
+            state=data.get('state', 'CT'),
+            postal_code=data.get('postal_code', ''),
+            country=data.get('country', 'United States'),
             address=data.get('address') or data.get('campus_address') or '',
             timezone=data.get('timezone', 'America/New_York'),
+            hostel_blocks_count=int(data.get('hostel_blocks_count') or 4),
             franchise=franchise,
             franchise_name_cache=franchise.name if franchise else '',
             admin_name=data.get('admin_name') or 'Campus Administrator',
-            admin_email=data.get('admin_email') or 'admin@institution.edu',
-            admin_phone=data.get('admin_phone') or '',
+            admin_email=data.get('admin_email') or data.get('adminEmail') or 'admin@institution.edu',
+            admin_phone=data.get('admin_phone') or data.get('phone') or '',
+            secondary_contact_name=data.get('secondary_contact_name', ''),
+            secondary_contact_email=data.get('secondary_contact_email', ''),
+            secondary_contact_phone=data.get('secondary_contact_phone', ''),
+            daily_duration_cap=daily_cap,
+            allowed_calling_days=data.get('allowed_calling_days', 'All 7 Days'),
+            emergency_calling_allowed=str(data.get('emergency_calling_allowed', 'true')).lower() in ['true', 'on', '1'],
+            kiosk_group_tag=data.get('kiosk_group_tag', 'AE-HOSTEL-BOOTH'),
             subscription_plan=data.get('subscription_plan', 'Enterprise Boarding Annual'),
+            billing_cycle=data.get('billing_cycle', 'Annually'),
             student_seats=seats,
             enrolled_students=seats,
             active_students=seats if status == 'Active' else 0,
-            daily_duration_cap=daily_cap,
             status=status,
             subscription_status="Active"
         )
@@ -322,5 +351,515 @@ def school_bulk_status_api(request):
 
     return JsonResponse({
         "message": f"Bulk status updated to {new_status}",
+        "updated_count": updated_count
+    })
+
+
+# =========================================================================
+# FRANCHISE: ASSIGNED SCHOOLS API (Scoped to Territory)
+# =========================================================================
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def franchise_schools_api(request):
+    """
+    GET  /api/v1/franchise/schools/ -> Server-paginated schools for franchise territory
+    POST /api/v1/franchise/schools/ -> Onboard assigned campus under territory
+    """
+    franchise_code = request.GET.get('franchise_code', 'FRN-101').strip()
+    franchise = Franchise.objects.filter(Q(code=franchise_code) | Q(name__icontains=franchise_code)).first()
+
+    if request.method == "GET":
+        try:
+            page = max(1, int(request.GET.get('page', 1)))
+            page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+        except (ValueError, TypeError):
+            page = 1
+            page_size = 10
+
+        qs = School.objects.select_related('franchise')
+        if franchise:
+            qs = qs.filter(franchise=franchise)
+        else:
+            qs = qs.filter(franchise__code='FRN-101')
+
+        # Fast Indexed Search
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            qs = qs.filter(
+                Q(code__istartswith=search_query) |
+                Q(name__icontains=search_query) |
+                Q(city__icontains=search_query) |
+                Q(admin_name__icontains=search_query)
+            )
+
+        status_filter = request.GET.get('status', '').strip()
+        if status_filter and status_filter.lower() != 'all':
+            qs = qs.filter(status__iexact=status_filter)
+
+        sub_filter = request.GET.get('subscriptionStatus', '').strip()
+        if sub_filter and sub_filter.lower() != 'all':
+            qs = qs.filter(subscription_status__iexact=sub_filter)
+
+        ordering = request.GET.get('ordering', '-id').strip()
+        qs = qs.order_by(ordering if ordering in ['id', '-id', 'name', '-name', 'code', '-code', 'enrolled_students', '-enrolled_students'] else '-id')
+
+        paginator = Paginator(qs, page_size)
+        try:
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page_obj = []
+
+        results = []
+        for s in page_obj:
+            results.append({
+                "id": s.code,
+                "db_id": s.id,
+                "code": s.code,
+                "name": s.name,
+                "campusType": s.campus_type,
+                "affiliationBoard": s.affiliation_board,
+                "website": s.website,
+                "city": s.city,
+                "state": s.state,
+                "postalCode": s.postal_code,
+                "country": s.country,
+                "address": s.address,
+                "timezone": s.timezone,
+                "hostelBlocksCount": s.hostel_blocks_count,
+                "franchiseId": s.franchise.code if s.franchise else "",
+                "franchise": s.franchise_name_cache or (s.franchise.name if s.franchise else ""),
+                "adminName": s.admin_name,
+                "adminEmail": s.admin_email,
+                "phone": s.admin_phone,
+                "secondaryContactName": s.secondary_contact_name,
+                "secondaryContactEmail": s.secondary_contact_email,
+                "secondaryContactPhone": s.secondary_contact_phone,
+                "students": s.enrolled_students,
+                "activeStudents": s.active_students,
+                "studentSeats": s.student_seats,
+                "devices": s.device_count,
+                "dailyDurationCap": s.daily_duration_cap,
+                "callingMinutes": s.active_students * 45,
+                "subscriptionPlan": s.subscription_plan,
+                "billingCycle": s.billing_cycle,
+                "subscriptionStatus": s.subscription_status,
+                "status": s.status,
+                "createdAt": s.created_at.strftime("%Y-%m-%d")
+            })
+
+        return JsonResponse({
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": page,
+            "page_size": page_size,
+            "results": results
+        })
+
+    elif request.method == "POST":
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        name = data.get('name', '').strip()
+        city = data.get('city', '').strip()
+        if not name or not city:
+            return JsonResponse({"error": "name and city are required fields"}, status=400)
+
+        code = data.get('code', '').strip()
+        if not code:
+            code = f"SCH-{School.objects.count() + 1001}"
+        elif School.objects.filter(code=code).exists():
+            code = f"{code}-{School.objects.count() + 1}"
+
+        seats = int(data.get('students') or data.get('student_seats') or 400)
+        daily_cap = int(data.get('daily_duration_cap') or 15)
+
+        school = School.objects.create(
+            code=code,
+            name=name,
+            campus_type=data.get('campus_type', 'Co-ed Residential Boarding'),
+            affiliation_board=data.get('affiliation_board', 'CBSE'),
+            website=data.get('website', ''),
+            city=city,
+            state=data.get('state', 'CT'),
+            postal_code=data.get('postal_code', ''),
+            country=data.get('country', 'United States'),
+            address=data.get('address', ''),
+            timezone=data.get('timezone', 'America/New_York'),
+            hostel_blocks_count=int(data.get('hostel_blocks_count') or 3),
+            franchise=franchise or Franchise.objects.first(),
+            franchise_name_cache=franchise.name if franchise else '',
+            admin_name=data.get('admin_name', 'Campus Administrator'),
+            admin_email=data.get('admin_email') or data.get('adminEmail') or 'admin@institution.edu',
+            admin_phone=data.get('admin_phone') or data.get('phone') or '',
+            secondary_contact_name=data.get('secondary_contact_name', ''),
+            secondary_contact_email=data.get('secondary_contact_email', ''),
+            secondary_contact_phone=data.get('secondary_contact_phone', ''),
+            daily_duration_cap=daily_cap,
+            allowed_calling_days=data.get('allowed_calling_days', 'All 7 Days'),
+            emergency_calling_allowed=str(data.get('emergency_calling_allowed', 'true')).lower() in ['true', 'on', '1'],
+            kiosk_group_tag=data.get('kiosk_group_tag', 'AE-HOSTEL-BOOTH'),
+            subscription_plan=data.get('subscription_plan', 'Campus Growth Annual'),
+            billing_cycle=data.get('billing_cycle', 'Annually'),
+            student_seats=seats,
+            enrolled_students=seats,
+            active_students=seats,
+            status='Active',
+            subscription_status="Active"
+        )
+
+        return JsonResponse({
+            "message": "Assigned school onboarded successfully",
+            "school": {
+                "id": school.code,
+                "code": school.code,
+                "name": school.name,
+                "city": school.city,
+                "status": school.status
+            }
+        }, status=201)
+
+
+# =========================================================================
+# HIGH-SCALE STUDENTS API (Super Admin, Franchise, and School Scopes)
+# =========================================================================
+
+def _serialize_student(stu):
+    """Helper to serialize Student model to JSON-compatible dict."""
+    return {
+        "id": stu.code,
+        "db_id": stu.id,
+        "code": stu.code,
+        "studentCode": stu.calling_code,
+        "name": stu.name,
+        "gender": stu.gender,
+        "schoolId": stu.school.code,
+        "school": stu.school.name,
+        "franchiseId": stu.school.franchise.code if stu.school.franchise else "",
+        "className": stu.class_name,
+        "section": stu.section,
+        "rollNumber": stu.roll_number,
+        "hostelWing": stu.hostel_wing or "General Boarding Wing",
+        "guardianName": stu.guardian_name,
+        "guardianRelation": stu.guardian_relation,
+        "primaryPhone": stu.primary_phone,
+        "secondaryPhone": stu.secondary_phone,
+        "remainingMinutes": stu.remaining_minutes,
+        "dailyLimitMin": stu.daily_limit_min,
+        "walletBalance": float(stu.wallet_balance),
+        "validityStart": stu.validity_start.strftime("%Y-%m-%d") if stu.validity_start else "",
+        "validityExpiry": stu.validity_expiry.strftime("%Y-%m-%d") if stu.validity_expiry else "2027-05-31",
+        "status": stu.status,
+        "createdAt": stu.created_at.strftime("%Y-%m-%d")
+    }
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+def students_collection_api(request):
+    """
+    GET  /api/v1/students/ -> Enterprise paginated student search & directory
+    POST /api/v1/students/ -> Enroll new student
+    """
+    if request.method == "GET":
+        try:
+            page = max(1, int(request.GET.get('page', 1)))
+            page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+        except (ValueError, TypeError):
+            page = 1
+            page_size = 10
+
+        qs = Student.objects.select_related('school', 'school__franchise')
+
+        # Filter by school
+        school_param = request.GET.get('school', '').strip()
+        if school_param and school_param.lower() != 'all':
+            qs = qs.filter(Q(school__code__iexact=school_param) | Q(school__name__icontains=school_param))
+
+        # Filter by franchise
+        franchise_param = request.GET.get('franchise', '').strip()
+        if franchise_param and franchise_param.lower() != 'all':
+            qs = qs.filter(Q(school__franchise__code__iexact=franchise_param) | Q(school__franchise__name__icontains=franchise_param))
+
+        # Filter by class
+        class_param = request.GET.get('className', request.GET.get('class', '')).strip()
+        if class_param and class_param.lower() != 'all':
+            qs = qs.filter(class_name__iexact=class_param)
+
+        # Filter by section
+        section_param = request.GET.get('section', '').strip()
+        if section_param and section_param.lower() != 'all':
+            qs = qs.filter(section__iexact=section_param)
+
+        # Filter by status
+        status_param = request.GET.get('status', '').strip()
+        if status_param and status_param.lower() != 'all':
+            qs = qs.filter(status__iexact=status_param)
+
+        # Search query across indexed fields
+        search_query = request.GET.get('search', '').strip()
+        if search_query:
+            qs = qs.filter(
+                Q(name__icontains=search_query) |
+                Q(code__istartswith=search_query) |
+                Q(calling_code__icontains=search_query) |
+                Q(primary_phone__icontains=search_query) |
+                Q(guardian_name__icontains=search_query)
+            )
+
+        ordering = request.GET.get('ordering', '-id').strip()
+        qs = qs.order_by(ordering if ordering in ['id', '-id', 'name', '-name', 'code', '-code', 'created_at', '-created_at'] else '-id')
+
+        paginator = Paginator(qs, page_size)
+        try:
+            page_obj = paginator.page(page)
+        except EmptyPage:
+            page_obj = []
+
+        return JsonResponse({
+            "count": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": page,
+            "page_size": page_size,
+            "results": [_serialize_student(s) for s in page_obj]
+        })
+
+    elif request.method == "POST":
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        name = data.get('name', '').strip()
+        primary_phone = data.get('primary_phone') or data.get('primaryPhone') or ''
+        school_id = data.get('school_id') or data.get('schoolId') or data.get('school')
+
+        school = School.objects.filter(Q(code=school_id) | Q(name__icontains=str(school_id))).first()
+        if not school:
+            school = School.objects.first()
+
+        code = data.get('code') or f"STU-{Student.objects.count() + 4001}"
+        calling_code = data.get('calling_code') or data.get('studentCode') or f"S2D-{school.code[:3]}-{Student.objects.count() + 8801}"
+
+        stu = Student.objects.create(
+            code=code,
+            calling_code=calling_code,
+            name=name,
+            gender=data.get('gender', 'Male'),
+            school=school,
+            class_name=data.get('className') or data.get('class_name', 'Grade 10'),
+            section=data.get('section', 'Section A'),
+            roll_number=data.get('roll_number', ''),
+            hostel_wing=data.get('hostelWing') or data.get('hostel_wing', ''),
+            guardian_name=data.get('guardianName') or data.get('guardian_name', 'Authorized Guardian'),
+            guardian_relation=data.get('guardianRelation') or data.get('guardian_relation', 'Father'),
+            primary_phone=primary_phone,
+            secondary_phone=data.get('secondary_phone') or data.get('secondaryPhone', ''),
+            remaining_minutes=int(data.get('remainingMinutes') or data.get('remaining_minutes') or 120),
+            daily_limit_min=int(data.get('dailyLimitMin') or data.get('daily_limit_min') or 15),
+            wallet_balance=float(data.get('wallet_balance') or 50.00),
+            status=data.get('status', 'Active')
+        )
+
+        return JsonResponse({
+            "message": "Student successfully enrolled",
+            "student": _serialize_student(stu)
+        }, status=201)
+
+
+@csrf_exempt
+def franchise_students_api(request):
+    """
+    GET /api/v1/franchise/students/
+    Returns student records scoped to the franchise territory (e.g. FRN-101).
+    """
+    franchise_code = request.GET.get('franchise_code', 'FRN-101').strip()
+    try:
+        page = max(1, int(request.GET.get('page', 1)))
+        page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+    except (ValueError, TypeError):
+        page = 1
+        page_size = 10
+
+    qs = Student.objects.select_related('school', 'school__franchise').filter(
+        Q(school__franchise__code__iexact=franchise_code) |
+        Q(school__franchise_name_cache__icontains=franchise_code)
+    )
+
+    # Search & filters
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        qs = qs.filter(
+            Q(name__icontains=search_query) |
+            Q(code__istartswith=search_query) |
+            Q(calling_code__icontains=search_query) |
+            Q(primary_phone__icontains=search_query) |
+            Q(guardian_name__icontains=search_query)
+        )
+
+    school_filter = request.GET.get('school', '').strip()
+    if school_filter and school_filter.lower() != 'all':
+        qs = qs.filter(Q(school__name__icontains=school_filter) | Q(school__code__iexact=school_filter))
+
+    class_filter = request.GET.get('className', '').strip()
+    if class_filter and class_filter.lower() != 'all':
+        qs = qs.filter(class_name__iexact=class_filter)
+
+    status_filter = request.GET.get('status', '').strip()
+    if status_filter and status_filter.lower() != 'all':
+        qs = qs.filter(status__iexact=status_filter)
+
+    paginator = Paginator(qs.order_by('-id'), page_size)
+    try:
+        page_obj = paginator.page(page)
+    except EmptyPage:
+        page_obj = []
+
+    return JsonResponse({
+        "count": paginator.count,
+        "total_pages": paginator.num_pages,
+        "current_page": page,
+        "page_size": page_size,
+        "results": [_serialize_student(s) for s in page_obj]
+    })
+
+
+@csrf_exempt
+def school_admin_students_api(request):
+    """
+    GET /api/v1/school-admin/students/
+    Returns student records scoped to the campus (e.g. SCH-1001 Oakridge).
+    """
+    school_code = request.GET.get('school_code', 'SCH-1001').strip()
+    try:
+        page = max(1, int(request.GET.get('page', 1)))
+        page_size = min(max(1, int(request.GET.get('page_size', 10))), 100)
+    except (ValueError, TypeError):
+        page = 1
+        page_size = 10
+
+    qs = Student.objects.select_related('school', 'school__franchise').filter(
+        Q(school__code__iexact=school_code) | Q(school__name__icontains=school_code)
+    )
+
+    search_query = request.GET.get('search', '').strip()
+    if search_query:
+        qs = qs.filter(
+            Q(name__icontains=search_query) |
+            Q(code__istartswith=search_query) |
+            Q(calling_code__icontains=search_query) |
+            Q(primary_phone__icontains=search_query) |
+            Q(guardian_name__icontains=search_query) |
+            Q(hostel_wing__icontains=search_query)
+        )
+
+    class_filter = request.GET.get('className', '').strip()
+    if class_filter and class_filter.lower() != 'all':
+        qs = qs.filter(class_name__iexact=class_filter)
+
+    section_filter = request.GET.get('section', '').strip()
+    if section_filter and section_filter.lower() != 'all':
+        qs = qs.filter(section__iexact=section_filter)
+
+    status_filter = request.GET.get('status', '').strip()
+    if status_filter and status_filter.lower() != 'all':
+        qs = qs.filter(status__iexact=status_filter)
+
+    paginator = Paginator(qs.order_by('-id'), page_size)
+    try:
+        page_obj = paginator.page(page)
+    except EmptyPage:
+        page_obj = []
+
+    return JsonResponse({
+        "count": paginator.count,
+        "total_pages": paginator.num_pages,
+        "current_page": page,
+        "page_size": page_size,
+        "results": [_serialize_student(s) for s in page_obj]
+    })
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "PATCH", "DELETE"])
+def student_item_api(request, student_id):
+    """
+    GET    /api/v1/students/<student_id>/ -> Fetch single student
+    PUT    /api/v1/students/<student_id>/ -> Update student
+    PATCH  /api/v1/students/<student_id>/ -> Partial update
+    DELETE /api/v1/students/<student_id>/ -> Deactivate/suspend student
+    """
+    stu = Student.objects.filter(Q(code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0)).select_related('school').first()
+    if not stu:
+        return JsonResponse({"error": f"Student '{student_id}' not found"}, status=404)
+
+    if request.method == "GET":
+        return JsonResponse(_serialize_student(stu))
+
+    elif request.method in ["PUT", "PATCH"]:
+        try:
+            if request.content_type == "application/json":
+                data = json.loads(request.body.decode('utf-8'))
+            else:
+                data = request.POST.dict()
+        except Exception as e:
+            return HttpResponseBadRequest(f"Malformed payload: {str(e)}")
+
+        for f in ['name', 'gender', 'class_name', 'section', 'roll_number', 'hostel_wing', 'guardian_name', 'guardian_relation', 'primary_phone', 'secondary_phone', 'status']:
+            if f in data:
+                setattr(stu, f, data[f])
+
+        if 'remainingMinutes' in data:
+            stu.remaining_minutes = int(data['remainingMinutes'])
+        elif 'remaining_minutes' in data:
+            stu.remaining_minutes = int(data['remaining_minutes'])
+
+        if 'dailyLimitMin' in data:
+            stu.daily_limit_min = int(data['dailyLimitMin'])
+        elif 'daily_limit_min' in data:
+            stu.daily_limit_min = int(data['daily_limit_min'])
+
+        stu.save()
+        return JsonResponse({"message": "Student updated successfully", "student": _serialize_student(stu)})
+
+    elif request.method == "DELETE":
+        stu.status = "Inactive"
+        stu.save(update_fields=['status'])
+        return JsonResponse({"message": f"Student '{stu.code}' deactivated", "status": "Inactive"})
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def student_bulk_status_api(request):
+    """
+    POST /api/v1/students/bulk-status/
+    Bulk activate / suspend students atomically.
+    """
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        data = request.POST.dict()
+
+    ids = data.get('ids', [])
+    action = data.get('action', '').lower()
+
+    if not ids or action not in ['activate', 'suspend', 'deactivate']:
+        return JsonResponse({"error": "ids list and valid action ('activate' or 'suspend') required"}, status=400)
+
+    new_status = 'Active' if action == 'activate' else 'Inactive'
+    updated_count = Student.objects.filter(Q(code__in=ids) | Q(id__in=[int(i) for i in ids if str(i).isdigit()])).update(
+        status=new_status
+    )
+
+    return JsonResponse({
+        "message": f"Bulk students updated to {new_status}",
         "updated_count": updated_count
     })

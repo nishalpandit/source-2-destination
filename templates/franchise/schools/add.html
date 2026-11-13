@@ -26,25 +26,222 @@
       <main class="app-content">
 
         <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">TERRITORY ONBOARDING</div><h1 class="page-title">Onboard New School in Territory</h1><p class="page-description">Submit a new residential school registration allocated automatically under North-East EduNet Partners (FRN-101).</p></div>
-          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Assigned Schools</span></a></div>
+          <div class="page-header-info">
+            <div class="page-eyebrow">TERRITORY ONBOARDING · {{ franchise.code|default:"FRN-101" }}</div>
+            <h1 class="page-title">Onboard New School in Territory</h1>
+            <p class="page-description">Submit a new residential boarding school registration allocated automatically under {{ franchise.name|default:"North-East EduNet Partners" }}.</p>
+          </div>
+          <div class="page-actions">
+            <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Assigned Schools</span></a>
+          </div>
         </div>
-        <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Campus Onboarding Submitted (Demo)">
-            <div class="s2d-form-section">
-              <div class="form-section-meta"><h3>Allocated Franchise</h3><p>Locked to your authenticated franchise identity.</p></div>
-              <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Franchise Allocation</label><input type="text" class="s2d-input" value="FRN-101 · North-East EduNet Partners" readonly></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Official School Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Berkshire Residential Academy" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">City &amp; State <span class="req-star">*</span></label><input type="text" name="city" class="s2d-input" placeholder="Concord, NH" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin Email <span class="req-star">*</span></label><input type="email" name="adminEmail" class="s2d-input" placeholder="admin@berkshire-academy.edu" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Campus Contact Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 244-8900" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Estimated Student Seats <span class="req-star">*</span></label><input type="number" name="students" class="s2d-input" min="25" value="400" required></div>
+
+        <div class="s2d-card">
+          <div class="s2d-card-body">
+            <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="School Onboarding Submitted" data-success-desc="Campus provisioned under your franchise territory.">
+              {% csrf_token %}
+              
+              <!-- SECTION 1: TERRITORY & CAMPUS IDENTITY -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Territory &amp; Campus Identity</h3>
+                  <p>Institution name, affiliation board, and locked regional partner allocation.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label">Assigned Franchise Partner</label>
+                    <input type="text" class="s2d-input" value="{{ franchise.code|default:'FRN-101' }} · {{ franchise.name|default:'North-East EduNet Partners' }}" readonly style="background:var(--s2d-surface-subtle);font-weight:600;">
+                    <span class="field-hint">Campuses are automatically registered within your assigned jurisdiction.</span>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_school_name">Official School / Hostel Name <span class="req-star">*</span></label>
+                    <input type="text" id="fr_school_name" name="name" class="s2d-input" placeholder="e.g. Berkshire Residential Academy" required>
+                    <div data-drf-error="name"></div>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_school_code">Campus Short Code</label>
+                    <input type="text" id="fr_school_code" name="code" class="s2d-input mono-code" placeholder="BRK-12">
+                    <span class="field-hint">Leave blank to auto-generate from franchise sequence.</span>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_campus_type">Campus Governance Model <span class="req-star">*</span></label>
+                    <select id="fr_campus_type" name="campus_type" class="s2d-select" required>
+                      <option value="Co-ed Residential Boarding">Co-ed Residential Boarding</option>
+                      <option value="All-Boys Boarding School">All-Boys Boarding School</option>
+                      <option value="All-Girls Boarding School">All-Girls Boarding School</option>
+                      <option value="Day-cum-Residential Hostel">Day-cum-Residential Hostel</option>
+                      <option value="Military / Preparatory Academy">Military / Preparatory Academy</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_affiliation_board">Educational Affiliation Board</label>
+                    <select id="fr_affiliation_board" name="affiliation_board" class="s2d-select">
+                      <option value="CBSE">CBSE (Central Board)</option>
+                      <option value="ICSE">ICSE / ISC</option>
+                      <option value="IB World">International Baccalaureate (IB)</option>
+                      <option value="Cambridge">Cambridge International (CIE)</option>
+                      <option value="State Board">State Board of Education</option>
+                      <option value="NEASC">NEASC Accredited</option>
+                    </select>
+                  </div>
+                  <div class="col-md-8 s2d-field">
+                    <label class="s2d-label" for="fr_website">Institutional Website</label>
+                    <input type="url" id="fr_website" name="website" class="s2d-input" placeholder="https://www.berkshireacademy.edu">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_hostel_blocks">Active Hostel Blocks</label>
+                    <input type="number" id="fr_hostel_blocks" name="hostel_blocks_count" class="s2d-input" min="1" max="50" value="3">
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Submit School Onboarding</span></button></div></div>
-          </form>
-        </div></div>
+
+              <!-- SECTION 2: PHYSICAL LOCATION -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Campus Location &amp; Facilities</h3>
+                  <p>Physical campus address, timezone, and regional dispatch coordinates.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_city">City <span class="req-star">*</span></label>
+                    <input type="text" id="fr_city" name="city" class="s2d-input" placeholder="Concord" required>
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="fr_state">State / Province <span class="req-star">*</span></label>
+                    <input type="text" id="fr_state" name="state" class="s2d-input" placeholder="NH" value="NH" required>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_postal_code">Postal Code</label>
+                    <input type="text" id="fr_postal_code" name="postal_code" class="s2d-input" placeholder="03301">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_country">Country</label>
+                    <input type="text" id="fr_country" name="country" class="s2d-input" value="United States">
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_address">Campus Physical Address</label>
+                    <input type="text" id="fr_address" name="address" class="s2d-input" placeholder="1200 Forest Way, North Campus">
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_timezone">Campus Timezone <span class="req-star">*</span></label>
+                    <select id="fr_timezone" name="timezone" class="s2d-select" required>
+                      <option value="America/New_York">America/New_York (EST/EDT)</option>
+                      <option value="America/Chicago">America/Chicago (CST/CDT)</option>
+                      <option value="America/Denver">America/Denver (MST/MDT)</option>
+                      <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
+                      <option value="UTC">UTC Standard</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 3: CAMPUS LEADERSHIP CONTACTS -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Campus Leadership Contacts</h3>
+                  <p>Designate the institutional primary administrator (Principal) and secondary contact (Hostel Warden).</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_admin_name">Primary Admin (Principal) Name <span class="req-star">*</span></label>
+                    <input type="text" id="fr_admin_name" name="admin_name" class="s2d-input" placeholder="Dr. Arthur Sterling" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_admin_email">Primary Admin Email <span class="req-star">*</span></label>
+                    <input type="email" id="fr_admin_email" name="adminEmail" class="s2d-input" placeholder="admin@berkshire-academy.edu" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_phone">Campus Contact Phone <span class="req-star">*</span></label>
+                    <input type="tel" id="fr_phone" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 244-8900" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_sec_name">Hostel Warden / In-charge</label>
+                    <input type="text" id="fr_sec_name" name="secondary_contact_name" class="s2d-input" placeholder="Matron Beatrice Holloway">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_sec_email">Hostel Warden Email</label>
+                    <input type="email" id="fr_sec_email" name="secondary_contact_email" class="s2d-input" placeholder="warden@berkshire-academy.edu">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_sec_phone">Hostel Warden Direct Phone</label>
+                    <input type="tel" id="fr_sec_phone" name="secondary_contact_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 244-8909">
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 4: CAPACITY, SUBSCRIPTION & CALLING POLICIES -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Capacity, Subscription &amp; Calling Policies</h3>
+                  <p>Configure licensed student seats, calling window hours, daily caps, and Android Enterprise booth tag.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_sub_plan">Subscription Tier <span class="req-star">*</span></label>
+                    <select id="fr_sub_plan" name="subscription_plan" class="s2d-select" required>
+                      <option value="Campus Growth Annual">Campus Growth Annual ($5,900 / yr · 550 seats)</option>
+                      <option value="Enterprise Boarding Annual">Enterprise Boarding Annual ($8,400 / yr · 850 seats)</option>
+                      <option value="Standard Hostel Quarterly">Standard Hostel Quarterly ($1,850 / qtr · 300 seats)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_billing_cycle">Billing Cycle</label>
+                    <select id="fr_billing_cycle" name="billing_cycle" class="s2d-select">
+                      <option value="Annually">Annually</option>
+                      <option value="Quarterly">Quarterly</option>
+                      <option value="Monthly">Monthly</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_students">Estimated Student Seats <span class="req-star">*</span></label>
+                    <input type="number" id="fr_students" name="students" class="s2d-input" min="25" max="5000" value="400" required>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_daily_cap">Default Daily Cap (Mins)</label>
+                    <input type="number" id="fr_daily_cap" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="15">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_win_start">Calling Window Start</label>
+                    <input type="time" id="fr_win_start" name="calling_window_start" class="s2d-input" value="17:00">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_win_end">Calling Window End</label>
+                    <input type="time" id="fr_win_end" name="calling_window_end" class="s2d-input" value="19:30">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="fr_days">Allowed Calling Days</label>
+                    <select id="fr_days" name="allowed_calling_days" class="s2d-select">
+                      <option value="All 7 Days">All 7 Days</option>
+                      <option value="Weekdays Only (Mon-Fri)">Weekdays Only (Mon-Fri)</option>
+                      <option value="Weekends Only (Sat-Sun)">Weekends Only (Sat-Sun)</option>
+                      <option value="Mon / Wed / Fri / Sun">Mon / Wed / Fri / Sun</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_kiosk_tag">Android Enterprise Kiosk Group Tag</label>
+                    <input type="text" id="fr_kiosk_tag" name="kiosk_group_tag" class="s2d-input mono-code" value="AE-HOSTEL-BOOTH">
+                  </div>
+                  <div class="col-md-6 s2d-field d-flex align-items-center pt-3">
+                    <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                      <input type="checkbox" name="emergency_calling_allowed" class="s2d-checkbox" checked>
+                      <span>Enable 24/7 Emergency Outbound Calling Bypass</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ACTIONS BAR -->
+              <div class="form-actions-bar">
+                <div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved onboarding details</span></div>
+                <div class="ms-auto d-flex gap-2">
+                  <a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a>
+                  <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Submit School Onboarding</span></button>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
     
       </main>
     </div>
