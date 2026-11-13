@@ -1,0 +1,62 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>School Profile & Settings — School Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="school-admin" data-root="../../" data-route="school-admin/settings/index.html" data-section="Hostel & Reporting" data-page-title="Profile & Settings">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">CAMPUS SETTINGS</div><h1 class="page-title">School Profile &amp; Operational Preferences</h1><p class="page-description">Manage Oakridge Residential Academy contact details, hostel emergency call policies, and School Admin account settings.</p></div></div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-success-title="Campus Settings Saved (Demo)">
+            <div class="s2d-form-section">
+              <div class="form-section-meta"><h3>Campus Profile</h3><p>Displayed on guardian communications and student recharge receipts.</p></div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Oakridge Residential Academy" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Dr. Arthur Pendelton" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Official Campus Email <span class="req-star">*</span></label><input type="email" class="s2d-input" value="admin@oakridge-academy.edu" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Control Desk Phone <span class="req-star">*</span></label><input type="tel" class="s2d-input" data-validate-phone="true" value="+1 (555) 210-9001" required></div>
+              </div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Preferences</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/modals.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/tables.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

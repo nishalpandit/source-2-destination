@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global Validity Rules — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/validity/rules.html" data-section="Calling Validity" data-page-title="Global Validity Rules">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info">
+            <div class="page-eyebrow">POLICY GOVERNANCE</div>
+            <h1 class="page-title">Global Validity &amp; Expiry Rules</h1>
+            <p class="page-description">Configure automated expiry warnings, grace-period behavior, credit rollover rules, and academic term synchronization.</p>
+          </div>
+          <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Validity Records</span></a></div>
+        </div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-success-title="Global Validity Rules Saved (Demo)">
+            <div class="s2d-form-section">
+              <div class="form-section-meta"><h3>Expiration &amp; Grace Window</h3><p>Define what happens when a student's calling validity reaches its end date.</p></div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Post-Expiry Grace Period (Hours) <span class="req-star">*</span></label><input type="number" name="grace_hours" class="s2d-input" min="0" max="168" value="72" required><span class="field-hint">Allows 1 supervised guardian notification call during grace window.</span></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Advance Reminder Dispatch <span class="req-star">*</span></label><select name="reminder_days" class="s2d-select"><option value="14,7,3,1">14d, 7d, 3d, and 24h before expiry</option><option value="7,3,1">7d, 3d, and 24h before expiry</option></select></div>
+                <div class="col-12"><div class="s2d-switch-row mb-2"><div><div class="fw-semibold text-heading">Preserve Unused Calling Minutes on Renewal Within 30 Days</div><div class="text-secondary-s2d" style="font-size:0.77rem;">Rolls over remaining balance when recharged within 30 days of expiration.</div></div><label class="s2d-switch"><input type="checkbox" checked><span class="s2d-switch-slider"></span></label></div></div>
+                <div class="col-12"><div class="s2d-switch-row"><div><div class="fw-semibold text-heading">Auto-Suspend Student Code When Validity Expires</div><div class="text-secondary-s2d" style="font-size:0.77rem;">Enforced by backend session validator on Android kiosk login.</div></div><label class="s2d-switch"><input type="checkbox" checked><span class="s2d-switch-slider"></span></label></div></div>
+              </div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Global Validity Policy</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/modals.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/tables.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

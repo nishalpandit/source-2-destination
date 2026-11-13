@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register & Assign Device — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/devices/register.html" data-section="Device Fleet" data-page-title="Register Device">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">HARDWARE PROVISIONING</div><h1 class="page-title">Register &amp; Assign Calling Terminal</h1><p class="page-description">Stage hardware identifiers (Serial / IMEI) for Android Enterprise zero-touch / QR enrollment and bind to a school campus.</p></div>
+          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Device Registry</span></a></div>
+        </div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Device Staged for Enrollment (Demo)">
+            <div class="s2d-form-section">
+              <div class="form-section-meta"><h3>Hardware Identity</h3><p>Verified against Android Management API enrollment tokens on the backend.</p></div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Terminal Label / Booth Name <span class="req-star">*</span></label><input type="text" name="deviceName" class="s2d-input" placeholder="North Hall Booth 3" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Hardware Model <span class="req-star">*</span></label><select name="model" class="s2d-select" required><option>Samsung Galaxy Tab Active5 Enterprise</option><option>Lenovo Tab K11 Kiosk Edition</option></select></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Manufacturer Serial Number <span class="req-star">*</span></label><input type="text" name="serialNumber" class="s2d-input mono-code" placeholder="S2D-TAB-90899X" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">15-Digit IMEI <span class="req-star">*</span></label><input type="text" name="imei" class="s2d-input mono-code" placeholder="358920104489901" required></div>
+              </div>
+            </div>
+            <div class="s2d-form-section">
+              <div class="form-section-meta"><h3>Campus Allocation &amp; Kiosk Policy</h3><p>Assign device to an active school and lock down dialer permissions.</p></div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label><select name="school" class="s2d-select" required><option value="SCH-1001">Oakridge Residential Academy</option><option value="SCH-1002">Westfield Collegiate Hostel</option><option value="SCH-1004">Greenwood International Prep</option></select></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Kiosk Policy Profile <span class="req-star">*</span></label><select name="policy" class="s2d-select"><option>Single-App Dedicated Calling Kiosk (Recommended)</option><option>Warden Desk Multi-Student Supervisor Mode</option></select></div>
+              </div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="qr-code"></i><span>Stage Device &amp; Request Token</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/modals.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/tables.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

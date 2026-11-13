@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classes & Sections — Franchise — Franchise Portal — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="franchise" data-root="../../" data-route="franchise/classes/index.html" data-section="Academics" data-page-title="Classes & Sections">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">ACADEMIC STRUCTURE</div><h1 class="page-title">Assigned-School Classes &amp; Sections</h1><p class="page-description">Configure academic classes, sections, and default calling schedule groups for your assigned campuses.</p></div>
+          <div class="page-actions"><button type="button" class="btn-s2d btn-s2d-primary" data-modal-open="fr-add-class-modal"><i data-lucide="plus"></i><span>Add Class / Section</span></button></div>
+        </div>
+        <div data-s2d-table="sch-classes-table"></div>
+        <div class="s2d-modal-backdrop" id="fr-add-class-modal">
+          <div class="s2d-modal-dialog"><div class="s2d-modal-header"><h3 class="s2d-card-title">Add School Class</h3><button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button></div>
+            <form data-s2d-form data-success-title="Class Created (Demo)"><div class="s2d-modal-body">
+              <div class="s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label><select class="s2d-select" required><option>Oakridge Residential Academy</option><option>Westfield Collegiate Hostel</option></select></div>
+              <div class="s2d-field"><label class="s2d-label">Class Name <span class="req-star">*</span></label><input type="text" class="s2d-input" placeholder="Grade 9" required></div>
+              <div class="s2d-field"><label class="s2d-label">Sections (Comma Separated) <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Section A, Section B" required></div>
+            </div><div class="s2d-modal-footer"><button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button><button type="submit" class="btn-s2d btn-s2d-primary">Create Class</button></div></form>
+          </div>
+        </div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/modals.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/tables.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

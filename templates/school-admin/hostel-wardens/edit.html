@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Hostel Warden — School Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="school-admin" data-root="../../" data-route="school-admin/hostel-wardens/edit.html" data-section="Hostel Wardens" data-page-title="Edit Warden">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <div class="page-header">
+          <div class="page-header-info"><div class="page-eyebrow">UPDATE WARDEN · <span data-bind-field="id">WRD-601</span></div><h1 class="page-title">Edit <span data-bind-field="name">Major Kenneth Cole (Ret.)</span></h1><p class="page-description">Update dormitory wing assignment, duty shift hours, or emergency override privileges.</p></div>
+          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back</span></a></div>
+        </div>
+        <div class="s2d-card"><div class="s2d-card-body">
+          <form data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id=WRD-601" data-success-title="Warden Assignment Updated (Demo)">
+            <div class="row g-3">
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Warden Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="Major Kenneth Cole (Ret.)" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Wing <span class="req-star">*</span></label><input type="text" name="hostelWing" class="s2d-input" data-bind-field="hostelWing" value="North Hall (Boys Grades 10–11)" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Shift Hours <span class="req-star">*</span></label><input type="text" name="shiftHours" class="s2d-input mono-code" data-bind-field="shiftHours" value="16:00 – 00:00" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="+1 (555) 210-9101" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Status</label><select name="status" class="s2d-select" data-bind-field="status"><option value="Active">Active</option><option value="Inactive">On Leave / Inactive</option></select></div>
+            </div>
+            <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Warden</span></button></div></div>
+          </form>
+        </div></div>
+    
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/demo-data.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/modals.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/tables.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script src="{% static 'js/charts.js' %}"></script>
+  <script src="{% static 'js/animations.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Python virtual environments
+env/
+venv/
+ENV/
+.venv/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+db.sqlite3
+
+# Static collected
+staticfiles/
+
+# System / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
