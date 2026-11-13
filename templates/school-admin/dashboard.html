@@ -165,7 +165,7 @@
                       <td class="mono-code">{{ r.created_at|date:"M d, H:i" }}</td>
                       <td class="cell-primary"><a href="students/details.html?id={{ r.student.code }}">{{ r.student.name }}</a></td>
                       <td>{{ r.plan_name_cache }}</td>
-                      <td><span class="s2d-badge s2d-badge-success">+{{ r.minutes_added }} mins (${{ r.amount }})</span></td>
+                      <td><span class="s2d-badge s2d-badge-success">+{{ r.minutes_added }} mins (₹{{ r.amount }})</span></td>
                     </tr>
                     {% empty %}
                     <tr><td colspan="4" class="text-secondary-s2d text-center py-3">No recent recharge transactions recorded.</td></tr>

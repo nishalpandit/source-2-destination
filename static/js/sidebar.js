@@ -8,9 +8,9 @@
 
   function getUserProfile(role) {
     const ctx = (window.S2D_DEMO && window.S2D_DEMO.currentContext) || {};
-    if (role === 'franchise') return ctx.franchise || { fullName: 'Marcus Sterling', initials: 'MS', email: 'm.sterling@northeast-edunet.com', roleLabel: 'Franchise Partner' };
-    if (role === 'school-admin') return ctx.schoolAdmin || { fullName: 'Dr. Arthur Pendelton', initials: 'AP', email: 'admin@oakridge-academy.edu', roleLabel: 'School Administrator' };
-    return ctx.superAdmin || { fullName: 'Eleanor Vance', initials: 'EV', email: 'e.vance@source2destination.io', roleLabel: 'Super Administrator' };
+    if (role === 'franchise') return ctx.franchise || { fullName: 'Vikramaditya Singhania', initials: 'VS', email: 'v.singhania@northedunet.in', roleLabel: 'Franchise Partner' };
+    if (role === 'school-admin') return ctx.schoolAdmin || { fullName: 'Dr. Ramesh Chandra Sharma', initials: 'RS', email: 'principal@doonvalley.edu.in', roleLabel: 'School Administrator' };
+    return ctx.superAdmin || { fullName: 'Aarav Singhal', initials: 'AS', email: 'aarav.singhal@source2destination.in', roleLabel: 'Super Administrator' };
   }
 
   function renderSidebarAndTopbar() {
@@ -124,9 +124,9 @@
         </div>
 
         <div class="topbar-right">
-          <div class="demo-mode-pill" title="Frontend UI Demonstration Mode: Changes operate in session memory and reset on refresh. Ready for Django REST API integration.">
-            <span class="demo-mode-dot"></span>
-            <span>Demo Mode <span class="demo-label-extended">· In-Memory</span></span>
+          <div class="demo-mode-pill" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25);color:#065f46;" title="Source 2 Destination Cloud Portal — System Active & Secure">
+            <span class="demo-mode-dot" style="background:#10b981;"></span>
+            <span>Campus Portal <span class="demo-label-extended">· Live System</span></span>
           </div>
 
           <button type="button" class="topbar-search-btn" data-open-cmd-search aria-label="Search modules">

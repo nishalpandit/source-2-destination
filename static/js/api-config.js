@@ -13,11 +13,11 @@
   'use strict';
 
   const API_CONFIG = {
-    mode: 'DEMO_IN_MEMORY', // Switch to 'LIVE_DRF_API' when connecting Django backend
+    mode: 'LIVE_DRF_API', // Switch to 'LIVE_DRF_API' when connecting Django backend
     baseUrl: '/api/v1',
     timeoutMs: 15000,
-    currencySymbol: '$',
-    currencyCode: 'USD',
+    currencySymbol: '₹',
+    currencyCode: 'INR',
     paginationDefaults: {
       pageParam: 'page',
       pageSizeParam: 'page_size',
@@ -146,14 +146,14 @@
 
   function formatCurrency(amount) {
     const num = Number(amount || 0);
-    return API_CONFIG.currencySymbol + num.toLocaleString('en-US', {
+    return API_CONFIG.currencySymbol + ' ' + num.toLocaleString('en-IN', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
   }
 
   function formatNumber(num) {
-    return Number(num || 0).toLocaleString('en-US');
+    return Number(num || 0).toLocaleString('en-IN');
   }
 
   window.S2DApiConfig = {

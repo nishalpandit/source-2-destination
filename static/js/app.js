@@ -7,7 +7,7 @@
   'use strict';
 
   function fmtMoney(v) {
-    return window.S2DApiConfig ? window.S2DApiConfig.formatCurrency(v) : '$' + Number(v || 0).toFixed(2);
+    return window.S2DApiConfig ? window.S2DApiConfig.formatCurrency(v) : '₹' + Number(v || 0).toFixed(2);
   }
 
   function badge(v) {
@@ -109,7 +109,7 @@
         data: D.schools,
         searchPlaceholder: 'Search school name, code, city, or admin...',
         filters: [
-          { key: 'franchise', label: 'Franchise', options: ['North-East EduNet Partners', 'Pacific Crest Scholastic Group', 'Heartland Boarding Solutions', 'Atlantic Campus Connect'] },
+          { key: 'franchise', label: 'Franchise', options: ['North India EduNet Partners', 'Western Scholastic Network', 'Southern Campus Connect', 'Central Heartland Edutech'] },
           { key: 'subscriptionStatus', label: 'Subscription', options: ['Active', 'Expiring', 'Expired'] },
           { key: 'status', label: 'Status', options: ['Active', 'Suspended'] }
         ],
@@ -159,7 +159,7 @@
         searchPlaceholder: 'Search student, code, or school...',
         filters: [
           { key: 'validityStatus', label: 'Validity', options: ['Active', 'Expiring', 'Expired'] },
-          { key: 'school', label: 'School', options: ['Oakridge Residential Academy', 'Westfield Collegiate Hostel', 'St. Jude Boarding Institute', 'Greenwood International Prep'] }
+          { key: 'school', label: 'School', options: ['Doon Valley Residential Academy', 'Mayo International Boarding School', 'Scindia Residential Campus', 'Bishop Cotton Boys School & Hostel', 'Sahyadri International Residential School'] }
         ],
         dateFilterKey: 'validityExpiry',
         exportFilename: 'student-validity-records.csv',
@@ -236,7 +236,7 @@
         data: D.callHistory,
         searchPlaceholder: 'Search student, guardian number, school, or call ID...',
         filters: [
-          { key: 'school', label: 'School', options: ['Oakridge Residential Academy', 'Westfield Collegiate Hostel', 'St. Jude Boarding Institute', 'Greenwood International Prep'] },
+          { key: 'school', label: 'School', options: ['Doon Valley Residential Academy', 'Mayo International Boarding School', 'Scindia Residential Campus', 'Bishop Cotton Boys School & Hostel', 'Sahyadri International Residential School'] },
           { key: 'status', label: 'Call Status', options: ['Completed', 'Missed', 'Restricted'] }
         ],
         dateFilterKey: 'dateOnly',
@@ -381,7 +381,7 @@
           data: D.students.filter((s) => s.franchiseId === 'FRN-101' && (!schoolCode || s.schoolId === schoolCode)),
           searchPlaceholder: 'Search student name, calling code, or guardian...',
           filters: [
-            { key: 'school', label: 'Assigned School', options: ['Oakridge Residential Academy', 'Westfield Collegiate Hostel', 'St. Jude Boarding Institute'] },
+            { key: 'school', label: 'Assigned School', options: ['Doon Valley Residential Academy', 'Mayo International Boarding School', 'Scindia Residential Campus'] },
             { key: 'className', label: 'Class', options: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'] },
             { key: 'status', label: 'Status', options: ['Active', 'Inactive'] }
           ],
@@ -409,7 +409,7 @@
         searchPlaceholder: 'Search school, billing period, or commission ID...',
         filters: [
           { key: 'status', label: 'Payout Status', options: ['Successful', 'Pending'] },
-          { key: 'school', label: 'School', options: ['Oakridge Residential Academy', 'Westfield Collegiate Hostel', 'St. Jude Boarding Institute'] }
+          { key: 'school', label: 'School', options: ['Doon Valley Residential Academy', 'Mayo International Boarding School', 'Scindia Residential Campus'] }
         ],
         exportFilename: 'franchise-commission-ledger.csv',
         columns: [
@@ -583,7 +583,7 @@
           { key: 'onlineStatus', label: 'Connectivity', options: ['Online', 'Offline'] },
           { key: 'status', label: 'Assignment', options: ['Active', 'Available'] }
         ],
-        exportFilename: 'oakridge-calling-devices.csv',
+        exportFilename: 'doon-valley-calling-devices.csv',
         columns: [
           { key: 'deviceName', label: 'Hostel Booth / Device', render: (r) => `<span class="cell-primary">${r.deviceName}</span><span class="cell-sub mono-code">${r.id} · ${r.model}</span>` },
           { key: 'wingLocation', label: 'Hostel Location' },
@@ -669,9 +669,9 @@
 
     const rootPrefix = document.body.hasAttribute('data-root') ? document.body.getAttribute('data-root') : '../';
     const demoPresets = {
-      'super-admin': { email: 'e.vance@source2destination.io', target: `${rootPrefix}super-admin/dashboard.html` },
-      'franchise':   { email: 'm.sterling@northeast-edunet.com', target: `${rootPrefix}franchise/dashboard.html` },
-      'school-admin':{ email: 'admin@oakridge-academy.edu', target: `${rootPrefix}school-admin/dashboard.html` }
+      'super-admin': { email: 'aarav.singhal@source2destination.in', target: `${rootPrefix}super-admin/dashboard.html` },
+      'franchise':   { email: 'v.singhania@northedunet.in', target: `${rootPrefix}franchise/dashboard.html` },
+      'school-admin':{ email: 'principal@doonvalley.edu.in', target: `${rootPrefix}school-admin/dashboard.html` }
     };
 
     if (roleSelect) {
