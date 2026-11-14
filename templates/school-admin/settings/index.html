@@ -35,20 +35,96 @@
           </div>
           
         </div>
-        <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-success-title="Campus Settings Saved (Demo)">
-            <div class="s2d-form-section">
-              <div class="form-section-meta"><h3>Campus Profile</h3><p>Displayed on guardian communications and student recharge receipts.</p></div>
-              <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Oakridge Residential Academy" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Dr. Arthur Pendelton" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Official Campus Email <span class="req-star">*</span></label><input type="email" class="s2d-input" value="admin@oakridge-academy.edu" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Control Desk Phone <span class="req-star">*</span></label><input type="tel" class="s2d-input" data-validate-phone="true" value="+1 (555) 210-9001" required></div>
+
+        <!-- Tabbed Configuration Cards -->
+        <div class="settings-tabs">
+          <button type="button" class="settings-tab active" data-tab="settings-profile">School Identity</button>
+          <button type="button" class="settings-tab" data-tab="settings-callerid">Caller ID Policies</button>
+          <button type="button" class="settings-tab" data-tab="settings-emergency">Emergency Override</button>
+          <button type="button" class="settings-tab" data-tab="settings-notify">Notification Channels</button>
+        </div>
+
+        <div class="settings-tab-panel active" id="settings-profile">
+          <div class="s2d-card">
+            <div class="s2d-card-body">
+              {% if message %}
+              <div class="s2d-alert s2d-alert-success mb-3">
+                <i data-lucide="check-circle-2"></i>
+                <span>{{ message }}</span>
+              </div>
+              {% endif %}
+              <form method="POST" action="/school-admin/settings/index.html">
+                {% csrf_token %}
+                <div class="s2d-form-section">
+                  <div class="form-section-meta"><h3>Campus Profile</h3><p>Displayed on guardian communications and student recharge receipts.</p></div>
+                  <div class="row g-3">
+                    <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" name="school_name" class="s2d-input" value="{{ school.name|default:'Doon Valley Residential Academy' }}" required></div>
+                    <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" name="admin_name" class="s2d-input" value="{{ school.admin_name|default:'Dr. Ramesh Chandra Sharma' }}" required></div>
+                    <div class="col-md-6 s2d-field"><label class="s2d-label">Official Campus Email <span class="req-star">*</span></label><input type="email" name="admin_email" class="s2d-input" value="{{ school.admin_email|default:'principal@doonvalley.edu.in' }}" required></div>
+                    <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Control Desk Phone <span class="req-star">*</span></label><input type="tel" name="admin_phone" class="s2d-input" value="{{ school.admin_phone|default:'+91 98101 23456' }}" required></div>
+                  </div>
+                </div>
+                <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Preferences</span></button></div></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-tab-panel" id="settings-callerid">
+          <div class="settings-card">
+            <h4>Caller ID Policies</h4>
+            <div class="s2d-switch-row mb-3">
+              <span>Display School Name on Outbound Calls</span>
+              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
+            </div>
+            <div class="s2d-switch-row mb-3">
+              <span>Show Guardian Whitelist Numbers</span>
+              <label class="status-toggle"><input type="checkbox"><span class="status-toggle-slider"></span></label>
+            </div>
+            <div class="s2d-switch-row">
+              <span>Enable Emergency Override Caller ID</span>
+              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-tab-panel" id="settings-emergency">
+          <div class="settings-card">
+            <h4>Emergency Override Contacts</h4>
+            <div class="row g-3">
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Primary Emergency Contact <span class="req-star">*</span></label>
+                <input type="tel" class="s2d-input" data-validate-phone="true" value="+91 98765 43210" required>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Secondary Emergency Contact</label>
+                <input type="tel" class="s2d-input" data-validate-phone="true" value="+91 98765 43211">
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Warden Escalation Number</label>
+                <input type="tel" class="s2d-input" data-validate-phone="true" value="+91 98765 43212">
               </div>
             </div>
-            <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Preferences</span></button></div></div>
-          </form>
-        </div></div>
+          </div>
+        </div>
+
+        <div class="settings-tab-panel" id="settings-notify">
+          <div class="settings-card">
+            <h4>Notification Channels</h4>
+            <div class="s2d-switch-row mb-3">
+              <span>SMS Alerts to Guardians</span>
+              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
+            </div>
+            <div class="s2d-switch-row mb-3">
+              <span>Email Receipts for Recharges</span>
+              <label class="status-toggle"><input type="checkbox"><span class="status-toggle-slider"></span></label>
+            </div>
+            <div class="s2d-switch-row">
+              <span>Push Notifications for Validity Expiry</span>
+              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
+            </div>
+          </div>
+        </div>
     
       </main>
     </div>
@@ -67,5 +143,15 @@
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>
+  <script>
+    document.querySelectorAll('.settings-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.settings-tab').forEach((t) => t.classList.remove('active'));
+        document.querySelectorAll('.settings-tab-panel').forEach((p) => p.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('settings-' + tab.dataset.tab.split('-')[1]).classList.add('active');
+      });
+    });
+  </script>
 </body>
 </html>

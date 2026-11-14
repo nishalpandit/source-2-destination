@@ -67,3 +67,4 @@ class RoleAccessMiddleware:
                     return redirect('/franchise/dashboard.html')
 
         return self.get_response(request)
+

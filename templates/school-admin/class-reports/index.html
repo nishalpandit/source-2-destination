@@ -33,8 +33,19 @@
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
             <span class="fw-semibold text-heading" style="font-size:0.92rem;">Class &amp; Section Calling Activity Reports</span>
           </div>
-          
+          <div class="d-flex align-items-center gap-2">
+            <a href="/school-admin/class-reports/export.csv" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="download"></i><span>Export CSV</span></a>
+            <button type="button" onclick="window.print()" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="printer"></i><span>Print Report</span></button>
+          </div>
         </div>
+
+        <!-- Analytics Summary Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4"><div class="kpi-card kpi-card--indigo"><div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon"><i data-lucide="book-open"></i></span></div><div class="kpi-value">{{ total_classes|default:"6" }}</div><div class="kpi-meta"><span>Academic Grades</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">{{ total_sections|default:"18" }}</div><div class="kpi-meta"><span>Active Sections</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Total Call Minutes</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">{{ total_minutes|default:"3000" }}</div><div class="kpi-meta"><span>Allocated Minutes</span></div></div></div>
+        </div>
+
         <div class="row g-4 mb-4">
           <div class="col-lg-6"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Calling Minutes by Class</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sch-usage-by-class"></div></div></div></div>
           <div class="col-lg-6"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Active vs Inactive by Class</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sch-class-distribution"></div></div></div></div>

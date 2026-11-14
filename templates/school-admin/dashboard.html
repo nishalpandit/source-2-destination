@@ -41,24 +41,71 @@
           </div>
         </div>
 
-        <!-- 12 Mandatory KPI Cards (Section 7.1) -->
-        <div class="row g-3 mb-4">
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="graduation-cap"></i></span></div><div class="kpi-value">{{ total_students }}</div><div class="kpi-meta"><span>Enrolled</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">{{ active_students }}</div><div class="kpi-meta"><span class="kpi-delta up">{{ active_percent }}%</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Inactive Students</span><span class="kpi-icon rose"><i data-lucide="user-x"></i></span></div><div class="kpi-value">{{ inactive_students }}</div><div class="kpi-meta"><span>Paused / Expired</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon sky"><i data-lucide="book-open"></i></span></div><div class="kpi-value">{{ total_classes }}</div><div class="kpi-meta"><span>Academic Grades</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon slate"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">{{ total_sections }}</div><div class="kpi-meta"><span>Active Sections</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Guardians</span><span class="kpi-icon emerald"><i data-lucide="heart-handshake"></i></span></div><div class="kpi-value">{{ total_guardians }}</div><div class="kpi-meta"><span>KYC Whitelisted</span></div></div></div>
-
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Registered Devices</span><span class="kpi-icon"><i data-lucide="tablet-smartphone"></i></span></div><div class="kpi-value">{{ school.hostel_blocks_count|default:"4" }}</div><div class="kpi-meta"><span class="kpi-delta up">Hostel Booths</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon emerald"><i data-lucide="key-round"></i></span></div><div class="kpi-value">{{ active_accounts }}</div><div class="kpi-meta"><span>Codes issued</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Calls Today</span><span class="kpi-icon sky"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">{{ recent_recharges_count|default:"0" }}</div><div class="kpi-meta"><span class="kpi-delta up">Logged Sessions</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Available Minutes</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div><div class="kpi-value">{{ total_minutes }}</div><div class="kpi-meta"><span>Voice Balance</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon amber"><i data-lucide="calendar-clock"></i></span></div><div class="kpi-value">{{ expiring_count }}</div><div class="kpi-meta"><span class="kpi-delta warn">&lt;14 days</span></div></div></div>
-          <div class="col-6 col-md-4 col-xl-2"><div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Recent Recharges</span><span class="kpi-icon emerald"><i data-lucide="zap"></i></span></div><div class="kpi-value">{{ recent_recharges_count }}</div><div class="kpi-meta"><span class="kpi-delta up">Total Top-Ups</span></div></div></div>
+        <!-- 12 Mandatory KPI Cards (Campus Portal) -->
+        <div class="kpi-grid mb-4">
+          <div class="kpi-card kpi-card--indigo">
+            <div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="graduation-cap"></i></span></div>
+            <div class="kpi-value">{{ total_students }}</div>
+            <div class="kpi-meta"><span>Enrolled</span></div>
+          </div>
+          <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon"><i data-lucide="user-check"></i></span></div>
+            <div class="kpi-value">{{ active_students }}</div>
+            <div class="kpi-meta"><span class="kpi-delta up">{{ active_percent }}%</span></div>
+          </div>
+          <div class="kpi-card kpi-card--rose">
+            <div class="kpi-top"><span class="kpi-label">Inactive Students</span><span class="kpi-icon"><i data-lucide="user-x"></i></span></div>
+            <div class="kpi-value">{{ inactive_students }}</div>
+            <div class="kpi-meta"><span>Paused / Expired</span></div>
+          </div>
+          <div class="kpi-card kpi-card--blue">
+            <div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon"><i data-lucide="book-open"></i></span></div>
+            <div class="kpi-value">{{ total_classes }}</div>
+            <div class="kpi-meta"><span>Academic Grades</span></div>
+          </div>
+          <div class="kpi-card kpi-card--slate">
+            <div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon"><i data-lucide="layout-grid"></i></span></div>
+            <div class="kpi-value">{{ total_sections }}</div>
+            <div class="kpi-meta"><span>Active Sections</span></div>
+          </div>
+          <div class="kpi-card kpi-card--violet">
+            <div class="kpi-top"><span class="kpi-label">Total Guardians</span><span class="kpi-icon"><i data-lucide="heart-handshake"></i></span></div>
+            <div class="kpi-value">{{ total_guardians }}</div>
+            <div class="kpi-meta"><span>KYC Whitelisted</span></div>
+          </div>
+          <div class="kpi-card kpi-card--cyan">
+            <div class="kpi-top"><span class="kpi-label">Active Booths</span><span class="kpi-icon"><i data-lucide="tablet-smartphone"></i></span></div>
+            <div class="kpi-value">{{ booths_online_count|default:"4" }}</div>
+            <div class="kpi-meta"><span class="kpi-delta up">Online Kiosks</span></div>
+          </div>
+          <div class="kpi-card kpi-card--emerald">
+            <div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon"><i data-lucide="key-round"></i></span></div>
+            <div class="kpi-value">{{ active_accounts }}</div>
+            <div class="kpi-meta"><span>Codes issued</span></div>
+          </div>
+          <div class="kpi-card kpi-card--blue">
+            <div class="kpi-top"><span class="kpi-label">Calls Today</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div>
+            <div class="kpi-value">{{ calls_today_count|default:"0" }}</div>
+            <div class="kpi-meta"><span class="kpi-delta up">Logged Sessions</span></div>
+          </div>
+          <div class="kpi-card kpi-card--amber">
+            <div class="kpi-top"><span class="kpi-label">Available Minutes</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div>
+            <div class="kpi-value">{{ total_minutes }}</div>
+            <div class="kpi-meta"><span>Voice Balance</span></div>
+          </div>
+          <div class="kpi-card kpi-card--orange">
+            <div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon"><i data-lucide="calendar-clock"></i></span></div>
+            <div class="kpi-value">{{ expiring_count }}</div>
+            <div class="kpi-meta"><span class="kpi-delta warn">&lt;14 days</span></div>
+          </div>
+          <div class="kpi-card kpi-card--pink">
+            <div class="kpi-top"><span class="kpi-label">Recent Recharges</span><span class="kpi-icon"><i data-lucide="zap"></i></span></div>
+            <div class="kpi-value">{{ recent_recharges_count }}</div>
+            <div class="kpi-meta"><span class="kpi-delta up">Total Top-Ups</span></div>
+          </div>
         </div>
 
-        <!-- 6 Mandatory School Admin Charts (Section 7.1) -->
+        <!-- 6 Mandatory School Admin Charts (Campus Portal) -->
         <div class="row g-4 mb-4">
           <div class="col-lg-6">
             <div class="chart-card">
@@ -83,7 +130,7 @@
           </div>
           <div class="col-lg-4">
             <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Active vs Inactive Students</h2><p class="chart-card-subtitle">Current Oakridge account breakdown</p></div></div>
+              <div class="chart-card-header"><div><h2 class="chart-card-title">Active vs Inactive Students</h2><p class="chart-card-subtitle">Current campus account breakdown</p></div></div>
               <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-active-donut"></div></div>
             </div>
           </div>
@@ -108,16 +155,32 @@
               <div class="s2d-card-header"><h3 class="s2d-card-title">Hostel Wardens &amp; Booth Status</h3><a href="hostel-wardens/list.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Wardens</a></div>
               <div class="s2d-card-body d-grid gap-3">
                 <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-2">
-                  <div><div class="fw-semibold text-heading">Major Kenneth Cole · North Hall</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 16:00–00:00 · 8 Booths Online</div></div>
-                  <span class="s2d-badge s2d-badge-success">On Duty</span>
+                  <div>
+                    <div class="fw-semibold text-heading">Major Kenneth Cole · North Hall</div>
+                    <div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 16:00–00:00 · 8 Booths Online</div>
+                  </div>
+                  <span class="status-pill"><span class="status-dot live pulse"></span>On Duty</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-2">
-                  <div><div class="fw-semibold text-heading">Matron Beatrice Holloway · East Gables</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 15:00–23:00 · 10 Booths Online</div></div>
-                  <span class="s2d-badge s2d-badge-success">On Duty</span>
+                  <div>
+                    <div class="fw-semibold text-heading">Matron Beatrice Holloway · East Gables</div>
+                    <div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 15:00–23:00 · 10 Booths Online</div>
+                  </div>
+                  <span class="status-pill"><span class="status-dot live pulse"></span>On Duty</span>
                 </div>
                 <div class="d-flex justify-content-between align-items-center">
-                  <div><div class="fw-semibold text-heading">DEV-7704 · Junior Wing Kiosk</div><div class="text-secondary-s2d" style="font-size:0.75rem;">Heartbeat delayed 3h · Wi-Fi check requested</div></div>
-                  <span class="s2d-badge s2d-badge-danger">Offline</span>
+                  <div>
+                    <div class="fw-semibold text-heading">DEV-7704 · Junior Wing Kiosk</div>
+                    <div class="text-secondary-s2d" style="font-size:0.75rem;">Heartbeat delayed 3h · Wi-Fi check requested</div>
+                  </div>
+                  <span class="status-pill"><span class="status-dot idle"></span>Offline</span>
+                </div>
+                <div class="mt-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-secondary-s2d" style="font-size:0.72rem;">Booth Health</span>
+                    <span class="text-secondary-s2d" style="font-size:0.72rem;">88% Online</span>
+                  </div>
+                  <div class="progress-bar"><div class="progress-bar-fill" style="width:88%;--kpi-accent:#10B981;--kpi-glow:rgba(16,185,129,0.4);"></div></div>
                 </div>
               </div>
             </div>
@@ -135,7 +198,12 @@
                   <tbody>
                     {% for s in recent_students %}
                     <tr>
-                      <td><a href="students/details.html?id={{ s.code }}" class="cell-primary">{{ s.name }}</a></td>
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <span class="avatar avatar--indigo">{{ s.name|slice:":1"|upper }}</span>
+                          <a href="students/details.html?id={{ s.code }}" class="cell-primary">{{ s.name }}</a>
+                        </div>
+                      </td>
                       <td class="mono-code">{{ s.calling_code }}</td>
                       <td>{{ s.class_name }} · {{ s.section }}</td>
                       <td>
@@ -168,7 +236,7 @@
                       <td class="mono-code">{{ r.created_at|date:"M d, H:i" }}</td>
                       <td class="cell-primary"><a href="students/details.html?id={{ r.student.code }}">{{ r.student.name }}</a></td>
                       <td>{{ r.plan_name_cache }}</td>
-                      <td><span class="s2d-badge s2d-badge-success">+{{ r.minutes_added }} mins (₹{{ r.amount }})</span></td>
+                      <td><span class="s2d-badge s2d-badge-success"><span class="rupee">+{{ r.amount }}</span> · {{ r.minutes_added }} mins</span></td>
                     </tr>
                     {% empty %}
                     <tr><td colspan="4" class="text-secondary-s2d text-center py-3">No recent recharge transactions recorded.</td></tr>

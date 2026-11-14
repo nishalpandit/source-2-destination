@@ -74,7 +74,35 @@
             </form>
           </div>
         </div>
-        <div data-s2d-table="sch-codes-table"></div>
+        <div class="row g-3">
+          <div class="col-12">
+            <div class="s2d-card">
+              <div class="s2d-card-header"><h3 class="s2d-card-title">Issued Cryptographic Codes</h3><span class="badge s2d-badge-subtle">Copy to clipboard for provisioning</span></div>
+              <div class="s2d-table-wrap">
+                <table class="s2d-table">
+                  <thead>
+                    <tr><th>Student</th><th>Calling Code</th><th>PIN Policy</th><th>Status</th><th>Action</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for c in issued_codes %}
+                    <tr>
+                      <td class="cell-primary">{{ c.student_name }} <span class="mono-code">({{ c.student_code }})</span></td>
+                      <td class="mono-code">{{ c.code }}</td>
+                      <td><span class="action-chip">{{ c.pin_policy }}</span></td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                      <td>
+                        <button type="button" class="btn-copy" data-copy-text="{{ c.code }}" title="Copy calling code"><i data-lucide="copy" style="width:14px;height:14px;"></i></button>
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-secondary-s2d text-center py-3">No codes issued yet.</td></tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
     
       </main>
     </div>
@@ -98,5 +126,22 @@
     }
   </script>
   <script src="{% static 'js/app.js' %}"></script>
+  <script>
+    document.querySelectorAll('.btn-copy').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const text = btn.getAttribute('data-copy-text');
+        navigator.clipboard.writeText(text).then(() => {
+          btn.classList.add('copied');
+          btn.innerHTML = '<i data-lucide="check" style="width:14px;height:14px;"></i>';
+          lucide.createIcons();
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<i data-lucide="copy" style="width:14px;height:14px;"></i>';
+            lucide.createIcons();
+          }, 1400);
+        });
+      });
+    });
+  </script>
 </body>
 </html>

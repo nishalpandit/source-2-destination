@@ -33,7 +33,43 @@
             <span class="fw-semibold text-heading" style="font-size:0.92rem;">Student Call History &amp; Usage Logs</span>
             <span class="badge s2d-badge-subtle">Voice Records</span>
           </div>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" onclick="window.print()" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="printer"></i><span>Print Log</span></button>
+          </div>
         </div>
+
+        <!-- Telemetry KPI Summary Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--blue">
+              <div class="kpi-top"><span class="kpi-label">Total Calls</span><span class="kpi-icon"><i data-lucide="phone"></i></span></div>
+              <div class="kpi-value">{{ total_calls }}</div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">All Recorded Sessions</span></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--emerald">
+              <div class="kpi-top"><span class="kpi-label">Completed Calls</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div>
+              <div class="kpi-value">{{ completed_calls }}</div>
+              <div class="kpi-meta"><span class="kpi-delta up">Connected Successfully</span></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--amber">
+              <div class="kpi-top"><span class="kpi-label">Flagged / Restricted</span><span class="kpi-icon"><i data-lucide="phone-missed"></i></span></div>
+              <div class="kpi-value">{{ flagged_calls }}</div>
+              <div class="kpi-meta"><span class="kpi-delta warn">Schedule Restrictions</span></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--slate">
+              <div class="kpi-top"><span class="kpi-label">Voice Talktime</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div>
+              <div class="kpi-value">{{ total_duration_minutes }} <span style="font-size:0.95rem;font-weight:500;">min</span></div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">Total Minutes Billed</span></div>
+            </div>
+          </div>
+        </div>
+
         <div data-s2d-table="global-call-history-table"></div>
     
       </main>
@@ -44,6 +80,12 @@
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
   <script src="{% static 'js/demo-data.js' %}"></script>
+  <script>
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    {% if call_history_json %}
+    window.S2D_DEMO.callHistory = {{ call_history_json|safe }};
+    {% endif %}
+  </script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

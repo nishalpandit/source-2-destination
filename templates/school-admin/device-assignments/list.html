@@ -35,6 +35,14 @@
           </div>
           <div class="d-flex align-items-center gap-2"><a href="assign.html" class="btn-s2d btn-s2d-primary"><i data-lucide="link"></i><span>Assign Device to Student / Wing</span></a></div>
         </div>
+
+        <!-- Booth Health Monitor Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Booths Online</span><span class="kpi-icon"><i data-lucide="wifi"></i></span></div><div class="kpi-value">{{ online_count|default:"4" }}</div><div class="kpi-meta"><span class="kpi-delta up">Active &amp; Ready</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--amber"><div class="kpi-top"><span class="kpi-label">In Maintenance</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div><div class="kpi-value">{{ maintenance_count|default:"0" }}</div><div class="kpi-meta"><span class="kpi-delta warn">Check Required</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--rose"><div class="kpi-top"><span class="kpi-label">Booths Offline</span><span class="kpi-icon"><i data-lucide="power"></i></span></div><div class="kpi-value">{{ offline_count|default:"0" }}</div><div class="kpi-meta"><span class="kpi-delta down">Needs Attention</span></div></div></div>
+        </div>
+
         <div data-s2d-table="sch-devices-table"></div>
     
       </main>
@@ -45,6 +53,12 @@
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
   <script src="{% static 'js/demo-data.js' %}"></script>
+  <script>
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    {% if devices_json %}
+    window.S2D_DEMO.devices = {{ devices_json|safe }};
+    {% endif %}
+  </script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

@@ -33,7 +33,48 @@
             <span class="fw-semibold text-heading" style="font-size:0.92rem;">Student Account Validity &amp; Expiring Accounts</span>
             <span class="text-secondary-s2d d-none d-md-inline" style="font-size:0.78rem;">· {{ school.name|default:"Doon Valley Residential Academy" }}</span>
           </div>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" data-modal-open="extend-validity-modal"><i data-lucide="clock"></i><span>Quick Extend</span></button>
+          </div>
         </div>
+
+        <!-- Quick Extend Validity Modal -->
+        <div class="s2d-modal-backdrop" id="extend-validity-modal">
+          <div class="s2d-modal-dialog">
+            <div class="s2d-modal-header">
+              <h3 class="s2d-card-title">Extend Student Validity</h3>
+              <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button>
+            </div>
+            <form method="POST" action="index.html" data-s2d-form data-success-title="Validity Extended" data-success-desc="Student account validity renewed.">
+              {% csrf_token %}
+              <div class="s2d-modal-body">
+                <div class="s2d-field">
+                  <label class="s2d-label">Student <span class="req-star">*</span></label>
+                  <select name="student_id" class="s2d-select" required>
+                    {% for s in students %}
+                    <option value="{{ s.code }}">{{ s.code }} · {{ s.name }} ({{ s.class_name }} · {{ s.section }})</option>
+                    {% empty %}
+                    <option value="" disabled>No enrolled students</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label">New Expiry Date <span class="req-star">*</span></label>
+                  <input type="date" name="validity_expiry" class="s2d-input" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label">Extension Reason</label>
+                  <input type="text" name="reason" class="s2d-input" placeholder="e.g. Semester extension / Medical leave">
+                </div>
+              </div>
+              <div class="s2d-modal-footer">
+                <button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Extend Validity</span></button>
+              </div>
+            </form>
+          </div>
+        </div>
+
         <div data-s2d-table="sa-validity-table"></div>
     
       </main>

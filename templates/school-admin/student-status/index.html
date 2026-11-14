@@ -46,7 +46,7 @@
         <div class="s2d-card mb-4">
           <div class="s2d-card-header">
             <h3 class="s2d-card-title">Modify Student Lifecycle Status</h3>
-            <span class="s2d-badge s2d-badge-info">Active: {{ active_count }} · Inactive: {{ inactive_count }} · Suspended: {{ suspended_count }}</span>
+            <span class="badge s2d-badge-subtle">Active: {{ active_count }} · Inactive: {{ inactive_count }} · Suspended: {{ suspended_count }}</span>
           </div>
           <div class="s2d-card-body">
             <form method="POST" action="index.html">
@@ -80,6 +80,12 @@
               </div>
             </form>
           </div>
+        </div>
+
+        <div class="batch-toolbar mb-4">
+          <span class="text-secondary-s2d" style="font-size:0.78rem;font-weight:600;">Batch Activation:</span>
+          <button type="button" class="btn-s2d btn-s2d-success btn-sm-s2d"><i data-lucide="user-check"></i><span>Activate Selected</span></button>
+          <button type="button" class="btn-s2d btn-s2d-danger-outline btn-sm-s2d"><i data-lucide="pause"></i><span>Suspend Selected</span></button>
         </div>
 
         <div class="mb-4" data-s2d-table="sch-students-table"></div>

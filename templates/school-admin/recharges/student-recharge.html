@@ -38,6 +38,25 @@
             <a href="overview.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="arrow-left"></i><span>Recharge History</span></a>
           </div>
         </div>
+
+        <!-- Recharge Plan Selection Cards -->
+        <div class="row g-4 mb-4">
+          {% for p in plans %}
+          <div class="col-md-4 col-lg-3">
+            <div class="recharge-plan {% if p.popular %}popular{% endif %}">
+              <div class="rp-name">{{ p.name }}</div>
+              <div class="rp-desc">{{ p.description|default:'Standard campus recharge package' }}</div>
+              <div class="rp-price"><span class="rupee">{{ p.price }}</span><span class="sub">· +{{ p.minutes_allocated }} mins</span></div>
+              <div class="mt-auto">
+                <button type="button" class="btn-s2d btn-s2d-{% if p.popular %}primary{% else %}secondary-outline{% endif %} w-100 btn-sm-s2d" onclick="selectPlan('{{ p.code }}')">
+                  <i data-lucide="zap" style="width:13px;height:13px;"></i><span>Select</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
         <div class="s2d-card"><div class="s2d-card-body">
           <form method="POST" action="student-recharge.html" data-s2d-form data-redirect="overview.html" data-success-title="Student Recharge Applied" data-success-desc="Minutes and validity credited to student account.">
             {% csrf_token %}
@@ -54,7 +73,7 @@
                 <label class="s2d-label">Recharge Plan <span class="req-star">*</span></label>
                 <select name="plan_id" class="s2d-select" required>
                   {% for p in plans %}
-                  <option value="{{ p.code }}">{{ p.name }} (${{ p.price }} · +{{ p.minutes_allocated }} mins · {{ p.validity_days }}d)</option>
+                  <option value="{{ p.code }}">{{ p.name }} ({{ p.price }} · +{{ p.minutes_allocated }} mins · {{ p.validity_days }}d)</option>
                   {% endfor %}
                 </select>
               </div>

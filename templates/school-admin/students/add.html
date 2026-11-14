@@ -39,9 +39,9 @@
           <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Student Enrolled" data-success-desc="Student added to campus database.">
             {% csrf_token %}
             <div class="s2d-form-section">
-              <div class="form-section-meta"><h3>Student &amp; Academic Placement</h3><p>Student Code is issued strictly by the Django backend upon enrollment.</p></div>
+              <div class="form-section-meta"><h3>1 · Student &amp; Academic Placement</h3><p>Student Code is issued strictly by the Django backend upon enrollment.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Full legal name" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Full legal name" required><span class="field-hint">As per school admission register.</span></div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Student Calling Code (Backend Issued)</label><input type="text" name="student_code" class="s2d-input mono-code" value="Auto-generated on save" readonly></div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">School (Locked)</label><input type="text" class="s2d-input" value="{{ school.name|default:'Assigned Campus' }}" readonly></div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label>
@@ -66,7 +66,7 @@
               </div>
             </div>
             <div class="s2d-form-section">
-              <div class="form-section-meta"><h3>Authorized Guardian Contacts</h3><p>Only numbers listed here can be dialed from the restricted Android calling app.</p></div>
+              <div class="form-section-meta"><h3>2 · Authorized Guardian Contacts</h3><p>Only numbers listed here can be dialed from the restricted Android calling app.</p></div>
               <div class="row g-3">
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name &amp; Relation <span class="req-star">*</span></label><input type="text" name="guardian_name" class="s2d-input" placeholder="e.g. Richard Sterling (Father)" required></div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Authorized Phone <span class="req-star">*</span></label><input type="tel" name="primary_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 000-0000" required></div>
@@ -75,7 +75,7 @@
               </div>
             </div>
             <div class="s2d-form-section">
-              <div class="form-section-meta"><h3>Account Status, Validity &amp; Device</h3><p>Link initial calling validity and primary hostel booth device.</p></div>
+              <div class="form-section-meta"><h3>3 · Account Status, Validity &amp; Device</h3><p>Link initial calling validity and primary hostel booth device.</p></div>
               <div class="row g-3">
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label><select name="status" class="s2d-select" required><option value="Active">Active</option><option value="Inactive">Inactive (Hold)</option></select></div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Calling Validity Expiry <span class="req-star">*</span></label><input type="date" name="validity_expiry" class="s2d-input" required></div>

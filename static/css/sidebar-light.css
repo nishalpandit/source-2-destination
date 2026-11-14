@@ -1,0 +1,167 @@
+/* ==========================================================================
+   MODERN SIDEBAR OVERRIDES — Enterprise Campus Portal (Light Professional)
+   ========================================================================== */
+
+/* Sidebar shell — light professional color */
+.app-sidebar {
+  background: #F8FAFC !important;
+  border-right: 1px solid var(--s2d-border);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Brand header — slightly lighter accent strip */
+.sidebar-brand {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid var(--s2d-border);
+  gap: 12px;
+}
+.sidebar-brand-name { color: var(--s2d-heading) !important; font-size: 0.95rem; }
+.sidebar-brand-role { color: var(--s2d-primary) !important; margin-top: 1px; }
+.sidebar-brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.12);
+}
+
+/* Nav area */
+.sidebar-nav-scroll { padding: 20px 10px 24px; }
+.sidebar-group { margin-bottom: 24px; }
+.sidebar-group-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--s2d-text-muted) !important;
+}
+
+/* Category links — default slate, each gets its own accent on active */
+.sidebar-link,
+.sidebar-parent-btn {
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 180ms ease;
+  color: var(--s2d-text-secondary) !important;
+  background: transparent;
+}
+
+.sidebar-link:hover,
+.sidebar-parent-btn:hover {
+  background-color: var(--s2d-surface-subtle);
+  border-color: var(--s2d-border-strong);
+  color: var(--s2d-heading) !important;
+}
+
+/* Active category — soft indigo tint with left accent bar */
+.sidebar-link.active,
+.sidebar-parent-btn.active-parent {
+  background-color: var(--s2d-primary-soft);
+  border-color: var(--s2d-primary-border);
+  color: var(--s2d-primary-dark) !important;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px var(--s2d-primary-border);
+}
+
+.sidebar-link.active::before {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background-color: var(--s2d-primary);
+}
+
+.sidebar-link-icon,
+.sidebar-link-icon [data-lucide] { color: currentColor !important; }
+.sidebar-link-label { color: currentColor !important; }
+.sidebar-chevron { color: var(--s2d-text-muted) !important; }
+
+.nav-item-box.open > .sidebar-parent-btn .sidebar-chevron {
+  transform: rotate(90deg);
+  color: var(--s2d-primary) !important;
+}
+
+/* Submenu — distinct lighter color for subcategories */
+.sidebar-submenu {
+  padding: 5px 0 7px 28px;
+  margin-left: 20px;
+  border-left: 1px solid var(--s2d-border);
+}
+
+.sidebar-sublink {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--s2d-text-secondary) !important;
+  transition: all 150ms ease;
+  background: transparent;
+}
+
+.sidebar-sublink:hover {
+  color: var(--s2d-primary) !important;
+  background-color: var(--s2d-primary-soft);
+  padding-left: 16px;
+}
+
+/* Active subcategory — distinct emerald accent (different from categories) */
+.sidebar-sublink.active {
+  color: #10B981 !important;
+  background-color: rgba(16, 185, 129, 0.12);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.25);
+}
+
+/* Tooltips on light sidebar */
+.sidebar-tooltip {
+  background: var(--s2d-heading) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.sidebar-tooltip::before { background: var(--s2d-heading) !important; }
+
+/* Footer user card on light sidebar */
+.sidebar-footer {
+  border-top: 1px solid var(--s2d-border);
+  padding: 16px 12px;
+  background-color: var(--s2d-surface) !important;
+  margin-top: auto;
+}
+
+.sidebar-user-card {
+  padding: 11px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--s2d-border);
+  background: #FFFFFF !important;
+  box-shadow: var(--shadow-xs);
+}
+
+.sidebar-user-name { color: var(--s2d-heading) !important; }
+.sidebar-user-email { color: var(--s2d-text-secondary) !important; }
+.sidebar-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  background: var(--s2d-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.15);
+}
+
+.sidebar-logout-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid var(--s2d-border);
+  background: var(--s2d-surface) !important;
+  color: var(--s2d-text-secondary) !important;
+  transition: all 150ms ease;
+}
+
+.sidebar-logout-btn:hover {
+  background: var(--s2d-danger-bg) !important;
+  color: var(--s2d-danger-text) !important;
+  border-color: var(--s2d-danger-border);
+}

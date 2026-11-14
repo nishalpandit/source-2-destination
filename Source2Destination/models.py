@@ -579,3 +579,135 @@ class ValidityExtensionLog(models.Model):
     def __str__(self):
         return f"{self.school.code} extended +{self.days_extended}d ({self.reason})"
 
+
+class CallRecord(models.Model):
+    """
+    Campus Voice Call Session & Usage Telemetry Record.
+    Flowchart: Section 6 'Call History and Usage Database', Section 5 'Call Authorization & Usage Ledger'.
+    """
+    STATUS_CHOICES = [
+        ('Completed', 'Completed'),
+        ('Busy', 'Busy'),
+        ('No Answer', 'No Answer'),
+        ('Restricted Schedule', 'Restricted Schedule'),
+        ('Insufficient Credits', 'Insufficient Credits'),
+        ('Unauthorized Number', 'Unauthorized Number'),
+    ]
+    CALL_TYPE_CHOICES = [
+        ('Father', 'Father'),
+        ('Mother', 'Mother'),
+        ('Guardian', 'Guardian'),
+        ('Emergency', 'Emergency Contact'),
+    ]
+
+    call_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. CAL-20261114-1001")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='call_records', db_index=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='call_records', db_index=True)
+    guardian = models.ForeignKey(Guardian, on_delete=models.SET_NULL, null=True, blank=True, related_name='calls')
+    destination_number = models.CharField(max_length=32, db_index=True)
+    call_type = models.CharField(max_length=32, choices=CALL_TYPE_CHOICES, default='Father')
+    device_id = models.CharField(max_length=64, default="North Hall Booth 1", help_text="Hostel booth terminal")
+    start_time = models.DateTimeField(default=timezone.now, db_index=True)
+    end_time = models.DateTimeField(null=True, blank=True)
+    duration_seconds = models.PositiveIntegerField(default=0)
+    minutes_deducted = models.PositiveIntegerField(default=0)
+    call_status = models.CharField(max_length=32, choices=STATUS_CHOICES, default='Completed', db_index=True)
+    audio_recording_url = models.CharField(max_length=255, blank=True, default="")
+
+    class Meta:
+        ordering = ['-start_time']
+        indexes = [
+            models.Index(fields=['school', 'start_time']),
+            models.Index(fields=['student', 'start_time']),
+            models.Index(fields=['call_status', 'start_time']),
+        ]
+
+    def __str__(self):
+        return f"{self.call_id} · {self.student.name} -> {self.destination_number} ({self.duration_seconds}s)"
+
+
+class KioskDevice(models.Model):
+    """
+    Hostel Calling Booth & Android Enterprise Dedicated Kiosk Device.
+    Flowchart: Section 7 'Android Enterprise / Kiosk Device Control', Section 6 'Device and Assignment Database'.
+    """
+    STATUS_CHOICES = [
+        ('Online', 'Online'),
+        ('Offline', 'Offline'),
+        ('Maintenance', 'Maintenance'),
+    ]
+
+    device_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. DEV-BOOTH-01")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='kiosk_devices', db_index=True)
+    name = models.CharField(max_length=128, help_text="e.g. North Hall Booth 1")
+    serial_number = models.CharField(max_length=64, blank=True, default="")
+    mac_address = models.CharField(max_length=64, blank=True, default="")
+    imei = models.CharField(max_length=64, blank=True, default="")
+    app_version = models.CharField(max_length=32, default="v2.4.12-enterprise")
+    hostel_block = models.CharField(max_length=128, default="North Wing")
+    assigned_wing = models.CharField(max_length=128, blank=True, default="Junior & Senior Boarding")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Online', db_index=True)
+    last_heartbeat = models.DateTimeField(default=timezone.now)
+    registered_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['school', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.device_id} · {self.name} ({self.status})"
+
+
+class DeviceAssignment(models.Model):
+    """
+    Mapping between kiosk device, hostel dorms, and student cohorts.
+    Flowchart: Section 3 'Assign Device to Student -> Save Device Mapping'.
+    """
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='device_assignments')
+    device = models.ForeignKey(KioskDevice, on_delete=models.CASCADE, related_name='assignments')
+    academic_class = models.CharField(max_length=128, blank=True, default="All Classes")
+    hostel_wing = models.CharField(max_length=128, default="North Wing")
+    assigned_by = models.CharField(max_length=128, default="Campus Administrator")
+    assigned_date = models.DateField(default=timezone.now)
+    status = models.CharField(max_length=20, default='Active')
+
+    class Meta:
+        ordering = ['-assigned_date']
+
+    def __str__(self):
+        return f"{self.device.name} assigned to {self.hostel_wing} ({self.status})"
+
+
+class HostelWarden(models.Model):
+    """
+    Hostel Duty Warden & Residential Supervisor.
+    Flowchart: Section 6 'Hostel Warden Database', Section 3 'Add / Edit / Assign Hostel Warden'.
+    """
+    STATUS_CHOICES = [
+        ('On Duty', 'On Duty'),
+        ('Off Duty', 'Off Duty'),
+        ('On Leave', 'On Leave'),
+    ]
+
+    code = models.CharField(max_length=32, unique=True, db_index=True, help_text="e.g. WRD-101")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='hostel_wardens', db_index=True)
+    name = models.CharField(max_length=128, help_text="e.g. Subedar R.K. Yadav")
+    phone = models.CharField(max_length=32)
+    email = models.EmailField(blank=True, default="")
+    hostel_block = models.CharField(max_length=128, help_text="e.g. North Hall / Shivaji Dorm")
+    shift_timings = models.CharField(max_length=64, default="16:00 – 00:00")
+    booths_monitored = models.PositiveIntegerField(default=4)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='On Duty', db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['school', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.code} · {self.name} ({self.hostel_block})"
+

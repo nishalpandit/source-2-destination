@@ -51,10 +51,10 @@
           <!-- Tab 1: Overview -->
           <div class="s2d-tab-panel active" id="stu-overview">
             <div class="row g-3 mb-4">
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Remaining Credits</div><div class="kpi-value mt-2"><span data-bind-field="remainingMinutes">{{ student.remaining_minutes }}</span>m</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Daily Cap</div><div class="kpi-value mt-2"><span data-bind-field="dailyLimitMin">{{ student.daily_limit_min }}</span>m</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Validity Expiry</div><div class="kpi-value mt-2 mono-code" style="font-size:1.2rem;" data-bind-field="validityExpiry">{{ student.validity_expiry|date:'Y-m-d' }}</div></div></div>
-              <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Account Status</div><div class="mt-2"><span class="s2d-badge {% if student.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}" data-bind-field="status">{{ student.status }}</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Remaining Credits</span><span class="kpi-icon"><i data-lucide="credit-card"></i></span></div><div class="kpi-value"><span data-bind-field="remainingMinutes">{{ student.remaining_minutes }}</span></div><div class="kpi-meta"><span>voice minutes</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Daily Cap</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div><div class="kpi-value"><span data-bind-field="dailyLimitMin">{{ student.daily_limit_min }}</span></div><div class="kpi-meta"><span>minutes / day</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card kpi-card--slate"><div class="kpi-top"><span class="kpi-label">Validity Expiry</span><span class="kpi-icon"><i data-lucide="calendar"></i></span></div><div class="kpi-value mt-2 mono-code" style="font-size:1.2rem;" data-bind-field="validityExpiry">{{ student.validity_expiry|date:'Y-m-d' }}</div><div class="kpi-meta"><span>account validity</span></div></div></div>
+              <div class="col-6 col-lg-3"><div class="kpi-card kpi-card--{% if student.status == 'Active' %}emerald{% else %}rose{% endif %}"><div class="kpi-top"><span class="kpi-label">Account Status</span><span class="kpi-icon"><i data-lucide="{% if student.status == 'Active' %}user-check{% else %}user-x{% endif %}"></i></span></div><div class="kpi-value"><span class="s2d-badge {% if student.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}" data-bind-field="status">{{ student.status }}</span></div><div class="kpi-meta"><span>calling privileges</span></div></div></div>
             </div>
             <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Enrollment &amp; Hostel Identity</h3></div>
               <div class="s2d-card-body"><div class="kv-grid">
@@ -78,9 +78,9 @@
                     {% for g in student.guardian_contacts.all %}
                     <tr>
                       <td class="cell-primary">{{ g.name }}</td>
-                      <td>{{ g.relation }}</td>
+                      <td><span class="action-chip">{{ g.relation }}</span></td>
                       <td class="mono-code">{{ g.father_phone|default:g.mother_phone }}</td>
-                      <td><span class="s2d-badge s2d-badge-success">{{ g.verification }}</span></td>
+                      <td><span class="s2d-badge {% if g.verification|lower == 'verified' %}s2d-badge-success{% else %}s2d-badge-warning{% endif %}">{{ g.verification }}</span></td>
                       <td><span class="s2d-badge {% if g.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-secondary{% endif %}">{{ g.status }}</span></td>
                     </tr>
                     {% empty %}
@@ -115,7 +115,7 @@
               <div class="s2d-card-body"><div class="kv-grid">
                 <div><div class="kv-item-label">Activated On</div><div class="kv-item-value mono-code" data-bind-field="validityStart">{{ student.validity_start|date:'Y-m-d' }}</div></div>
                 <div><div class="kv-item-label">Current Expiry Date</div><div class="kv-item-value mono-code" data-bind-field="validityExpiry">{{ student.validity_expiry|date:'Y-m-d' }}</div></div>
-                <div><div class="kv-item-label">Validity Status</div><div class="kv-item-value"><span class="s2d-badge {% if student.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}">{{ student.status }}</span></div></div>
+                <div><div class="kv-item-label">Validity Status</div><div class="kv-item-value"><span class="validity-badge {% if student.status == 'Active' %}valid{% elif student.status == 'Expiring' %}expiring{% else %}expired{% endif %}">{{ student.status }}</span></div></div>
               </div></div>
             </div>
           </div>

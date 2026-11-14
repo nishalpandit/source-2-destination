@@ -30,6 +30,7 @@
               max-width 240ms cubic-bezier(0.4, 0, 0.2, 1),
               transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
+  box-shadow: var(--shadow-sm);
 }
 
 body.sidebar-collapsed .app-sidebar {
@@ -406,20 +407,172 @@ body.sidebar-collapsed .sidebar-user-card {
   justify-content: center;
 }
 
-/* Mobile Backdrop */
-.sidebar-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.42);
-  backdrop-filter: blur(2px);
-  z-index: 1030;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 220ms ease, visibility 220ms ease;
+/* ==========================================================================
+   MODERN SIDEBAR OVERRIDES — Enterprise Campus Portal (Solid Dark Color)
+   ========================================================================== */
+
+/* Sidebar shell — solid dark color */
+.app-sidebar {
+  background: #0F172A !important;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  box-shadow: var(--shadow-md);
 }
-.sidebar-backdrop.show {
-  opacity: 1;
-  visibility: visible;
+
+/* Brand header on dark sidebar */
+.sidebar-brand {
+  background: #0B1120 !important;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 12px;
+}
+.sidebar-brand-name { color: #FFFFFF !important; font-size: 0.95rem; }
+.sidebar-brand-role { color: var(--s2d-primary) !important; margin-top: 1px; }
+.sidebar-brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.18);
+}
+
+/* Nav area on dark sidebar */
+.sidebar-nav-scroll { padding: 20px 10px 24px; }
+.sidebar-group { margin-bottom: 24px; }
+.sidebar-group-label {
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94A3B8 !important;
+}
+
+/* Category links — each category gets its own accent color on hover/active */
+.sidebar-link,
+.sidebar-parent-btn {
+  padding: 11px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 180ms ease;
+  color: #CBD5E1 !important;
+  background: transparent;
+}
+
+.sidebar-link:hover,
+.sidebar-parent-btn:hover {
+  background-color: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+  color: #FFFFFF !important;
+}
+
+/* Active category — bright accent with glow */
+.sidebar-link.active,
+.sidebar-parent-btn.active-parent {
+  background-color: rgba(79, 70, 229, 0.15);
+  border-color: rgba(79, 70, 229, 0.35);
+  color: #FFFFFF !important;
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.4);
+}
+
+.sidebar-link.active::before {
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background-color: var(--s2d-primary);
+}
+
+.sidebar-link-icon,
+.sidebar-link-icon [data-lucide] { color: currentColor !important; }
+.sidebar-link-label { color: currentColor !important; }
+.sidebar-chevron { color: #94A3B8 !important; }
+
+.nav-item-box.open > .sidebar-parent-btn .sidebar-chevron {
+  transform: rotate(90deg);
+  color: var(--s2d-primary) !important;
+}
+
+/* Submenu — lighter, distinct color */
+.sidebar-submenu {
+  padding: 5px 0 7px 28px;
+  margin-left: 20px;
+  border-left: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-sublink {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #94A3B8 !important;
+  transition: all 150ms ease;
+  background: transparent;
+}
+
+.sidebar-sublink:hover {
+  color: #FFFFFF !important;
+  background-color: rgba(255,255,255,0.06);
+  padding-left: 16px;
+}
+
+/* Active subcategory — distinct emerald accent color */
+.sidebar-sublink.active {
+  color: #10B981 !important;
+  background-color: rgba(16, 185, 129, 0.15);
+  font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.3);
+}
+
+/* Tooltips on dark sidebar */
+.sidebar-tooltip {
+  background: #0F172A !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.sidebar-tooltip::before { background: #0F172A !important; }
+
+/* Footer user card on dark sidebar */
+.sidebar-footer {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  padding: 16px 12px;
+  background-color: #0B1120 !important;
+  margin-top: auto;
+}
+
+.sidebar-user-card {
+  padding: 11px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.08);
+  background: #111827 !important;
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-user-name { color: #FFFFFF !important; }
+.sidebar-user-email { color: #94A3B8 !important; }
+.sidebar-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  background: var(--s2d-primary) !important;
+  color: #FFFFFF !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+}
+
+.sidebar-logout-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: #111827 !important;
+  color: #CBD5E1 !important;
+  transition: all 150ms ease;
+}
+
+.sidebar-logout-btn:hover {
+  background: var(--s2d-danger) !important;
+  color: #FFFFFF !important;
+  border-color: var(--s2d-danger);
 }
 
 /* ==================== MAIN WORKSPACE & TOPBAR ==================== */
@@ -832,4 +985,21 @@ body.sidebar-collapsed .sidebar-user-card {
     height: auto;
     max-height: none;
   }
+}
+
+
+/* Mobile Backdrop */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1030;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 220ms ease, visibility 220ms ease;
+}
+.sidebar-backdrop.show {
+  opacity: 1;
+  visibility: visible;
 }

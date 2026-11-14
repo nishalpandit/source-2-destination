@@ -209,11 +209,11 @@
     const fileBadge = document.getElementById('uploaded-filename-badge');
 
     const sampleRows = [
-      { row: 2, name: ' Evelyn Montgomery', code: 'AUTO-SERVER', school: 'Oakridge Residential Academy', grade: 'Grade 9', section: 'Section A', fatherPhone: '+1 (555) 890-1101', motherPhone: '+1 (555) 890-1102', status: 'Valid', issue: 'Ready for import' },
-      { row: 3, name: 'Sebastian Cross', code: 'AUTO-SERVER', school: 'Oakridge Residential Academy', grade: 'Grade 10', section: 'Section B', fatherPhone: '+1 (555) 890-2240', motherPhone: '+1 (555) 890-2241', status: 'Valid', issue: 'Ready for import' },
-      { row: 4, name: 'Liam Hawthorne', code: 'S2D-OAK-8841', school: 'Oakridge Residential Academy', grade: 'Grade 10', section: 'Section A', fatherPhone: '+1 (555) 801-2210', motherPhone: '+1 (555) 801-2211', status: 'Duplicate', issue: 'Duplicate student + primary phone already exists (STU-4001)' },
-      { row: 5, name: 'Nora Lindqvist', code: 'AUTO-SERVER', school: 'Oakridge Residential Academy', grade: 'Grade 11', section: 'Section C', fatherPhone: '555-99', motherPhone: '', status: 'Error', issue: 'Invalid E.164 guardian phone number format' },
-      { row: 6, name: 'Julian Ashford', code: 'AUTO-SERVER', school: 'Oakridge Residential Academy', grade: 'Grade 8', section: 'Section A', fatherPhone: '+1 (555) 890-4418', motherPhone: '+1 (555) 890-4419', status: 'Valid', issue: 'Ready for import' }
+      { row: 2, name: 'Aarav Sharma', code: 'AUTO-SERVER', school: 'Doon Valley Residential Academy', grade: 'Grade 9', section: 'Section A', fatherPhone: '+91 98101 22334', motherPhone: '+91 98101 22335', status: 'Valid', issue: 'Ready for import' },
+      { row: 3, name: 'Ananya Patel', code: 'AUTO-SERVER', school: 'Doon Valley Residential Academy', grade: 'Grade 10', section: 'Section B', fatherPhone: '+91 98202 33445', motherPhone: '+91 98202 33446', status: 'Valid', issue: 'Ready for import' },
+      { row: 4, name: 'Rohan Gupta', code: 'S2D-DOON-8807', school: 'Doon Valley Residential Academy', grade: 'Grade 10', section: 'Section A', fatherPhone: '+91 98105 89012', motherPhone: '+91 98105 89013', status: 'Duplicate', issue: 'Duplicate student + primary phone already exists (STU-4007)' },
+      { row: 5, name: 'Priya Nair', code: 'AUTO-SERVER', school: 'Doon Valley Residential Academy', grade: 'Grade 11', section: 'Section C', fatherPhone: '98765', motherPhone: '', status: 'Error', issue: 'Invalid E.164 guardian phone number format' },
+      { row: 6, name: 'Ishaan Verma', code: 'AUTO-SERVER', school: 'Doon Valley Residential Academy', grade: 'Grade 8', section: 'Section A', fatherPhone: '+91 98303 44556', motherPhone: '+91 98303 44557', status: 'Valid', issue: 'Ready for import' }
     ];
 
     function renderPreview(fileName) {
@@ -260,26 +260,12 @@
     }
 
     if (simulateBtn) {
-      simulateBtn.addEventListener('click', () => renderPreview('oakridge_term1_students_sample.xlsx'));
+      simulateBtn.addEventListener('click', () => renderPreview('doon_valley_term1_students_sample.xlsx'));
     }
 
     if (sampleBtn) {
       sampleBtn.addEventListener('click', () => {
-        const csv = [
-          'student_full_name,class_grade,section,hostel_wing,father_name,father_authorized_phone,mother_name,mother_authorized_phone,validity_plan_code',
-          '"Evelyn Montgomery","Grade 9","Section A","East Gables Rm 104","Arthur Montgomery","+15558901101","claire Montgomery","+15558901102","RPL-02"',
-          '"Sebastian Cross","Grade 10","Section B","North Hall Rm 212","Edward Cross","+15558902240","Hannah Cross","+15558902241","RPL-03"'
-        ].join('\n');
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 's2d_bulk_student_upload_template.csv';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        window.S2DNotify.show({ title: 'Sample Template Downloaded', description: 's2d_bulk_student_upload_template.csv saved.', type: 'success' });
+        window.location.href = '/school-admin/bulk-upload/sample.csv';
       });
     }
 

@@ -35,9 +35,9 @@
           </div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Inherited Hard Max / Call</div><div class="kpi-value mt-2">{{ global_rule.hard_max_call_duration }} Mins</div><div class="kpi-meta"><span>Super Admin Ceiling</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Campus Standard Cap</div><div class="kpi-value mt-2">{{ standard_cap }} Mins</div><div class="kpi-meta"><span>Grades 9–11 Default</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Junior Wing Cap</div><div class="kpi-value mt-2">{{ junior_cap }} Mins</div><div class="kpi-meta"><span>Grades 7–8 Default</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--indigo"><div class="kpi-top"><span class="kpi-label">Inherited Hard Max / Call</span><span class="kpi-icon"><i data-lucide="hard-drive"></i></span></div><div class="kpi-value">{{ global_rule.hard_max_call_duration }}</div><div class="kpi-meta"><span class="kpi-delta up">Super Admin Ceiling</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Campus Standard Cap</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div><div class="kpi-value">{{ standard_cap }}</div><div class="kpi-meta"><span>Grades 9–11 Default</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Junior Wing Cap</span><span class="kpi-icon"><i data-lucide="user"></i></span></div><div class="kpi-value">{{ junior_cap }}</div><div class="kpi-meta"><span>Grades 7–8 Default</span></div></div></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form method="POST" action="index.html" data-s2d-form data-success-title="Campus Duration Configuration Saved" data-success-desc="Campus duration limits updated.">
@@ -51,8 +51,20 @@
                   <option value="Grades 11–12 (Senior Wing)">Grades 11–12 (Senior Wing)</option>
                 </select>
               </div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Max Per-Call Duration (Max {{ global_rule.hard_max_call_duration }}m) <span class="req-star">*</span></label><input type="number" min="3" max="{{ global_rule.hard_max_call_duration }}" name="max_call" class="s2d-input" value="{{ standard_cap }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Daily Cumulative Limit (Max {{ global_rule.max_daily_student_cap }}m) <span class="req-star">*</span></label><input type="number" min="5" max="{{ global_rule.max_daily_student_cap }}" name="daily_limit" class="s2d-input" value="15" required></div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Max Per-Call Duration (Max {{ global_rule.hard_max_call_duration }}m) <span class="req-star">*</span></label>
+                <div class="d-flex align-items-center gap-3">
+                  <input type="number" min="3" max="{{ global_rule.hard_max_call_duration }}" name="max_call" class="s2d-input" style="width:80px;" value="{{ standard_cap }}" required>
+                  <span class="text-secondary-s2d" style="font-size:0.78rem;">minutes per call</span>
+                </div>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Daily Cumulative Limit (Max {{ global_rule.max_daily_student_cap }}m) <span class="req-star">*</span></label>
+                <div class="d-flex align-items-center gap-3">
+                  <input type="number" min="5" max="{{ global_rule.max_daily_student_cap }}" name="daily_limit" class="s2d-input" style="width:80px;" value="15" required>
+                  <span class="text-secondary-s2d" style="font-size:0.78rem;">minutes per day</span>
+                </div>
+              </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Update Campus Limits</span></button></div></div>
           </form>

@@ -33,8 +33,44 @@
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
             <span class="fw-semibold text-heading" style="font-size:0.92rem;">Student-wise Calling Usage &amp; Remaining Duration Reports</span>
           </div>
-          
+          <div class="d-flex align-items-center gap-2">
+            <a href="/school-admin/student-reports/export.csv" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="download"></i><span>Export CSV</span></a>
+            <button type="button" onclick="window.print()" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="printer"></i><span>Print Report</span></button>
+          </div>
         </div>
+
+        <!-- Student Aggregates Cards -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--blue">
+              <div class="kpi-top"><span class="kpi-label">Students Tracked</span><span class="kpi-icon"><i data-lucide="users"></i></span></div>
+              <div class="kpi-value">{{ total_students|default:"15" }}</div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">Enrolled Boarders</span></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--emerald">
+              <div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon"><i data-lucide="user-check"></i></span></div>
+              <div class="kpi-value">{{ active_students|default:"15" }}</div>
+              <div class="kpi-meta"><span class="kpi-delta up">Valid Allowance</span></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--amber">
+              <div class="kpi-top"><span class="kpi-label">Total Minutes Pool</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div>
+              <div class="kpi-value">{{ total_minutes|default:"3000" }} <span style="font-size:0.85rem;">min</span></div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">Across Campus</span></div>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div class="kpi-card kpi-card--slate">
+              <div class="kpi-top"><span class="kpi-label">Avg Minutes / Student</span><span class="kpi-icon"><i data-lucide="bar-chart-2"></i></span></div>
+              <div class="kpi-value">{{ avg_minutes|default:"200" }} <span style="font-size:0.85rem;">min</span></div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">Remaining Balance</span></div>
+            </div>
+          </div>
+        </div>
+
         <div data-s2d-table="sch-students-table"></div>
     
       </main>

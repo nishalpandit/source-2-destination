@@ -40,7 +40,7 @@
   <div class="col-lg-8">
     <div class="s2d-card mb-4">
       <div class="s2d-card-header">
-        <div><h3 class="s2d-card-title">Upload Campus Student Excel / CSV</h3><p class="s2d-card-subtitle">Automatically scoped to Oakridge Residential Academy (SCH-1001)</p></div>
+        <div><h3 class="s2d-card-title">Upload Campus Student Excel / CSV</h3><p class="s2d-card-subtitle">Automatically scoped to {{ school.name|default:"Doon Valley Residential Academy" }} ({{ school.code|default:"SCH-1001" }})</p></div>
         <button type="button" class="btn-s2d btn-s2d-secondary btn-sm-s2d" id="download-sample-template"><i data-lucide="download"></i><span>Download Sample Format</span></button>
       </div>
       <div class="s2d-card-body">
