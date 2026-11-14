@@ -114,7 +114,7 @@
               <div class="sidebar-user-name">${user.fullName}</div>
               <div class="sidebar-user-email">${user.email}</div>
             </div>
-            <a href="${resolveHref('auth/login.html')}" class="sidebar-logout-btn" title="Sign out">
+            <a href="/logout/" class="sidebar-logout-btn" title="Sign out">
               <i data-lucide="log-out" style="width:16px;height:16px;"></i>
             </a>
           </div>
@@ -233,7 +233,7 @@
                 <span>Operational Overview</span>
               </a>
               <div class="s2d-dropdown-divider"></div>
-              <a href="${resolveHref('auth/login.html')}" class="s2d-dropdown-item danger">
+              <a href="/logout/" class="s2d-dropdown-item danger">
                 <i data-lucide="log-out" style="width:15px;height:15px;"></i>
                 <span>Sign Out</span>
               </a>

@@ -12,8 +12,13 @@ from . import Api_views
 app_name = 'source2destination'
 
 urlpatterns = [
-    # Root / Auth Portal
-    path('', views.index, name='index'),
+    # Root / Unified Authentication Portal (Single Login Page)
+    path('', views.login_view, name='login'),
+    path('index.html', views.login_view, name='index_html'),
+    path('login/', views.login_view, name='login_direct'),
+    path('auth/login.html', views.login_view, name='auth_login_html'),
+    path('logout/', views.logout_view, name='logout'),
+    path('auth/logout/', views.logout_view, name='auth_logout'),
 
     # Super Admin School Management Specific Views
     path('super-admin/schools/', admin_views.schools_list, name='super_admin_schools_list'),

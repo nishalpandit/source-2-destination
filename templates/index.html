@@ -16,76 +16,13 @@
   <link rel="stylesheet" href="{% static 'css/animations.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
   <style>
-    /* Strict non-scrollable viewport lock */
+    /* Strict non-scrollable viewport lock on desktop */
     html, body.auth-viewport-locked {
       height: 100vh !important;
       max-height: 100vh !important;
       overflow: hidden !important;
       margin: 0;
       padding: 0;
-    }
-
-    .dev-top-strip {
-      height: 38px;
-      max-height: 38px;
-      background: #060911;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.8);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      font-size: 0.78rem;
-      z-index: 1050;
-      position: relative;
-    }
-
-    .dev-pill-btn {
-      font-size: 0.72rem;
-      padding: 3px 9px;
-      font-weight: 600;
-      border-radius: 6px;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 160ms ease;
-      line-height: 1.2;
-    }
-    .dev-pill-btn.super {
-      background: rgba(99, 102, 241, 0.16);
-      color: #C7D2FE;
-      border: 1px solid rgba(99, 102, 241, 0.4);
-    }
-    .dev-pill-btn.super:hover {
-      background: #6366F1;
-      color: #FFFFFF;
-    }
-    .dev-pill-btn.franchise {
-      background: rgba(6, 182, 212, 0.16);
-      color: #A5F3FC;
-      border: 1px solid rgba(6, 182, 212, 0.4);
-    }
-    .dev-pill-btn.franchise:hover {
-      background: #06B6D4;
-      color: #FFFFFF;
-    }
-    .dev-pill-btn.school {
-      background: rgba(16, 185, 129, 0.16);
-      color: #A7F3D0;
-      border: 1px solid rgba(16, 185, 129, 0.4);
-    }
-    .dev-pill-btn.school:hover {
-      background: #10B981;
-      color: #FFFFFF;
-    }
-    .dev-pill-btn.legacy {
-      background: rgba(148, 163, 184, 0.12);
-      color: #CBD5E1;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-    }
-    .dev-pill-btn.legacy:hover {
-      background: rgba(148, 163, 184, 0.25);
-      color: #FFFFFF;
     }
 
     .telemetry-tag {
@@ -115,42 +52,14 @@
     }
 
     .telemetry-stat-cell {
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 10px;
-      background: rgba(30, 41, 59, 0.6);
+      background: rgba(30, 41, 59, 0.65);
       border: 1px solid rgba(51, 65, 85, 0.5);
     }
   </style>
 </head>
 <body class="auth-viewport-locked" data-root="" data-route="index.html">
-
-  <!-- =========================================================================
-       DEVELOPMENT NAVIGATION BAR (NON-SCROLLABLE 38px COMPACT HEADER)
-       ========================================================================= -->
-  <header class="dev-top-strip">
-    <div class="d-flex align-items-center gap-2">
-      <span class="badge bg-warning text-dark font-monospace fw-bold" style="font-size:0.68rem;padding:3px 6px;">DEV MODE</span>
-      <span class="d-none d-lg-inline text-secondary" style="font-size:0.75rem;">Direct Portal Navigation:</span>
-    </div>
-    <div class="d-flex align-items-center gap-2">
-      <a href="super-admin/dashboard.html" class="dev-pill-btn super">
-        <i data-lucide="shield-check" style="width:13px;height:13px;"></i>
-        <span>Super Admin</span>
-      </a>
-      <a href="franchise/dashboard.html" class="dev-pill-btn franchise">
-        <i data-lucide="building-2" style="width:13px;height:13px;"></i>
-        <span>Franchise Dashboard</span>
-      </a>
-      <a href="school-admin/dashboard.html" class="dev-pill-btn school">
-        <i data-lucide="graduation-cap" style="width:13px;height:13px;"></i>
-        <span>School Admin</span>
-      </a>
-      <a href="auth/login.html" class="dev-pill-btn legacy" title="Auth Suite">
-        <i data-lucide="key" style="width:12px;height:12px;"></i>
-        <span>Auth Suite</span>
-      </a>
-    </div>
-  </header>
 
   <!-- =========================================================================
        70% BANNER / 30% LOGIN SPLIT (ZERO SCROLL VIEWPORT)
@@ -165,7 +74,7 @@
 
       <!-- Top Branding Strip -->
       <div class="auth-banner-content d-flex align-items-center justify-content-between flex-wrap gap-2">
-        <a href="index.html" class="d-inline-flex align-items-center gap-2.5 text-decoration-none text-white">
+        <a href="/" class="d-inline-flex align-items-center gap-2.5 text-decoration-none text-white">
           <img src="{% static 'images/logo.svg' %}" alt="Source 2 Destination" width="34" height="34">
           <div>
             <div style="font-family:var(--font-display);font-weight:700;font-size:1.05rem;letter-spacing:-0.02em;line-height:1.2;">Source 2 Destination</div>
@@ -181,10 +90,39 @@
         </div>
       </div>
 
-    
+      <!-- Bottom Glass KPI & Architecture Overlay -->
+      <div class="auth-glass-footer-card">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-3 pb-2 border-bottom" style="border-color:rgba(148,163,184,0.2) !important;">
+          <div class="d-flex align-items-center gap-2">
+            <span class="telemetry-pulse"></span>
+            <span style="font-size:0.8rem;font-weight:600;color:#F8FAFC;">Unified Institutional Authentication Core</span>
+          </div>
+          <span style="font-size:0.72rem;color:#94A3B8;">Role-Based Routing: Super Admin &bull; Franchise Partner &bull; School Principal</span>
+        </div>
+        <div class="row g-2">
+          <div class="col-4">
+            <div class="telemetry-stat-cell">
+              <div style="font-size:0.68rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">Enforcement</div>
+              <div style="font-size:0.92rem;font-weight:700;color:#38BDF8;">Whitelist Strict</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="telemetry-stat-cell">
+              <div style="font-size:0.68rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">Hostel Windows</div>
+              <div style="font-size:0.92rem;font-weight:700;color:#34D399;">Scheduled Only</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="telemetry-stat-cell">
+              <div style="font-size:0.68rem;color:#94A3B8;text-transform:uppercase;letter-spacing:0.04em;">Terminal Security</div>
+              <div style="font-size:0.92rem;font-weight:700;color:#A78BFA;">MDM Protected</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- 30% RIGHT PANEL: Clean Institutional Login Card (No Duplicates, No Signup) -->
+    <!-- 30% RIGHT PANEL: Clean Institutional Login Card -->
     <section class="auth-form-30">
       <div class="auth-card-30">
         
@@ -196,22 +134,33 @@
           <p class="text-secondary-s2d mb-0" style="font-size:0.82rem;">Enter your institutional credentials to access your dashboard.</p>
         </div>
 
-        <form id="s2d-auth-login-form" data-s2d-form data-redirect="super-admin/dashboard.html" data-success-title="Authenticated" data-success-desc="Opening your institutional workspace...">
-          
-          <div class="s2d-field">
-            <label class="s2d-label" for="login-email">Institutional Email <span class="req-star">*</span></label>
-            <input type="email" id="login-email" name="email" class="s2d-input" value="admin@institution.edu" placeholder="name@institution.edu" required autocomplete="username">
-            <div data-drf-error="email"></div>
+        <form method="POST" action="{% url 'source2destination:login' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+
+          {% if error %}
+          <div class="alert alert-danger d-flex align-items-center gap-2 mb-3 py-2 px-3" role="alert" style="font-size:0.83rem;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#DC2626;">
+            <i data-lucide="alert-circle" style="width:18px;height:18px;flex-shrink:0;"></i>
+            <div>{{ error }}</div>
+          </div>
+          {% endif %}
+
+          <div class="s2d-field mb-3">
+            <label class="s2d-label" for="login-username">Username or Email <span class="req-star">*</span></label>
+            <div style="position:relative;">
+              <input type="text" id="login-username" name="username" class="s2d-input" value="{{ login_val }}" placeholder="e.g. admin, franchise, school" required autofocus autocomplete="username" style="padding-left:36px;">
+              <i data-lucide="user" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--s2d-text-secondary);pointer-events:none;"></i>
+            </div>
           </div>
 
-          <div class="s2d-field">
+          <div class="s2d-field mb-3">
             <div class="d-flex justify-content-between align-items-center mb-1">
               <label class="s2d-label mb-0" for="login-password">Password <span class="req-star">*</span></label>
-              <a href="auth/forgot-password.html" class="s2d-link" style="font-size:0.74rem;">Forgot password?</a>
             </div>
             <div style="position:relative;">
-              <input type="password" id="login-password" name="password" class="s2d-input" value="DemoPass123!" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:38px;">
-              <button type="button" class="btn" data-toggle-password="#login-password" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:3px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
+              <input type="password" id="login-password" name="password" class="s2d-input" placeholder="••••••••••••" required autocomplete="current-password" style="padding-left:36px;padding-right:38px;">
+              <i data-lucide="key" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--s2d-text-secondary);pointer-events:none;"></i>
+              <button type="button" class="btn" id="toggle-password-btn" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);padding:3px;color:var(--s2d-text-secondary);border:none;background:transparent;" aria-label="Toggle password visibility">
                 <i data-lucide="eye" style="width:16px;height:16px;"></i>
               </button>
             </div>
@@ -220,8 +169,9 @@
           <div class="d-flex align-items-center justify-content-between mb-4">
             <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.78rem;color:var(--s2d-text-secondary);cursor:pointer;">
               <input type="checkbox" name="remember" class="s2d-checkbox" checked>
-              <span>Remember this terminal</span>
+              <span>Remember session</span>
             </label>
+            <span class="text-secondary-s2d" style="font-size:0.75rem;">TLS 1.3 Encrypted</span>
           </div>
 
           <button type="submit" class="btn-s2d btn-s2d-primary w-100 justify-content-center py-2.5" style="font-size:0.88rem;">
@@ -229,6 +179,31 @@
             <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
           </button>
         </form>
+
+        <!-- Authorized Roles Hint Box -->
+        <div class="mt-4 p-3 border rounded-3" style="background:var(--s2d-surface-subtle);border-color:var(--s2d-border);font-size:0.75rem;">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <span class="fw-semibold text-heading d-flex align-items-center gap-1.5">
+              <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--s2d-primary);"></i>
+              <span>Authorized Test Roles</span>
+            </span>
+            <span class="badge bg-light text-secondary border" style="font-size:0.68rem;">Auto-fill</span>
+          </div>
+          <div class="d-grid gap-1.5">
+            <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d justify-content-between text-start w-100" onclick="fillLogin('admin', '12345')">
+              <span><strong>Super Admin:</strong> <code>admin</code></span>
+              <span class="text-secondary-s2d">12345 &rarr;</span>
+            </button>
+            <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d justify-content-between text-start w-100" onclick="fillLogin('franchise', '12345')">
+              <span><strong>Franchise:</strong> <code>franchise</code></span>
+              <span class="text-secondary-s2d">12345 &rarr;</span>
+            </button>
+            <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d justify-content-between text-start w-100" onclick="fillLogin('school', '12345')">
+              <span><strong>School Admin:</strong> <code>school</code></span>
+              <span class="text-secondary-s2d">12345 &rarr;</span>
+            </button>
+          </div>
+        </div>
 
         <div class="mt-4 pt-3 border-top text-center" style="font-size:0.74rem;color:var(--s2d-text-secondary);">
           <i data-lucide="shield-check" style="width:14px;height:14px;color:#10B981;vertical-align:text-bottom;margin-right:3px;"></i>
@@ -246,16 +221,32 @@
   <script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'vendor/lucide.min.js' %}"></script>
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
-  <script src="{% static 'js/api-config.js' %}"></script>
-  <script src="{% static 'js/notifications.js' %}"></script>
-  <script src="{% static 'js/modals.js' %}"></script>
-  <script src="{% static 'js/forms.js' %}"></script>
-  <script src="{% static 'js/animations.js' %}"></script>
-  <script src="{% static 'js/app.js' %}"></script>
 
   <script>
+    function fillLogin(username, password) {
+      const uInput = document.getElementById('login-username');
+      const pInput = document.getElementById('login-password');
+      if (uInput) uInput.value = username;
+      if (pInput) pInput.value = password;
+      if (pInput) pInput.focus();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       if (window.lucide) window.lucide.createIcons();
+
+      const toggleBtn = document.getElementById('toggle-password-btn');
+      const passwordInput = document.getElementById('login-password');
+      if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function() {
+          const isPass = passwordInput.type === 'password';
+          passwordInput.type = isPass ? 'text' : 'password';
+          const icon = toggleBtn.querySelector('i');
+          if (icon) {
+            icon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+            if (window.lucide) window.lucide.createIcons();
+          }
+        });
+      }
     });
   </script>
 </body>

@@ -48,7 +48,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'Source2Destination.middleware.RoleAccessMiddleware',
 ]
+
+LOGIN_URL = '/'
 
 ROOT_URLCONF = 'project.urls'
 

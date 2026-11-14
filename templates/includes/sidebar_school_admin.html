@@ -205,12 +205,12 @@
 
 <div class="sidebar-footer">
   <div class="sidebar-user-card">
-    <div class="sidebar-user-avatar">RS</div>
+    <div class="sidebar-user-avatar">{% if request.user.is_authenticated and request.user.first_name %}{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1"|default:"" }}{% else %}RS{% endif %}</div>
     <div class="sidebar-user-meta">
-      <div class="sidebar-user-name">Dr. Ramesh Chandra Sharma</div>
-      <div class="sidebar-user-email">principal@doonvalley.edu.in</div>
+      <div class="sidebar-user-name">{% if request.user.is_authenticated and request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}Dr. Ramesh Chandra Sharma{% endif %}</div>
+      <div class="sidebar-user-email">{% if request.user.is_authenticated and request.user.email %}{{ request.user.email }}{% else %}principal@doonvalley.edu.in{% endif %}</div>
     </div>
-    <a href="/auth/login.html" class="sidebar-logout-btn" title="Sign out">
+    <a href="/logout/" class="sidebar-logout-btn" title="Sign out">
       <i data-lucide="log-out" style="width:16px;height:16px;"></i>
     </a>
   </div>

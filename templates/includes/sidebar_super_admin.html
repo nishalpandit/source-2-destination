@@ -204,12 +204,12 @@
 
 <div class="sidebar-footer">
   <div class="sidebar-user-card">
-    <div class="sidebar-user-avatar">AS</div>
+    <div class="sidebar-user-avatar">{% if request.user.is_authenticated and request.user.first_name %}{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1"|default:"" }}{% else %}AS{% endif %}</div>
     <div class="sidebar-user-meta">
-      <div class="sidebar-user-name">Aarav Singhal</div>
-      <div class="sidebar-user-email">aarav.singhal@source2destination.in</div>
+      <div class="sidebar-user-name">{% if request.user.is_authenticated and request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}Aarav Singhal{% endif %}</div>
+      <div class="sidebar-user-email">{% if request.user.is_authenticated and request.user.email %}{{ request.user.email }}{% else %}aarav.singhal@source2destination.in{% endif %}</div>
     </div>
-    <a href="/auth/login.html" class="sidebar-logout-btn" title="Sign out">
+    <a href="/logout/" class="sidebar-logout-btn" title="Sign out">
       <i data-lucide="log-out" style="width:16px;height:16px;"></i>
     </a>
   </div>
