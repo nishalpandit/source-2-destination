@@ -20,21 +20,21 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/recharges/overview.html" data-section="Recharge Management" data-page-title="Plans & Credit Allocation">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">CALLING CREDIT CATALOG</div>
-            <h1 class="page-title">Recharge Overview &amp; Active Plans</h1>
-            <p class="page-description">Manage standardized student calling recharge packs, minute allocations, validity durations, and direct campus credit allocations.</p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Recharge Overview &amp; Active Plans</span>
           </div>
-          <div class="page-actions">
-            <a href="history.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="history"></i><span>Recharge History</span></a>
-            <a href="create-plan.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Create Recharge Plan</span></a>
-          </div>
+          <div class="d-flex align-items-center gap-2"><a href="history.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="history"></i><span>Recharge History</span></a>
+            <a href="create-plan.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Create Recharge Plan</span></a></div>
         </div>
         <div class="row g-3 mb-4">
           {% for p in plans %}

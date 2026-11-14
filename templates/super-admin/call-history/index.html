@@ -20,13 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/call-history/index.html" data-section="Calling Policy" data-page-title="Call History Logs">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">VOICE SESSION TELEMETRY</div><h1 class="page-title">Global Call History</h1><p class="page-description">Inspect completed, missed, and policy-restricted student-to-guardian voice sessions across all schools.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Global Call History</span>
+          </div>
+          
         </div>
         <div data-s2d-table="global-call-history-table"></div>
     

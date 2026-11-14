@@ -20,13 +20,19 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/validity/index.html" data-section="Calling Rules" data-page-title="Student Validity">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">CAMPUS VALIDITY DESK</div><h1 class="page-title">Student Account Validity &amp; Expiring Accounts</h1><p class="page-description">Monitor active, expiring (&lt;14 days), and expired student calling accounts at {{ school.name|default:"Campus" }}.</p></div>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Student Account Validity &amp; Expiring Accounts</span>
+            <span class="text-secondary-s2d d-none d-md-inline" style="font-size:0.78rem;">· {{ school.name|default:"Doon Valley Residential Academy" }}</span>
+          </div>
         </div>
         <div data-s2d-table="sa-validity-table"></div>
     

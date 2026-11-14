@@ -1,0 +1,7 @@
+{% if '/franchise/' in request.path %}
+  {% include 'includes/sidebar_franchise.html' %}
+{% elif '/super-admin/' in request.path %}
+  {% include 'includes/sidebar_super_admin.html' %}
+{% else %}
+  {% include 'includes/sidebar_school_admin.html' %}
+{% endif %}

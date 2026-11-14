@@ -20,18 +20,20 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/schools/list.html" data-section="Assigned Schools" data-page-title="Assigned School List">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">TERRITORY SCOPE · FRN-101</div>
-            <h1 class="page-title">Assigned Boarding Schools</h1>
-            <p class="page-description">View and manage boarding campuses explicitly allocated to North-East EduNet Partners. Cross-franchise school records and global billing controls are restricted to Super Admin.</p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Assigned Boarding Schools</span>
           </div>
-          <div class="page-actions"><a href="add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Onboard Assigned School</span></a></div>
+          <div class="d-flex align-items-center gap-2"><a href="add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Onboard Assigned School</span></a></div>
         </div>
         <div class="s2d-callout indigo mb-4"><i data-lucide="lock"></i><div><strong>Territory Access Boundary:</strong> Only campuses mapped to <code>FRN-101</code> are exposed here; backend queryset filtering enforces strict tenant isolation.</div></div>
         <div data-s2d-table="fr-schools-table"></div>

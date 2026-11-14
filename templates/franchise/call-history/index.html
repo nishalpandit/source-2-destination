@@ -20,12 +20,21 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/call-history/index.html" data-section="Calling & Validity" data-page-title="Call History">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">TERRITORY CALL LOGS</div><h1 class="page-title">Assigned-School Call History</h1><p class="page-description">Filter voice sessions across your allocated schools by student, guardian number, status, and date range.</p></div></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Assigned-School Call History</span>
+          </div>
+          
+        </div>
         <div data-s2d-table="global-call-history-table"></div>
     
       </main>

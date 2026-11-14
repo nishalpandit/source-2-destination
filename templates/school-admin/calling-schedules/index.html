@@ -20,19 +20,31 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/calling-schedules/index.html" data-section="Calling Rules" data-page-title="Calling Schedules">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">HOSTEL TIME WINDOWS</div><h1 class="page-title">School, Class &amp; Student Calling Schedules</h1><p class="page-description">Configure allowed hostel calling hours and academic restrictions. Click any slot in the weekly calendar to toggle Allowed / Restricted / Supervised.</p></div>
-          <div class="page-actions"><button type="button" class="btn-s2d btn-s2d-primary" data-demo-action="Campus Calling Schedule Published"><i data-lucide="save"></i><span>Publish Schedule</span></button></div>
-        </div>
-        <div class="s2d-tabs" data-s2d-tabs="sch-sched-tabs">
-          <button type="button" class="s2d-tab-btn active" data-tab-target="sc-weekly">Weekly Calendar View (School)</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="sc-class">Class-wise Schedules</button>
-          <button type="button" class="s2d-tab-btn" data-tab-target="sc-student">Student-wise Exceptions</button>
+        <!-- Sleek Calling Schedules Action & Filter Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="s2d-tabs mb-0" data-s2d-tabs="sch-sched-tabs" style="border-bottom:none;padding-bottom:0;">
+            <button type="button" class="s2d-tab-btn active" data-tab-target="sc-weekly">Weekly Calendar View (School)</button>
+            <button type="button" class="s2d-tab-btn" data-tab-target="sc-class">Class-wise Schedules</button>
+            <button type="button" class="s2d-tab-btn" data-tab-target="sc-student">Student-wise Exceptions</button>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-none d-md-inline-flex align-items-center gap-3 text-secondary-s2d me-2" style="font-size:0.75rem;">
+              <span class="d-inline-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background:#10b981;"></span> Allowed</span>
+              <span class="d-inline-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background:#64748b;"></span> Restricted</span>
+              <span class="d-inline-flex align-items-center gap-1"><span style="width:8px;height:8px;border-radius:50%;background:#8b5cf6;"></span> Supervised</span>
+            </span>
+            <button type="button" class="btn-s2d btn-s2d-primary" data-demo-action="Campus Calling Schedule Published">
+              <i data-lucide="save"></i>
+              <span>Publish Schedule</span>
+            </button>
+          </div>
         </div>
         <div id="sch-sched-tabs">
           <div class="s2d-tab-panel active" id="sc-weekly">

@@ -20,14 +20,23 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/guardians/list.html" data-section="Parents & Guardians" data-page-title="Guardian Directory">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">AUTHORIZED CONTACT WHITELIST</div><h1 class="page-title">Parent &amp; Guardian Management</h1><p class="page-description">Verify father, mother, and legal guardian contact numbers. Only numbers marked Authorized are exposed on student calling kiosks.</p></div>
-          <div class="page-actions"><a href="add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Add Guardian &amp; Numbers</span></a></div>
+        <!-- Sleek Guardian Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Guardian &amp; Whitelist Directory</span>
+            <span class="badge s2d-badge-subtle">Authorized Kiosk Contacts</span>
+          </div>
+          <div>
+            <a href="add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Add Guardian &amp; Numbers</span></a>
+          </div>
         </div>
         <div data-s2d-table="sch-guardians-table"></div>
     

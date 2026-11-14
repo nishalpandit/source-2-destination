@@ -20,17 +20,21 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/payments/details.html" data-section="Payments & Ledger" data-page-title="Payment Details">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">TRANSACTION RECEIPT · <span data-bind-field="id">TXN-30001</span></div><h1 class="page-title">Settlement Record Details</h1><p class="page-description">Verified payment receipt metadata, gateway settlement reference, and commission split audit.</p></div>
-          <div class="page-actions">
-            <button type="button" class="btn-s2d btn-s2d-secondary" onclick="window.print()"><i data-lucide="printer"></i><span>Print Receipt</span></button>
-            <a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Ledger</span></a>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Settlement Record Details</span>
           </div>
+          <div class="d-flex align-items-center gap-2"><button type="button" class="btn-s2d btn-s2d-secondary" onclick="window.print()"><i data-lucide="printer"></i><span>Print Receipt</span></button>
+            <a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Ledger</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">Invoice &amp; Gateway Breakdown</h3><span class="s2d-badge s2d-badge-success" data-bind-field="status">Successful</span></div>
           <div class="s2d-card-body">

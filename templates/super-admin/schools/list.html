@@ -20,20 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/schools/list.html" data-section="School Management" data-page-title="School Directory">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">INSTITUTIONAL GOVERNANCE</div>
-            <h1 class="page-title">Registered Schools &amp; Hostels</h1>
-            <p class="page-description">Manage residential schools, franchise assignments, primary campus administrators, subscription contracts, and operational calling status.</p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Registered Schools &amp; Hostels</span>
           </div>
-          <div class="page-actions">
-            <a href="../reports/index.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="file-spreadsheet"></i><span>School Reports</span></a>
-            <a href="add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Add New School</span></a>
-          </div>
+          <div class="d-flex align-items-center gap-2"><a href="../reports/index.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="file-spreadsheet"></i><span>School Reports</span></a>
+            <a href="add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Add New School</span></a></div>
         </div>
 
         <div class="row g-3 mb-4">

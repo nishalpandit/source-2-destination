@@ -20,12 +20,21 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/class-reports/index.html" data-section="Hostel & Reporting" data-page-title="Class Reports">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">ACADEMIC COHORT ANALYTICS</div><h1 class="page-title">Class &amp; Section Calling Activity Reports</h1><p class="page-description">Compare calling consumption and active account ratios across Grades 7–12.</p></div></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Class &amp; Section Calling Activity Reports</span>
+          </div>
+          
+        </div>
         <div class="row g-4 mb-4">
           <div class="col-lg-6"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Calling Minutes by Class</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sch-usage-by-class"></div></div></div></div>
           <div class="col-lg-6"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Active vs Inactive by Class</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sch-class-distribution"></div></div></div></div>

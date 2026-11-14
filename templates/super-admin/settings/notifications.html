@@ -20,13 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/settings/notifications.html" data-section="Settings & Audit" data-page-title="Notifications">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">COMMUNICATION ENGINE</div><h1 class="page-title">Notification Templates &amp; Dispatch History</h1><p class="page-description">Configure automated email/SMS alert templates for low credits, expiring student validities, and school subscription renewals.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Notification Templates &amp; Dispatch History</span>
+          </div>
+          
         </div>
         <div class="row g-4">
           <div class="col-lg-6">

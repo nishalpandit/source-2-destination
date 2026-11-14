@@ -20,14 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/roles-permissions/create.html" data-section="Governance" data-page-title="Create Role">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">IAM ROLE DEFINITION</div><h1 class="page-title">Create / Edit Administrative Role</h1><p class="page-description">Define role scope and assign capability groups consumed by Django REST permission classes.</p></div>
-          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Roles</span></a></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Create / Edit Administrative Role</span>
+          </div>
+          <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Roles</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form data-s2d-form data-redirect="list.html" data-success-title="Custom Role Saved (Demo)">

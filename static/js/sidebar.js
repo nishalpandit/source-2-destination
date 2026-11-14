@@ -25,7 +25,26 @@
     const sidebarMount = document.getElementById('app-sidebar');
     const topbarMount = document.getElementById('app-topbar');
 
-    if (sidebarMount) {
+    if (sidebarMount && sidebarMount.children.length > 0) {
+      if (window.lucide) window.lucide.createIcons({ nodes: [sidebarMount] });
+      // Server-rendered sidebar via Django {% include %}: highlight active route
+      const currentPath = window.location.pathname;
+      sidebarMount.querySelectorAll('a.sidebar-link, a.sidebar-sublink').forEach((link) => {
+        const href = link.getAttribute('href');
+        if (href && (href === currentPath || href.endsWith(currentRoute) || (currentRoute && href.includes(currentRoute.replace('.html', ''))))) {
+          link.classList.add('active');
+          const parentBox = link.closest('.nav-item-box');
+          if (parentBox) {
+            parentBox.classList.add('open');
+            const pBtn = parentBox.querySelector('.sidebar-parent-btn');
+            if (pBtn) {
+              pBtn.classList.add('active-parent');
+              pBtn.setAttribute('aria-expanded', 'true');
+            }
+          }
+        }
+      });
+    } else if (sidebarMount) {
       let groupsHtml = '';
       navCfg.groups.forEach((group) => {
         let itemsHtml = '';

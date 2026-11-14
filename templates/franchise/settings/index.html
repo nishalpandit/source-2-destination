@@ -20,12 +20,21 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/settings/index.html" data-section="Commercials & Analytics" data-page-title="Profile & Settings">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">PARTNER ACCOUNT</div><h1 class="page-title">Franchise Profile &amp; Preferences</h1><p class="page-description">Manage partner contact details, notification alerts, and verified settlement display settings.</p></div></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Franchise Profile &amp; Preferences</span>
+          </div>
+          
+        </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form data-s2d-form data-success-title="Franchise Profile Updated (Demo)">
             <div class="s2d-form-section">

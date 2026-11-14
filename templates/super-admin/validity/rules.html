@@ -20,18 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/validity/rules.html" data-section="Calling Validity" data-page-title="Global Validity Rules">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">POLICY GOVERNANCE</div>
-            <h1 class="page-title">Global Validity &amp; Expiry Rules</h1>
-            <p class="page-description">Configure automated expiry warnings, grace-period behavior, credit rollover rules, and academic term synchronization.</p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Global Validity &amp; Expiry Rules</span>
           </div>
-          <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Validity Records</span></a></div>
+          <div class="d-flex align-items-center gap-2"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Validity Records</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form method="POST" action="rules.html" data-s2d-form data-success-title="Global Validity Rules Saved" data-success-desc="Validity policy and grace period thresholds updated.">

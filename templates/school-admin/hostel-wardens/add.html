@@ -20,14 +20,20 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/hostel-wardens/add.html" data-section="Hostel Wardens" data-page-title="Add Warden">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">STAFF ONBOARDING</div><h1 class="page-title">Add Hostel Warden &amp; Wing Assignment</h1><p class="page-description">Register a hostel warden to supervise calling booths and authorize emergency out-of-window guardian calls.</p></div>
-          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Warden List</span></a></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Add Hostel Warden &amp; Wing Assignment</span>
+          </div>
+          <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Warden List</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Hostel Warden Added (Demo)">

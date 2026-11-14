@@ -784,18 +784,21 @@ def render_school_page(request, path):
     if clean_path.startswith('..'):
         raise Http404("Invalid template path")
 
-    candidates = [
-        f"school-admin/{clean_path}",
-        f"school-admin/{clean_path}.html",
-    ]
-    if not clean_path.endswith('.html'):
-        candidates.append(f"school-admin/{clean_path}/index.html")
+    candidates = []
+    if clean_path.endswith('.html'):
+        candidates.append(f"school-admin/{clean_path}")
+    else:
+        candidates.extend([
+            f"school-admin/{clean_path}.html",
+            f"school-admin/{clean_path}/index.html",
+            f"school-admin/{clean_path}",
+        ])
 
     for template_name in candidates:
         try:
             get_template(template_name)
             return render(request, template_name)
-        except TemplateDoesNotExist:
+        except (TemplateDoesNotExist, PermissionError):
             continue
 
     raise Http404(f"School Admin template '{clean_path}' not found")

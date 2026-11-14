@@ -18,18 +18,21 @@ def render_template_page(request, path):
     if clean_path.startswith('..') or clean_path.startswith('/'):
         raise Http404("Invalid template path")
 
-    candidates = [
-        clean_path,
-        f"{clean_path}.html",
-    ]
-    if not clean_path.endswith('.html'):
-        candidates.append(f"{clean_path}/index.html")
+    candidates = []
+    if clean_path.endswith('.html'):
+        candidates.append(clean_path)
+    else:
+        candidates.extend([
+            f"{clean_path}.html",
+            f"{clean_path}/index.html",
+            clean_path,
+        ])
 
     for template_name in candidates:
         try:
             get_template(template_name)
             return render(request, template_name)
-        except TemplateDoesNotExist:
+        except (TemplateDoesNotExist, PermissionError):
             continue
 
     raise Http404(f"Template '{clean_path}' not found")

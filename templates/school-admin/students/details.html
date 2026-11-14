@@ -19,21 +19,21 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/students/details.html" data-section="Student Management" data-page-title="Student Details">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">STUDENT 360° PROFILE · <span data-bind-field="studentCode">{{ student.calling_code }}</span></div>
-            <h1 class="page-title" data-bind-field="name">{{ student.name }}</h1>
-            <p class="page-description"><span data-bind-field="className">{{ student.class_name }}</span> · <span data-bind-field="section">{{ student.section }}</span> · <span data-bind-field="hostelWing">{{ student.hostel_wing }}</span></p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ student.name }}</span>
           </div>
-          <div class="page-actions">
-            <a href="../recharges/student-recharge.html?student={{ student.code }}" class="btn-s2d btn-s2d-soft"><i data-lucide="zap"></i><span>Recharge Credits</span></a>
+          <div class="d-flex align-items-center gap-2"><a href="../recharges/student-recharge.html?student={{ student.code }}" class="btn-s2d btn-s2d-soft"><i data-lucide="zap"></i><span>Recharge Credits</span></a>
             <a href="edit.html?id={{ student.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Student</span></a>
-            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
-          </div>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a></div>
         </div>
 
         <!-- All 7 Mandatory Student Details Tabs (Section 7.2) -->

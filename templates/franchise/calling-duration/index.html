@@ -20,13 +20,20 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/calling-duration/index.html" data-section="Calling & Validity" data-page-title="Calling Duration">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">INHERITED POLICY CEILINGS</div><h1 class="page-title">Franchise Calling Duration Limits</h1><p class="page-description">Configure default calling duration for assigned schools within the global 20-minute per-call ceiling established by Super Admin.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Franchise Calling Duration Limits</span>
+          </div>
+          
         </div>
         <div class="s2d-callout indigo mb-4"><i data-lucide="shield-check"></i><div><strong>Inherited Super Admin Ceiling:</strong> Maximum Per-Call Duration cannot exceed <strong>{{ global_rule.hard_max_call_duration }} minutes</strong>; Daily Cumulative Cap cannot exceed <strong>{{ global_rule.max_daily_student_cap }} minutes</strong>.</div></div>
         <div class="s2d-card"><div class="s2d-card-body">

@@ -20,14 +20,20 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/hostel-wardens/edit.html" data-section="Hostel Wardens" data-page-title="Edit Warden">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">UPDATE WARDEN · <span data-bind-field="id">WRD-601</span></div><h1 class="page-title">Edit <span data-bind-field="name">Major Kenneth Cole (Ret.)</span></h1><p class="page-description">Update dormitory wing assignment, duty shift hours, or emergency override privileges.</p></div>
-          <div class="page-actions"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back</span></a></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Edit <span data-bind-field="name">Major Kenneth Cole (Ret.)</span></span>
+          </div>
+          <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id=WRD-601" data-success-title="Warden Assignment Updated (Demo)">

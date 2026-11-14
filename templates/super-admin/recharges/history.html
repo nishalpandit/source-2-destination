@@ -20,14 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/recharges/history.html" data-section="Recharge Management" data-page-title="Recharge Ledger">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">CREDIT LEDGER</div><h1 class="page-title">Global Recharge History</h1><p class="page-description">Complete audit log of student calling top-ups, bulk franchise allocations, and school desk recharges.</p></div>
-          <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="layers"></i><span>View Plans</span></a></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Global Recharge History</span>
+          </div>
+          <div class="d-flex align-items-center gap-2"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="layers"></i><span>View Plans</span></a></div>
         </div>
         <div data-s2d-table="sa-recharge-history-table"></div>
     

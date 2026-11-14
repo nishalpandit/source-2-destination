@@ -20,18 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/school-admins/edit.html" data-section="School Administrators" data-page-title="Edit School Admin">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">UPDATE ADMINISTRATOR · <span data-bind-field="id">ADM-201</span></div>
-            <h1 class="page-title">Edit <span data-bind-field="name">Dr. Arthur Pendelton</span></h1>
-            <p class="page-description">Update campus assignment, contact information, MFA requirement, or administrative status.</p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Edit <span data-bind-field="name">Dr. Arthur Pendelton</span></span>
           </div>
-          <div class="page-actions"><a href="details.html?id=ADM-201" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a></div>
+          <div class="d-flex align-items-center gap-2"><a href="details.html?id=ADM-201" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Administrator Updated (Demo)">

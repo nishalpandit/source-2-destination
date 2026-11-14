@@ -1,0 +1,173 @@
+{% load static %}
+<div class="sidebar-brand">
+  <a href="/franchise/" class="sidebar-brand-link" title="Source 2 Destination">
+    <img src="{% static 'images/logo.svg' %}" alt="Source 2 Destination Logo" class="sidebar-brand-logo">
+    <div class="sidebar-brand-text">
+      <span class="sidebar-brand-name">Source 2 Destination</span>
+      <span class="sidebar-brand-role">Franchise Partner</span>
+    </div>
+  </a>
+  <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d d-lg-none sidebar-close-mobile" data-sidebar-close aria-label="Close navigation">
+    <i data-lucide="x"></i>
+  </button>
+</div>
+
+<nav class="sidebar-nav-scroll" aria-label="Franchise Partner Navigation">
+  <!-- Partner Overview -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Partner Overview</div>
+    <div class="nav-item-box">
+      <a href="/franchise/" class="sidebar-link {% if request.path == '/franchise/' or request.path == '/franchise/dashboard/' or request.path == '/franchise/dashboard/index.html' %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="layout-dashboard"></i></span>
+        <span class="sidebar-link-label">Franchise Dashboard</span>
+      </a>
+      <div class="sidebar-tooltip">Franchise Dashboard</div>
+    </div>
+  </div>
+
+  <!-- Campus & Student Ops -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Campus &amp; Student Ops</div>
+
+    <div class="nav-item-box {% if '/franchise/schools/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/franchise/schools/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/franchise/schools/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="building-2"></i></span>
+        <span class="sidebar-link-label">Assigned Schools</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Assigned Schools</div>
+      <div class="sidebar-submenu">
+        <a href="/franchise/schools/list.html" class="sidebar-sublink {% if request.path == '/franchise/schools/list.html' %}active{% endif %}">Assigned School List</a>
+        <a href="/franchise/schools/add.html" class="sidebar-sublink {% if request.path == '/franchise/schools/add.html' %}active{% endif %}">Onboard School</a>
+        <a href="/franchise/schools/edit.html" class="sidebar-sublink {% if request.path == '/franchise/schools/edit.html' %}active{% endif %}">Edit School Record</a>
+        <a href="/franchise/schools/details.html" class="sidebar-sublink {% if request.path == '/franchise/schools/details.html' %}active{% endif %}">School Details</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box {% if '/franchise/students/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/franchise/students/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/franchise/students/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="users"></i></span>
+        <span class="sidebar-link-label">Student Directory</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Student Directory</div>
+      <div class="sidebar-submenu">
+        <a href="/franchise/students/list.html" class="sidebar-sublink {% if request.path == '/franchise/students/list.html' %}active{% endif %}">Student List</a>
+        <a href="/franchise/students/add.html" class="sidebar-sublink {% if request.path == '/franchise/students/add.html' %}active{% endif %}">Add Student</a>
+        <a href="/franchise/students/edit.html" class="sidebar-sublink {% if request.path == '/franchise/students/edit.html' %}active{% endif %}">Edit Student</a>
+        <a href="/franchise/students/details.html" class="sidebar-sublink {% if request.path == '/franchise/students/details.html' %}active{% endif %}">Student Profile</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/bulk-upload/index.html" class="sidebar-link {% if '/franchise/bulk-upload/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="file-spreadsheet"></i></span>
+        <span class="sidebar-link-label">Bulk Student Upload</span>
+      </a>
+      <div class="sidebar-tooltip">Bulk Student Upload</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/classes/" class="sidebar-link {% if '/franchise/classes/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="book-open"></i></span>
+        <span class="sidebar-link-label">Classes &amp; Sections</span>
+      </a>
+      <div class="sidebar-tooltip">Classes &amp; Sections</div>
+    </div>
+  </div>
+
+  <!-- Calling & Validity -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Calling &amp; Validity</div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/validity/index.html" class="sidebar-link {% if '/franchise/validity/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="calendar-clock"></i></span>
+        <span class="sidebar-link-label">Student Validity</span>
+      </a>
+      <div class="sidebar-tooltip">Student Validity</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/recharges/" class="sidebar-link {% if '/franchise/recharges/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="zap"></i></span>
+        <span class="sidebar-link-label">Recharge Management</span>
+      </a>
+      <div class="sidebar-tooltip">Recharge Management</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/calling-duration/" class="sidebar-link {% if '/franchise/calling-duration/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="timer"></i></span>
+        <span class="sidebar-link-label">Calling Duration</span>
+      </a>
+      <div class="sidebar-tooltip">Calling Duration</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/calling-schedules/" class="sidebar-link {% if '/franchise/calling-schedules/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="clock-4"></i></span>
+        <span class="sidebar-link-label">Calling Schedules</span>
+      </a>
+      <div class="sidebar-tooltip">Calling Schedules</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/call-history/index.html" class="sidebar-link {% if '/franchise/call-history/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="phone-call"></i></span>
+        <span class="sidebar-link-label">Call History</span>
+      </a>
+      <div class="sidebar-tooltip">Call History</div>
+    </div>
+  </div>
+
+  <!-- Commercials & Analytics -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Commercials &amp; Analytics</div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/commissions/index.html" class="sidebar-link {% if '/franchise/commissions/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="coins"></i></span>
+        <span class="sidebar-link-label">Revenue &amp; Commissions</span>
+      </a>
+      <div class="sidebar-tooltip">Revenue &amp; Commissions</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/transactions/index.html" class="sidebar-link {% if '/franchise/transactions/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="receipt"></i></span>
+        <span class="sidebar-link-label">Payment &amp; Transactions</span>
+      </a>
+      <div class="sidebar-tooltip">Payment &amp; Transactions</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/reports/index.html" class="sidebar-link {% if '/franchise/reports/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="bar-chart-3"></i></span>
+        <span class="sidebar-link-label">School &amp; Student Reports</span>
+      </a>
+      <div class="sidebar-tooltip">School &amp; Student Reports</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/franchise/settings/index.html" class="sidebar-link {% if '/franchise/settings/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="settings"></i></span>
+        <span class="sidebar-link-label">Profile &amp; Settings</span>
+      </a>
+      <div class="sidebar-tooltip">Profile &amp; Settings</div>
+    </div>
+  </div>
+</nav>
+
+<div class="sidebar-footer">
+  <div class="sidebar-user-card">
+    <div class="sidebar-user-avatar">VS</div>
+    <div class="sidebar-user-meta">
+      <div class="sidebar-user-name">Vikramaditya Singhania</div>
+      <div class="sidebar-user-email">v.singhania@northedunet.in</div>
+    </div>
+    <a href="/auth/login.html" class="sidebar-logout-btn" title="Sign out">
+      <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+    </a>
+  </div>
+</div>

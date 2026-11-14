@@ -20,32 +20,25 @@
 </head>
 <body data-role="super-admin" data-root="../" data-route="super-admin/dashboard.html" data-section="Executive Command" data-page-title="Dashboard Overview">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
 
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
 
       <main class="app-content">
-        <!-- Page Header -->
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">GLOBAL PLATFORM COMMAND · NOVEMBER 2026</div>
-            <h1 class="page-title">Executive Platform Overview</h1>
-            <p class="page-description">Real-time operational telemetry across 4 regional franchises, 52 residential campuses, student calling usage, subscriptions, and Android Enterprise device compliance.</p>
+        <!-- Sleek Super Admin Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:9px;height:9px;border-radius:50%;background:#4f46e5;box-shadow:0 0 0 3px rgba(79,70,229,0.2);"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Executive Governance &amp; Platform Command</span>
+            <span class="badge s2d-badge-subtle" style="font-size:0.72rem;">National Fleet</span>
           </div>
-          <div class="page-actions">
-            <a href="reports/index.html" class="btn-s2d btn-s2d-secondary">
-              <i data-lucide="bar-chart-3"></i>
-              <span>Analytical Reports</span>
-            </a>
-            <a href="devices/register.html" class="btn-s2d btn-s2d-secondary">
-              <i data-lucide="tablet-smartphone"></i>
-              <span>Provision Device</span>
-            </a>
-            <a href="schools/add.html" class="btn-s2d btn-s2d-primary">
-              <i data-lucide="plus"></i>
-              <span>Register School</span>
-            </a>
+          <div class="d-flex align-items-center gap-2">
+            <a href="reports/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="bar-chart-3"></i><span>Analytical Reports</span></a>
+            <a href="devices/register.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="tablet-smartphone"></i><span>Provision Device</span></a>
+            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Register School</span></a>
           </div>
         </div>
 

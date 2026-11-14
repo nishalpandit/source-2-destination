@@ -20,16 +20,23 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/classes/list.html" data-section="Classes & Sections" data-page-title="Classes Management">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">ACADEMIC HIERARCHY</div><h1 class="page-title">Campus Classes Management</h1><p class="page-description">Manage academic grades, faculty coordinators, default daily duration limits, and student counts.</p></div>
-          <div class="page-actions">
-            <a href="sections.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="layout-list"></i><span>Manage Sections</span></a>
-            <button type="button" class="btn-s2d btn-s2d-primary" data-modal-open="add-class-modal"><i data-lucide="plus"></i><span>Add Class</span></button>
+        <!-- Sleek Classes Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Campus Classes Directory</span>
+            <span class="badge s2d-badge-subtle">{{ classes|length|default:"6" }} Classes</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <a href="sections.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="layout-list"></i><span>Manage Sections</span></a>
+            <button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" data-modal-open="add-class-modal"><i data-lucide="plus"></i><span>Add Class</span></button>
           </div>
         </div>
         <div data-s2d-table="sch-classes-table"></div>

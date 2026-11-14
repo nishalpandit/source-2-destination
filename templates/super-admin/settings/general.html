@@ -20,13 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/settings/general.html" data-section="Settings & Audit" data-page-title="General Settings">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">SYSTEM CONFIGURATION</div><h1 class="page-title">General, Administrative &amp; Profile Settings</h1><p class="page-description">Manage platform identity, session security policies, and Super Administrator profile details.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">General, Administrative &amp; Profile Settings</span>
+          </div>
+          
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form data-s2d-form data-success-title="System Settings Updated (Demo)">

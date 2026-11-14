@@ -20,14 +20,20 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/recharges/index.html" data-section="Calling & Validity" data-page-title="Recharge Management">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">TERRITORY CREDITS</div><h1 class="page-title">Recharge Requests &amp; Credit Allocations</h1><p class="page-description">Track school desk recharge requests, bulk credit allocations, and settlement status across assigned schools.</p></div>
-          <div class="page-actions"><button type="button" class="btn-s2d btn-s2d-primary" data-demo-action="Recharge Allocation Submitted"><i data-lucide="zap"></i><span>New Credit Allocation</span></button></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Recharge Requests &amp; Credit Allocations</span>
+          </div>
+          <div class="d-flex align-items-center gap-2"><button type="button" class="btn-s2d btn-s2d-primary" data-demo-action="Recharge Allocation Submitted"><i data-lucide="zap"></i><span>New Credit Allocation</span></button></div>
         </div>
         <div data-s2d-table="sa-recharge-history-table"></div>
     

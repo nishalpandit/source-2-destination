@@ -20,14 +20,23 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/recharges/student-recharge.html" data-section="Recharge Desk" data-page-title="Student Recharge">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">DIRECT CREDIT ALLOCATION</div><h1 class="page-title">Initiate Student Account Recharge</h1><p class="page-description">Select an enrolled student, review current minute balance, and allocate an approved calling pack.</p></div>
-          <div class="page-actions"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Recharge History</span></a></div>
+        <!-- Sleek Student Recharge Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Direct Student Account Recharge</span>
+            <span class="badge s2d-badge-subtle">Credit Minutes &amp; Validity</span>
+          </div>
+          <div>
+            <a href="overview.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="arrow-left"></i><span>Recharge History</span></a>
+          </div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
           <form method="POST" action="student-recharge.html" data-s2d-form data-redirect="overview.html" data-success-title="Student Recharge Applied" data-success-desc="Minutes and validity credited to student account.">

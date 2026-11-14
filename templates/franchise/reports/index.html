@@ -20,12 +20,21 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/reports/index.html" data-section="Commercials & Analytics" data-page-title="Reports">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">TERRITORY ANALYTICS</div><h1 class="page-title">School-wise &amp; Student-wise Reports</h1><p class="page-description">Analyze calling minutes, recharge adoption, and active student ratios across assigned schools.</p></div></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">School-wise &amp; Student-wise Reports</span>
+          </div>
+          
+        </div>
         <div class="row g-4 mb-4">
           <div class="col-lg-6"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Territory Calling Usage</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="fr-calling-usage-line"></div></div></div></div>
           <div class="col-lg-6"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">Student Distribution by Assigned School</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="fr-school-students-donut"></div></div></div></div>

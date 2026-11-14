@@ -20,13 +20,20 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/commissions/index.html" data-section="Commercials & Analytics" data-page-title="Revenue & Commissions">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">PARTNER COMMERCIAL LEDGER · 18% TIER</div><h1 class="page-title">Revenue &amp; Commission Management</h1><p class="page-description">Track gross territory volume, earned 18% partner commissions, pending monthly payouts, and school-by-school attribution.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Revenue &amp; Commission Management</span>
+          </div>
+          
         </div>
         <div class="row g-3 mb-4">
           <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Total Territory Revenue (YTD)</div><div class="kpi-value mt-2">$148,920.00</div><div class="kpi-meta"><span class="kpi-delta up">+16.2% YoY</span></div></div></div>

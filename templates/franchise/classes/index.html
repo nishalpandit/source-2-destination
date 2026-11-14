@@ -20,14 +20,20 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/classes/index.html" data-section="Academics" data-page-title="Classes & Sections">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">ACADEMIC STRUCTURE</div><h1 class="page-title">Assigned-School Classes &amp; Sections</h1><p class="page-description">Configure academic classes, sections, and default calling schedule groups for your assigned campuses.</p></div>
-          <div class="page-actions"><button type="button" class="btn-s2d btn-s2d-primary" data-modal-open="fr-add-class-modal"><i data-lucide="plus"></i><span>Add Class / Section</span></button></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Assigned-School Classes &amp; Sections</span>
+          </div>
+          <div class="d-flex align-items-center gap-2"><button type="button" class="btn-s2d btn-s2d-primary" data-modal-open="fr-add-class-modal"><i data-lucide="plus"></i><span>Add Class / Section</span></button></div>
         </div>
         <div data-s2d-table="sch-classes-table"></div>
         <div class="s2d-modal-backdrop" id="fr-add-class-modal">

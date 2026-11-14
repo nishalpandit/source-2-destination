@@ -510,18 +510,21 @@ def render_franchise_page(request, path):
     if clean_path.startswith('..'):
         raise Http404("Invalid template path")
 
-    candidates = [
-        f"franchise/{clean_path}",
-        f"franchise/{clean_path}.html",
-    ]
-    if not clean_path.endswith('.html'):
-        candidates.append(f"franchise/{clean_path}/index.html")
+    candidates = []
+    if clean_path.endswith('.html'):
+        candidates.append(f"franchise/{clean_path}")
+    else:
+        candidates.extend([
+            f"franchise/{clean_path}.html",
+            f"franchise/{clean_path}/index.html",
+            f"franchise/{clean_path}",
+        ])
 
     for template_name in candidates:
         try:
             get_template(template_name)
             return render(request, template_name)
-        except TemplateDoesNotExist:
+        except (TemplateDoesNotExist, PermissionError):
             continue
 
     raise Http404(f"Franchise template '{clean_path}' not found")

@@ -20,21 +20,21 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/validity/overview.html" data-section="Calling Validity" data-page-title="Validity Records & Alerts">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">STUDENT ACCOUNT LIFECYCLE</div>
-            <h1 class="page-title">Student Calling Validity Management</h1>
-            <p class="page-description">Monitor student calling account activation dates, upcoming validity expirations, grace-period accounts, and bulk validity extensions.</p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Student Calling Validity Management</span>
           </div>
-          <div class="page-actions">
-            <a href="rules.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="sliders"></i><span>Validity Rules</span></a>
-            <button type="button" class="btn-s2d btn-s2d-primary" data-modal-open="extend-validity-modal"><i data-lucide="calendar-plus"></i><span>Bulk Extend Validity</span></button>
-          </div>
+          <div class="d-flex align-items-center gap-2"><a href="rules.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="sliders"></i><span>Validity Rules</span></a>
+            <button type="button" class="btn-s2d btn-s2d-primary" data-modal-open="extend-validity-modal"><i data-lucide="calendar-plus"></i><span>Bulk Extend Validity</span></button></div>
         </div>
         <div class="row g-3 mb-4">
           <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Valid Active Accounts</div><div class="kpi-value mt-2">{{ valid_active }}</div><div class="kpi-meta"><span class="kpi-delta up">Active</span><span>In good standing</span></div></div></div>

@@ -20,21 +20,24 @@
 </head>
 <body data-role="school-admin" data-root="../" data-route="school-admin/dashboard.html" data-section="Campus Command" data-page-title="School Dashboard">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Page Header -->
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">{{ school.name|upper }} ({{ school.code }}) · {{ school.city|upper }}{% if school.state %}, {{ school.state|upper }}{% endif %}</div>
-            <h1 class="page-title">Campus &amp; Hostel Calling Operations</h1>
-            <p class="page-description">Daily operational command for enrolled boarding students, verified guardian phone whitelists, hostel calling windows, credit recharges, booth devices, and duty wardens.</p>
+        <!-- Sleek Dashboard Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:9px;height:9px;border-radius:50%;background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,0.2);"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ school.name|default:"Doon Valley Residential Academy" }}</span>
+            <span class="badge s2d-badge-subtle mono-code" style="font-size:0.72rem;">{{ school.code|default:"SCH-1001" }}</span>
+            <span class="text-secondary-s2d d-none d-md-inline" style="font-size:0.78rem;">· {{ school.city|default:"Dehradun" }}</span>
           </div>
-          <div class="page-actions">
-            <a href="recharges/student-recharge.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="zap"></i><span>Student Recharge</span></a>
-            <a href="calling-schedules/index.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="calendar-range"></i><span>Hostel Schedules</span></a>
-            <a href="students/add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="user-plus"></i><span>Enroll Student</span></a>
+          <div class="d-flex align-items-center gap-2">
+            <a href="recharges/student-recharge.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="zap"></i><span>Student Recharge</span></a>
+            <a href="calling-schedules/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="calendar-range"></i><span>Hostel Schedules</span></a>
+            <a href="students/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="user-plus"></i><span>Enroll Student</span></a>
           </div>
         </div>
 

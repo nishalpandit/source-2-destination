@@ -20,17 +20,21 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/schools/details.html" data-section="Assigned Schools" data-page-title="School Details">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">ASSIGNED CAMPUS · <span data-bind-field="id">{{ school.code }}</span></div><h1 class="page-title" data-bind-field="name">{{ school.name }}</h1><p class="page-description"><span data-bind-field="city">{{ school.city }}</span> · Territory Allocated: <strong>{{ school.franchise.code }}</strong> · 18% Commission Eligible</p></div>
-          <div class="page-actions">
-            <a href="edit.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Campus</span></a>
-            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Schools</span></a>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ school.name }}</span>
           </div>
+          <div class="d-flex align-items-center gap-2"><a href="edit.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Campus</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Schools</span></a></div>
         </div>
         <div class="s2d-tabs" data-s2d-tabs="fr-school-tabs">
           <button type="button" class="s2d-tab-btn active" data-tab-target="fr-tab-overview">Overview</button>

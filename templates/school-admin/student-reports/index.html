@@ -20,12 +20,21 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/student-reports/index.html" data-section="Hostel & Reporting" data-page-title="Student Reports">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">STUDENT USAGE ANALYTICS</div><h1 class="page-title">Student-wise Calling Usage &amp; Remaining Duration Reports</h1><p class="page-description">Detailed per-student credit consumption, remaining minutes, and validity health with CSV export.</p></div></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Student-wise Calling Usage &amp; Remaining Duration Reports</span>
+          </div>
+          
+        </div>
         <div data-s2d-table="sch-students-table"></div>
     
       </main>

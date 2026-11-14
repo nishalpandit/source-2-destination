@@ -20,13 +20,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/calling-duration/index.html" data-section="Calling Policy" data-page-title="Duration Ceilings & Rules">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">GLOBAL DURATION GOVERNANCE</div><h1 class="page-title">Calling Duration Configuration</h1><p class="page-description">Establish platform-wide default and maximum calling duration ceilings inherited by all franchises and schools.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Calling Duration Configuration</span>
+          </div>
+          
         </div>
         <div class="row g-3 mb-4">
           <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Global Default Per-Call Limit</div><div class="kpi-value mt-2">{{ rule.default_call_duration }} Mins</div><div class="kpi-meta"><span>Applied when school unspecified</span></div></div></div>

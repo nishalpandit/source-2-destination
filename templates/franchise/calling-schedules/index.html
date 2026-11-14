@@ -20,13 +20,20 @@
 </head>
 <body data-role="franchise" data-root="../../" data-route="franchise/calling-schedules/index.html" data-section="Calling & Validity" data-page-title="Calling Schedules">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_franchise.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info"><div class="page-eyebrow">CAMPUS SCHEDULES</div><h1 class="page-title">Assigned-School Calling Schedules</h1><p class="page-description">Manage weekly hostel calling windows for your assigned schools. Click slots to toggle Allowed / Restricted / Supervised.</p></div>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Assigned-School Calling Schedules</span>
+          </div>
+          
         </div>
         <div class="s2d-card"><div class="s2d-card-header"><h3 class="s2d-card-title">{{ first_school.name|default:"Territory Campus" }} — Weekly Time-Slot Configuration</h3></div>
           <div class="s2d-card-body">

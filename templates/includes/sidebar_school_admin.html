@@ -1,0 +1,217 @@
+{% load static %}
+<div class="sidebar-brand">
+  <a href="/school-admin/" class="sidebar-brand-link" title="Source 2 Destination">
+    <img src="{% static 'images/logo.svg' %}" alt="Source 2 Destination Logo" class="sidebar-brand-logo">
+    <div class="sidebar-brand-text">
+      <span class="sidebar-brand-name">Source 2 Destination</span>
+      <span class="sidebar-brand-role">School Admin</span>
+    </div>
+  </a>
+  <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d d-lg-none sidebar-close-mobile" data-sidebar-close aria-label="Close navigation">
+    <i data-lucide="x"></i>
+  </button>
+</div>
+
+<nav class="sidebar-nav-scroll" aria-label="School Admin Navigation">
+  <!-- Campus Command -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Campus Command</div>
+    <div class="nav-item-box">
+      <a href="/school-admin/" class="sidebar-link {% if request.path == '/school-admin/' or request.path == '/school-admin/dashboard/' or request.path == '/school-admin/dashboard/index.html' %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="layout-dashboard"></i></span>
+        <span class="sidebar-link-label">School Dashboard</span>
+      </a>
+      <div class="sidebar-tooltip">School Dashboard</div>
+    </div>
+  </div>
+
+  <!-- Students & Families -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Students &amp; Families</div>
+
+    <div class="nav-item-box {% if '/school-admin/students/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/school-admin/students/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/school-admin/students/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="graduation-cap"></i></span>
+        <span class="sidebar-link-label">Student Management</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Student Management</div>
+      <div class="sidebar-submenu">
+        <a href="/school-admin/students/list.html" class="sidebar-sublink {% if request.path == '/school-admin/students/' or request.path == '/school-admin/students/list.html' %}active{% endif %}">Student Directory</a>
+        <a href="/school-admin/students/add.html" class="sidebar-sublink {% if request.path == '/school-admin/students/add.html' %}active{% endif %}">Enroll Student</a>
+        <a href="/school-admin/students/edit.html" class="sidebar-sublink {% if request.path == '/school-admin/students/edit.html' %}active{% endif %}">Edit Student</a>
+        <a href="/school-admin/students/details.html" class="sidebar-sublink {% if request.path == '/school-admin/students/details.html' %}active{% endif %}">Student 360° Details</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/bulk-upload/index.html" class="sidebar-link {% if '/school-admin/bulk-upload/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="file-spreadsheet"></i></span>
+        <span class="sidebar-link-label">Bulk Student Upload</span>
+      </a>
+      <div class="sidebar-tooltip">Bulk Student Upload</div>
+    </div>
+
+    <div class="nav-item-box {% if '/school-admin/classes/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/school-admin/classes/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/school-admin/classes/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="layout-grid"></i></span>
+        <span class="sidebar-link-label">Classes &amp; Sections</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Classes &amp; Sections</div>
+      <div class="sidebar-submenu">
+        <a href="/school-admin/classes/" class="sidebar-sublink {% if request.path == '/school-admin/classes/' or request.path == '/school-admin/classes/list.html' %}active{% endif %}">Manage Classes</a>
+        <a href="/school-admin/classes/sections.html" class="sidebar-sublink {% if request.path == '/school-admin/classes/sections.html' %}active{% endif %}">Manage Sections</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box {% if '/school-admin/guardians/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/school-admin/guardians/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/school-admin/guardians/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="heart-handshake"></i></span>
+        <span class="sidebar-link-label">Parents &amp; Guardians</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Parents &amp; Guardians</div>
+      <div class="sidebar-submenu">
+        <a href="/school-admin/guardians/" class="sidebar-sublink {% if request.path == '/school-admin/guardians/' or request.path == '/school-admin/guardians/list.html' %}active{% endif %}">Guardian &amp; Whitelist</a>
+        <a href="/school-admin/guardians/add.html" class="sidebar-sublink {% if request.path == '/school-admin/guardians/add.html' %}active{% endif %}">Add Guardian</a>
+        <a href="/school-admin/guardians/edit.html" class="sidebar-sublink {% if request.path == '/school-admin/guardians/edit.html' %}active{% endif %}">Edit Guardian</a>
+        <a href="/school-admin/guardians/details.html" class="sidebar-sublink {% if request.path == '/school-admin/guardians/details.html' %}active{% endif %}">Guardian Details</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/student-codes/" class="sidebar-link {% if '/school-admin/student-codes/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="key-round"></i></span>
+        <span class="sidebar-link-label">Student Unique Codes</span>
+      </a>
+      <div class="sidebar-tooltip">Student Unique Codes</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/student-status/" class="sidebar-link {% if '/school-admin/student-status/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="user-check"></i></span>
+        <span class="sidebar-link-label">Activation &amp; Status</span>
+      </a>
+      <div class="sidebar-tooltip">Activation &amp; Status</div>
+    </div>
+  </div>
+
+  <!-- Calling Rules & Credits -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Calling Rules &amp; Credits</div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/calling-schedules/" class="sidebar-link {% if '/school-admin/calling-schedules/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="calendar-range"></i></span>
+        <span class="sidebar-link-label">Calling Schedules</span>
+      </a>
+      <div class="sidebar-tooltip">Calling Schedules</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/calling-duration/" class="sidebar-link {% if '/school-admin/calling-duration/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="timer"></i></span>
+        <span class="sidebar-link-label">Calling Duration</span>
+      </a>
+      <div class="sidebar-tooltip">Calling Duration</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/validity/" class="sidebar-link {% if '/school-admin/validity/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="calendar-check-2"></i></span>
+        <span class="sidebar-link-label">Student Validity</span>
+      </a>
+      <div class="sidebar-tooltip">Student Validity</div>
+    </div>
+
+    <div class="nav-item-box {% if '/school-admin/recharges/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/school-admin/recharges/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/school-admin/recharges/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="zap"></i></span>
+        <span class="sidebar-link-label">Recharge Desk</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Recharge Desk</div>
+      <div class="sidebar-submenu">
+        <a href="/school-admin/recharges/overview.html" class="sidebar-sublink {% if request.path == '/school-admin/recharges/overview/' or request.path == '/school-admin/recharges/overview.html' %}active{% endif %}">Overview &amp; History</a>
+        <a href="/school-admin/recharges/student-recharge.html" class="sidebar-sublink {% if request.path == '/school-admin/recharges/student-recharge/' or request.path == '/school-admin/recharges/student-recharge.html' %}active{% endif %}">Recharge Student Account</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/call-history/index.html" class="sidebar-link {% if '/school-admin/call-history/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="phone-call"></i></span>
+        <span class="sidebar-link-label">Campus Call History</span>
+      </a>
+      <div class="sidebar-tooltip">Campus Call History</div>
+    </div>
+  </div>
+
+  <!-- Hostel & Reporting -->
+  <div class="sidebar-group">
+    <div class="sidebar-group-label">Hostel &amp; Reporting</div>
+
+    <div class="nav-item-box {% if '/school-admin/device-assignments/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/school-admin/device-assignments/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/school-admin/device-assignments/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="tablet"></i></span>
+        <span class="sidebar-link-label">Device Assignments</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Device Assignments</div>
+      <div class="sidebar-submenu">
+        <a href="/school-admin/device-assignments/list.html" class="sidebar-sublink {% if request.path == '/school-admin/device-assignments/list.html' %}active{% endif %}">Assigned Booths</a>
+        <a href="/school-admin/device-assignments/assign.html" class="sidebar-sublink {% if request.path == '/school-admin/device-assignments/assign.html' %}active{% endif %}">Assign Booth Device</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box {% if '/school-admin/hostel-wardens/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/school-admin/hostel-wardens/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/school-admin/hostel-wardens/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="user-cog"></i></span>
+        <span class="sidebar-link-label">Hostel Wardens</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Hostel Wardens</div>
+      <div class="sidebar-submenu">
+        <a href="/school-admin/hostel-wardens/list.html" class="sidebar-sublink {% if request.path == '/school-admin/hostel-wardens/list.html' %}active{% endif %}">Warden Duty List</a>
+        <a href="/school-admin/hostel-wardens/add.html" class="sidebar-sublink {% if request.path == '/school-admin/hostel-wardens/add.html' %}active{% endif %}">Add Duty Warden</a>
+      </div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/student-reports/index.html" class="sidebar-link {% if '/school-admin/student-reports/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="file-text"></i></span>
+        <span class="sidebar-link-label">Student-wise Reports</span>
+      </a>
+      <div class="sidebar-tooltip">Student-wise Reports</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/class-reports/index.html" class="sidebar-link {% if '/school-admin/class-reports/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="bar-chart-2"></i></span>
+        <span class="sidebar-link-label">Class-wise Reports</span>
+      </a>
+      <div class="sidebar-tooltip">Class-wise Reports</div>
+    </div>
+
+    <div class="nav-item-box">
+      <a href="/school-admin/settings/index.html" class="sidebar-link {% if '/school-admin/settings/' in request.path %}active{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="settings"></i></span>
+        <span class="sidebar-link-label">Profile &amp; Settings</span>
+      </a>
+      <div class="sidebar-tooltip">Profile &amp; Settings</div>
+    </div>
+  </div>
+</nav>
+
+<div class="sidebar-footer">
+  <div class="sidebar-user-card">
+    <div class="sidebar-user-avatar">RS</div>
+    <div class="sidebar-user-meta">
+      <div class="sidebar-user-name">Dr. Ramesh Chandra Sharma</div>
+      <div class="sidebar-user-email">principal@doonvalley.edu.in</div>
+    </div>
+    <a href="/auth/login.html" class="sidebar-logout-btn" title="Sign out">
+      <i data-lucide="log-out" style="width:16px;height:16px;"></i>
+    </a>
+  </div>
+</div>

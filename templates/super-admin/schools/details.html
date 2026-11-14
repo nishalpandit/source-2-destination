@@ -19,20 +19,20 @@
 </head>
 <body data-role="super-admin" data-root="../../" data-route="super-admin/schools/details.html" data-section="School Management" data-page-title="School Details">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">SCHOOL 360° DOSSIER · <span data-bind-field="id">{{ school.code }}</span></div>
-            <h1 class="page-title" data-bind-field="name">{{ school.name }}</h1>
-            <p class="page-description"><span data-bind-field="city">{{ school.city }}</span> · Assigned to <strong data-bind-field="franchise">{{ school.franchise.name|default:school.franchise_name_cache }}</strong> · Primary Admin: <span data-bind-field="adminName">{{ school.admin_name }}</span></p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ school.name }}</span>
           </div>
-          <div class="page-actions">
-            <a href="edit.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
-            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
-          </div>
+          <div class="d-flex align-items-center gap-2"><a href="edit.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit School</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a></div>
         </div>
 
         <!-- 7 Mandatory Tabs from Section 5.2 -->

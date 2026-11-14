@@ -20,21 +20,21 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/guardians/details.html" data-section="Parents & Guardians" data-page-title="Guardian Details">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header">
-          <div class="page-header-info">
-            <div class="page-eyebrow">GUARDIAN WHITELIST RECORD · <span data-bind-field="id">{{ guardian.code }}</span></div>
-            <h1 class="page-title" data-bind-field="name">{{ guardian.name }}</h1>
-            <p class="page-description">Linked Student: <strong data-bind-field="studentName">{{ student.name }}</strong> (<span data-bind-field="className">{{ student.class_name }} · {{ student.section }}</span>) · Whitelist: <span class="s2d-badge s2d-badge-info">{{ guardian.whitelist_status }}</span></p>
+        <!-- Sleek Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ guardian.name }}</span>
           </div>
-          <div class="page-actions">
-            <a href="edit.html?id={{ guardian.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Numbers</span></a>
-            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a>
-          </div>
+          <div class="d-flex align-items-center gap-2"><a href="edit.html?id={{ guardian.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Numbers</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-ghost"><i data-lucide="arrow-left"></i><span>Back to Directory</span></a></div>
         </div>
         <div class="s2d-card mb-4"><div class="s2d-card-body"><div class="kv-grid">
           <div><div class="kv-item-label">Father Number</div><div class="kv-item-value mono-code" data-bind-field="fatherPhone">{{ guardian.father_phone|default:"None" }}</div></div>

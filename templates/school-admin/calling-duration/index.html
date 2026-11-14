@@ -20,12 +20,20 @@
 </head>
 <body data-role="school-admin" data-root="../../" data-route="school-admin/calling-duration/index.html" data-section="Calling Rules" data-page-title="Calling Duration">
   <div class="app-shell">
-    <aside class="app-sidebar" id="app-sidebar"></aside>
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_school_admin.html' %}
+    </aside>
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
 
-        <div class="page-header"><div class="page-header-info"><div class="page-eyebrow">CAMPUS DURATION POLICY</div><h1 class="page-title">Calling Duration Limits &amp; Usage</h1><p class="page-description">Configure school, class, and student duration caps within inherited Super Admin (20m/call) and Franchise (15m/call default) boundaries.</p></div></div>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Calling Duration Policy &amp; Per-Call Caps</span>
+            <span class="text-secondary-s2d d-none d-md-inline" style="font-size:0.78rem;">· Inherited &amp; Custom Rules</span>
+          </div>
+        </div>
         <div class="row g-3 mb-4">
           <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Inherited Hard Max / Call</div><div class="kpi-value mt-2">{{ global_rule.hard_max_call_duration }} Mins</div><div class="kpi-meta"><span>Super Admin Ceiling</span></div></div></div>
           <div class="col-md-4"><div class="kpi-card"><div class="kpi-label">Campus Standard Cap</div><div class="kpi-value mt-2">{{ standard_cap }} Mins</div><div class="kpi-meta"><span>Grades 9–11 Default</span></div></div></div>
