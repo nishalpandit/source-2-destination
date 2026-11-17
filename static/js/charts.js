@@ -96,97 +96,11 @@
     };
   }
 
-  function spikeChartOptions(height) {
-    return {
-      chart: {
-        type: 'bar',
-        height: height || 275,
-        fontFamily: BASE_FONT,
-        toolbar: { show: false },
-        zoom: { enabled: false },
-        animations: {
-          enabled: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-          easing: 'easeinout',
-          speed: 400
-        }
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: '18%', // Ultra-slender telemetric spike needles
-          borderRadius: 4,
-          borderRadiusApplication: 'end'
-        }
-      },
-      dataLabels: { enabled: false },
-      stroke: {
-        show: true,
-        width: 0,
-        colors: ['transparent']
-      },
-      fill: {
-        type: 'gradient',
-        gradient: {
-          shade: 'light',
-          type: 'vertical',
-          shadeIntensity: 0.25,
-          opacityFrom: 0.96,
-          opacityTo: 0.40,
-          stops: [0, 85, 100]
-        }
-      },
-      grid: {
-        borderColor: '#F1F5F9',
-        strokeDashArray: 3,
-        padding: { left: 6, right: 8, top: 4, bottom: 0 }
-      },
-      xaxis: {
-        axisBorder: { show: false },
-        axisTicks: { show: false },
-        crosshairs: {
-          show: true,
-          width: 1,
-          opacity: 0.85,
-          stroke: {
-            color: '#4F46E5',
-            width: 1,
-            dashArray: 3
-          }
-        },
-        labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } }
-      },
-      yaxis: {
-        crosshairs: {
-          show: true,
-          position: 'back',
-          stroke: {
-            color: '#94A3B8',
-            width: 1,
-            dashArray: 3
-          }
-        },
-        labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } }
-      },
-      legend: {
-        position: 'top',
-        horizontalAlign: 'right',
-        fontSize: '12px',
-        fontFamily: BASE_FONT,
-        markers: { radius: 3, width: 9, height: 9 }
-      },
-      tooltip: {
-        theme: 'dark',
-        shared: true,
-        intersect: false,
-        style: { fontSize: '12px', fontFamily: BASE_FONT }
-      }
-    };
-  }
-
   const CHART_REGISTRY = {
     /* ==================== SUPER ADMIN CHARTS ==================== */
     'sa-revenue-trend': {
-      build: (range) => {
+      build: (range, viewType) => {
+        const type = viewType || 'bar';
         const map = {
           '12M': {
             cats: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
@@ -205,22 +119,65 @@
           }
         };
         const d = map[range] || map['12M'];
-        return Object.assign(spikeChartOptions(285), {
+
+        if (type === 'area') {
+          return Object.assign(baseChartOptions('area', 285), {
+            colors: [PALETTE.indigo, PALETTE.emerald],
+            series: [
+              { name: 'Subscription Revenue', data: d.sub },
+              { name: 'Student Recharges', data: d.rech }
+            ],
+            fill: {
+              type: 'gradient',
+              gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.04, stops: [0, 92, 100] }
+            },
+            stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
+            markers: { size: 3.5, strokeWidth: 2, strokeColors: '#FFFFFF', hover: { size: 6 } },
+            xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+            yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+            tooltip: { shared: true, intersect: false, y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
+          });
+        }
+
+        // Substantial, balanced modern column view
+        return Object.assign(baseChartOptions('bar', 285), {
           colors: [PALETTE.indigo, PALETTE.emerald],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '46%',
+              borderRadius: 6,
+              borderRadiusApplication: 'end'
+            }
+          },
           series: [
-            { name: 'Subscription Revenue Spikes', data: d.sub },
-            { name: 'Recharge Volume Spikes', data: d.rech }
+            { name: 'Subscription Revenue', data: d.sub },
+            { name: 'Student Recharges', data: d.rech }
           ],
+          fill: {
+            type: 'gradient',
+            gradient: {
+              shade: 'light',
+              type: 'vertical',
+              shadeIntensity: 0.15,
+              opacityFrom: 0.98,
+              opacityTo: 0.82,
+              stops: [0, 90, 100]
+            }
+          },
+          stroke: { show: true, width: 2, colors: ['transparent'] },
           xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
           yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
-          tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
+          tooltip: { shared: true, intersect: false, y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
         });
       }
     },
 
     'sa-school-growth': {
-      build: () => Object.assign(spikeChartOptions(265), {
+      build: () => Object.assign(baseChartOptions('line', 265), {
         colors: [PALETTE.indigo, PALETTE.teal],
+        stroke: { curve: 'smooth', width: 3 },
+        markers: { size: 4, strokeWidth: 2, strokeColors: '#FFFFFF' },
         series: [
           { name: 'Total Registered Schools', data: [28, 31, 34, 36, 39, 41, 44, 46, 48, 50, 51, 52] },
           { name: 'Active Boarding Campuses', data: [26, 29, 32, 34, 37, 39, 42, 44, 46, 48, 49, 50] }
@@ -234,11 +191,12 @@
         const d = range === '7D'
           ? { cats: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'], mins: [7820, 8140, 9420, 12680, 14120, 8390, 8940], calls: [910, 945, 1120, 1480, 1620, 980, 1040] }
           : { cats: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], mins: [52400, 54800, 56100, 58900, 61200, 59800, 63400, 66850], calls: [6120, 6380, 6510, 6890, 7120, 6940, 7410, 7820] };
-        return Object.assign(spikeChartOptions(265), {
+        return Object.assign(baseChartOptions('bar', 265), {
           colors: [PALETTE.indigo, PALETTE.sky],
+          plotOptions: { bar: { columnWidth: '46%', borderRadius: 5, borderRadiusApplication: 'end' } },
           series: [
-            { name: 'Calling Minutes Spikes', data: d.mins },
-            { name: 'Completed Sessions Spikes', data: d.calls }
+            { name: 'Calling Minutes', data: d.mins },
+            { name: 'Completed Sessions', data: d.calls }
           ],
           xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
         });
@@ -344,16 +302,52 @@
 
     /* ==================== FRANCHISE CHARTS ==================== */
     'fr-revenue-chart': {
-      build: () => Object.assign(spikeChartOptions(275), {
-        colors: [PALETTE.indigo, PALETTE.teal],
-        series: [
-          { name: 'Gross Territory Revenue Spikes', data: [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450] },
-          { name: 'Net Partner Commission Spikes (18%)', data: [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501] }
-        ],
-        xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
-        yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
-        tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
-      })
+      build: (range, viewType) => {
+        const type = viewType || 'bar';
+        const cats = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+        const gross = [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450];
+        const comm = [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501];
+
+        if (type === 'area') {
+          return Object.assign(baseChartOptions('area', 275), {
+            colors: [PALETTE.indigo, PALETTE.teal],
+            series: [
+              { name: 'Gross Territory Revenue', data: gross },
+              { name: 'Net Partner Commission (18%)', data: comm }
+            ],
+            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.32, opacityTo: 0.04 } },
+            stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
+            markers: { size: 3.5, strokeWidth: 2, strokeColors: '#FFFFFF', hover: { size: 6 } },
+            xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+            yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+            tooltip: { shared: true, intersect: false, y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
+          });
+        }
+
+        return Object.assign(baseChartOptions('bar', 275), {
+          colors: [PALETTE.indigo, PALETTE.teal],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '46%',
+              borderRadius: 6,
+              borderRadiusApplication: 'end'
+            }
+          },
+          series: [
+            { name: 'Gross Territory Revenue', data: gross },
+            { name: 'Net Partner Commission (18%)', data: comm }
+          ],
+          fill: {
+            type: 'gradient',
+            gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.15, opacityFrom: 0.98, opacityTo: 0.82, stops: [0, 90, 100] }
+          },
+          stroke: { show: true, width: 2, colors: ['transparent'] },
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+          yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+          tooltip: { shared: true, intersect: false, y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
+        });
+      }
     },
 
     'fr-commission-bar': {
@@ -423,10 +417,10 @@
     },
 
     'fr-calling-usage-line': {
-      build: () => Object.assign(spikeChartOptions(255), {
+      build: () => Object.assign(baseChartOptions('bar', 255), {
         colors: [PALETTE.indigo],
-        plotOptions: { bar: { horizontal: false, columnWidth: '14%', borderRadius: 4, borderRadiusApplication: 'end' } },
-        series: [{ name: 'Territory Calling Minutes Spikes', data: [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940] }],
+        plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
+        series: [{ name: 'Territory Calling Minutes', data: [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940] }],
         xaxis: { categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
       })
     },
@@ -442,22 +436,57 @@
 
     /* ==================== SCHOOL ADMIN CHARTS ==================== */
     'sch-daily-calls': {
-      build: () => Object.assign(spikeChartOptions(270), {
-        colors: [PALETTE.indigo, PALETTE.rose],
-        series: [
-          { name: 'Completed Calling Spikes', data: [118, 132, 145, 188, 212, 154, 168] },
-          { name: 'Restricted / Blocked Spikes', data: [8, 6, 9, 14, 12, 7, 5] }
-        ],
-        xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
-        tooltip: { y: { formatter: (v) => v + ' Calls' } }
-      })
+      build: (range, viewType) => {
+        const type = viewType || 'bar';
+        const cats = ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'];
+        const completed = [118, 132, 145, 188, 212, 154, 168];
+        const restricted = [8, 6, 9, 14, 12, 7, 5];
+
+        if (type === 'area') {
+          return Object.assign(baseChartOptions('area', 270), {
+            colors: [PALETTE.indigo, PALETTE.rose],
+            series: [
+              { name: 'Completed Calls', data: completed },
+              { name: 'Restricted / Blocked Attempts', data: restricted }
+            ],
+            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.32, opacityTo: 0.04 } },
+            stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
+            markers: { size: 4, strokeWidth: 2, strokeColors: '#FFFFFF', hover: { size: 6 } },
+            xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+            tooltip: { shared: true, intersect: false, y: { formatter: (v) => v + ' Calls' } }
+          });
+        }
+
+        return Object.assign(baseChartOptions('bar', 270), {
+          colors: [PALETTE.indigo, PALETTE.rose],
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '42%',
+              borderRadius: 6,
+              borderRadiusApplication: 'end'
+            }
+          },
+          series: [
+            { name: 'Completed Calls', data: completed },
+            { name: 'Restricted / Blocked Attempts', data: restricted }
+          ],
+          fill: {
+            type: 'gradient',
+            gradient: { shade: 'light', type: 'vertical', shadeIntensity: 0.15, opacityFrom: 0.98, opacityTo: 0.82, stops: [0, 90, 100] }
+          },
+          stroke: { show: true, width: 2, colors: ['transparent'] },
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+          tooltip: { shared: true, intersect: false, y: { formatter: (v) => v + ' Calls' } }
+        });
+      }
     },
 
     'sch-weekly-duration': {
-      build: () => Object.assign(spikeChartOptions(270), {
+      build: () => Object.assign(baseChartOptions('bar', 270), {
         colors: [PALETTE.sky],
-        plotOptions: { bar: { horizontal: false, columnWidth: '16%', borderRadius: 4, borderRadiusApplication: 'end' } },
-        series: [{ name: 'Minutes Used Spikes', data: [1240, 1380, 1510, 2340, 2690, 1420, 1595] }],
+        plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
+        series: [{ name: 'Minutes Used', data: [1240, 1380, 1510, 2340, 2690, 1420, 1595] }],
         xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
         tooltip: { y: { formatter: (v) => v + ' mins' } }
       })
@@ -517,16 +546,31 @@
     },
 
     'sch-recharge-trend': {
-      build: () => Object.assign(spikeChartOptions(260), {
+      build: () => Object.assign(baseChartOptions('bar', 260), {
         colors: [PALETTE.emerald, PALETTE.indigo],
+        plotOptions: { bar: { horizontal: false, columnWidth: '46%', borderRadius: 5, borderRadiusApplication: 'end' } },
         series: [
-          { name: 'Parent Portal Top-Ups Spikes', data: [38, 44, 52, 94, 61, 68] },
-          { name: 'School Desk Allocations Spikes', data: [14, 12, 18, 42, 19, 23] }
+          { name: 'Parent Portal Top-Ups', data: [38, 44, 52, 94, 61, 68] },
+          { name: 'School Desk Allocations', data: [14, 12, 18, 42, 19, 23] }
         ],
         xaxis: { categories: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
       })
     }
   };
+
+  const chartState = {
+    'sa-revenue-trend': { range: '12M', view: 'bar' },
+    'fr-revenue-chart': { range: '12M', view: 'bar' },
+    'sch-daily-calls': { range: '7D', view: 'bar' }
+  };
+
+  function updateTargetChart(key) {
+    const entry = activeCharts[key];
+    if (!entry || !entry.spec) return;
+    const state = chartState[key] || { range: '12M', view: 'bar' };
+    const updated = entry.spec.build(state.range, state.view);
+    entry.instance.updateOptions(updated, true, true);
+  }
 
   function mountCharts() {
     if (!window.ApexCharts) return;
@@ -537,14 +581,15 @@
       if (!spec) return;
 
       el.innerHTML = '';
-      const opts = spec.build('12M');
+      const state = chartState[key] || { range: '12M', view: 'bar' };
+      const opts = spec.build(state.range, state.view);
       const chart = new window.ApexCharts(el, opts);
       chart.render();
       activeCharts[key] = { instance: chart, el, spec };
     });
 
-    // Bind time-range switcher buttons [data-chart-target="sa-revenue-trend"][data-range="30D"]
-    document.querySelectorAll('[data-chart-target]').forEach((btn) => {
+    // Bind time-range switcher buttons
+    document.querySelectorAll('[data-chart-target][data-range]').forEach((btn) => {
       btn.addEventListener('click', () => {
         const targetKey = btn.getAttribute('data-chart-target');
         const range = btn.getAttribute('data-range');
@@ -553,11 +598,25 @@
           group.querySelectorAll('.chart-range-btn').forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
         }
-        const entry = activeCharts[targetKey];
-        if (entry && entry.spec) {
-          const updated = entry.spec.build(range);
-          entry.instance.updateOptions(updated, true, true);
+        if (!chartState[targetKey]) chartState[targetKey] = { range: '12M', view: 'bar' };
+        chartState[targetKey].range = range;
+        updateTargetChart(targetKey);
+      });
+    });
+
+    // Bind view-type switcher buttons (Bars vs Trend)
+    document.querySelectorAll('[data-chart-target][data-view]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const targetKey = btn.getAttribute('data-chart-target');
+        const view = btn.getAttribute('data-view');
+        const group = btn.closest('.chart-range-group');
+        if (group) {
+          group.querySelectorAll('.chart-range-btn').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
         }
+        if (!chartState[targetKey]) chartState[targetKey] = { range: '12M', view: 'bar' };
+        chartState[targetKey].view = view;
+        updateTargetChart(targetKey);
       });
     });
   }
