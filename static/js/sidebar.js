@@ -143,19 +143,6 @@
         </div>
 
         <div class="topbar-right">
-          <div class="demo-mode-pill" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.25);color:#065f46;" title="Source 2 Destination Cloud Portal — System Active & Secure">
-            <span class="demo-mode-dot" style="background:#10b981;"></span>
-            <span>Campus Portal <span class="demo-label-extended">· Live System</span></span>
-          </div>
-
-          <button type="button" class="topbar-search-btn" data-open-cmd-search aria-label="Search modules">
-            <span style="display:inline-flex;align-items:center;gap:7px;">
-              <i data-lucide="search" style="width:15px;height:15px;"></i>
-              <span class="search-btn-label">Quick search...</span>
-            </span>
-            <span class="topbar-kbd">⌘K</span>
-          </button>
-
           <!-- Role Environment Switcher for Seamless Demo Inspection -->
           <div style="position:relative;" class="s2d-dropdown-host">
             <button type="button" class="btn-s2d btn-s2d-secondary btn-sm-s2d" data-dropdown-toggle title="Switch Role Portal (Demo Preview)">
