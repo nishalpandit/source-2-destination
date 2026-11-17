@@ -19,7 +19,7 @@
     muted: '#CBD5E1'
   };
 
-  const BASE_FONT = 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+  const BASE_FONT = "'Plus Jakarta Sans', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   const activeCharts = {};
 
   function baseChartOptions(type, height) {
@@ -33,17 +33,17 @@
         animations: {
           enabled: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
           easing: 'easeinout',
-          speed: 380
+          speed: 400
         }
       },
       dataLabels: { enabled: false },
       stroke: {
-        curve: 'straight', // Technical telemetric spikes
-        width: type === 'bar' ? 0 : 2.5,
+        curve: 'smooth', // Fluid, humanized organic curve
+        width: type === 'bar' ? 0 : 3,
         lineCap: 'round'
       },
       markers: {
-        size: type === 'bar' ? 0 : 3.5,
+        size: 0,
         strokeWidth: 2,
         strokeColors: '#FFFFFF',
         hover: { size: 6 }
@@ -66,7 +66,7 @@
             dashArray: 3
           }
         },
-        labels: { style: { colors: '#64748B', fontSize: '11.5px' } }
+        labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } }
       },
       yaxis: {
         crosshairs: {
@@ -78,18 +78,20 @@
             dashArray: 3
           }
         },
-        labels: { style: { colors: '#64748B', fontSize: '11.5px' } }
+        labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } }
       },
       legend: {
         position: 'top',
         horizontalAlign: 'right',
         fontSize: '12px',
+        fontFamily: BASE_FONT,
         markers: { radius: 3, width: 9, height: 9 }
       },
       tooltip: {
         theme: 'dark',
         shared: true,
-        intersect: false
+        intersect: false,
+        style: { fontSize: '12px', fontFamily: BASE_FONT }
       }
     };
   }
@@ -101,18 +103,18 @@
         const map = {
           '12M': {
             cats: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
-            sub:  [24200, 28100, 23800, 31900, 27400, 34500, 31800, 39400, 35200, 44900, 39100, 48920],
-            rech: [11400, 14200, 11800, 17900, 13400, 19800, 14900, 22400, 18100, 26400, 22100, 27640]
+            sub:  [24200, 26100, 27800, 29900, 31400, 33500, 35800, 38400, 41200, 43900, 46100, 48920],
+            rech: [11400, 12800, 13900, 15400, 16800, 18200, 19900, 21800, 23500, 25200, 26400, 27640]
           },
           '90D': {
             cats: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8', 'Wk 9', 'Wk 10', 'Wk 11', 'Wk 12'],
-            sub:  [9800, 11400, 9900, 12600, 10400, 13100, 11200, 13900, 11800, 14200, 12400, 15100],
-            rech: [5200, 6800, 5400, 7400, 5900, 7800, 6200, 8300, 6600, 8700, 7100, 9200]
+            sub:  [9800, 10200, 10600, 11100, 11400, 11900, 12200, 12600, 12900, 13400, 13800, 14200],
+            rech: [5200, 5600, 5900, 6300, 6600, 7000, 7300, 7700, 8000, 8400, 8800, 9200]
           },
           '30D': {
             cats: ['Nov 1', 'Nov 4', 'Nov 7', 'Nov 10', 'Nov 13', 'Nov 16', 'Nov 19', 'Nov 22', 'Nov 25', 'Nov 28'],
-            sub:  [3900, 4800, 3850, 5200, 4100, 5600, 4450, 5800, 4700, 6100],
-            rech: [2100, 2800, 2050, 3100, 2250, 3400, 2550, 3600, 2750, 3850]
+            sub:  [3900, 4150, 4380, 4620, 4850, 5100, 5320, 5580, 5840, 6100],
+            rech: [2100, 2280, 2450, 2620, 2810, 3020, 3210, 3420, 3640, 3850]
           }
         };
         const d = map[range] || map['12M'];
@@ -124,7 +126,7 @@
           ],
           fill: {
             type: 'gradient',
-            gradient: { shadeIntensity: 1, opacityFrom: 0.24, opacityTo: 0.02, stops: [0, 95, 100] }
+            gradient: { shadeIntensity: 1, opacityFrom: 0.28, opacityTo: 0.02, stops: [0, 95, 100] }
           },
           xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
           yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
@@ -262,10 +264,10 @@
       build: () => Object.assign(baseChartOptions('area', 275), {
         colors: [PALETTE.indigo, PALETTE.teal],
         series: [
-          { name: 'Gross Territory Revenue', data: [10200, 13400, 10800, 14200, 11900, 15800, 12600, 16800, 14100, 18400, 15600, 19450] },
-          { name: 'Net Partner Commission (18%)', data: [1836, 2412, 1944, 2556, 2142, 2844, 2268, 3024, 2538, 3312, 2808, 3501] }
+          { name: 'Gross Territory Revenue', data: [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450] },
+          { name: 'Net Partner Commission (18%)', data: [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501] }
         ],
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.22, opacityTo: 0.02 } },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.26, opacityTo: 0.02 } },
         xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
         yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
         tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
@@ -360,10 +362,10 @@
       build: () => Object.assign(baseChartOptions('area', 270), {
         colors: [PALETTE.indigo, PALETTE.rose],
         series: [
-          { name: 'Completed Calls', data: [118, 184, 124, 246, 131, 218, 282] },
-          { name: 'Restricted / Blocked Attempts', data: [8, 24, 6, 38, 9, 29, 41] }
+          { name: 'Completed Calls', data: [118, 132, 145, 188, 212, 154, 168] },
+          { name: 'Restricted / Blocked Attempts', data: [8, 6, 9, 14, 12, 7, 5] }
         ],
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.22, opacityTo: 0.02 } },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.26, opacityTo: 0.02 } },
         xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
       })
     },

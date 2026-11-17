@@ -180,31 +180,6 @@
           </button>
         </form>
 
-        <!-- Authorized Roles Hint Box -->
-        <div class="mt-4 p-3 border rounded-3" style="background:var(--s2d-surface-subtle);border-color:var(--s2d-border);font-size:0.75rem;">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <span class="fw-semibold text-heading d-flex align-items-center gap-1.5">
-              <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--s2d-primary);"></i>
-              <span>Authorized Test Roles</span>
-            </span>
-            <span class="badge bg-light text-secondary border" style="font-size:0.68rem;">Auto-fill</span>
-          </div>
-          <div class="d-grid gap-1.5">
-            <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d justify-content-between text-start w-100" onclick="fillLogin('admin', '12345')">
-              <span><strong>Super Admin:</strong> <code>admin</code></span>
-              <span class="text-secondary-s2d">12345 &rarr;</span>
-            </button>
-            <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d justify-content-between text-start w-100" onclick="fillLogin('franchise', '12345')">
-              <span><strong>Franchise:</strong> <code>franchise</code></span>
-              <span class="text-secondary-s2d">12345 &rarr;</span>
-            </button>
-            <button type="button" class="btn-s2d btn-s2d-secondary btn-xs-s2d justify-content-between text-start w-100" onclick="fillLogin('school', '12345')">
-              <span><strong>School Admin:</strong> <code>school</code></span>
-              <span class="text-secondary-s2d">12345 &rarr;</span>
-            </button>
-          </div>
-        </div>
-
         <div class="mt-4 pt-3 border-top text-center" style="font-size:0.74rem;color:var(--s2d-text-secondary);">
           <i data-lucide="shield-check" style="width:14px;height:14px;color:#10B981;vertical-align:text-bottom;margin-right:3px;"></i>
           <span>Enforced by Android Enterprise MDM &amp; Whitelist Protocol</span>
@@ -223,14 +198,6 @@
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
 
   <script>
-    function fillLogin(username, password) {
-      const uInput = document.getElementById('login-username');
-      const pInput = document.getElementById('login-password');
-      if (uInput) uInput.value = username;
-      if (pInput) pInput.value = password;
-      if (pInput) pInput.focus();
-    }
-
     document.addEventListener('DOMContentLoaded', function() {
       if (window.lucide) window.lucide.createIcons();
 

@@ -1031,6 +1031,121 @@
   border: 1px solid rgba(52, 211, 153, 0.35) !important;
 }
 
+/* ==================== VIBRANT HUMANIZED STAT CARD COLOR THEMES ==================== */
+/* Indigo / Platform Fleet Theme */
+.s2d-stat-card--indigo {
+  background: linear-gradient(145deg, #FFFFFF 0%, #EEF2FF 55%, #E0E7FF 100%) !important;
+  border: 1px solid rgba(165, 180, 252, 0.55) !important;
+  box-shadow: 0 4px 16px -2px rgba(99, 102, 241, 0.08) !important;
+}
+.s2d-stat-card--indigo:hover {
+  border-color: rgba(99, 102, 241, 0.45) !important;
+  box-shadow: 0 16px 32px -6px rgba(99, 102, 241, 0.16) !important;
+}
+.s2d-stat-card--indigo .stat-card-label { color: #4338CA !important; font-weight: 600; }
+.s2d-stat-card--indigo .stat-card-value { color: #1E1B4B !important; }
+.s2d-stat-card--indigo .stat-icon-well {
+  background: #FFFFFF !important;
+  color: #4F46E5 !important;
+  border: 1px solid rgba(199, 210, 254, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* Emerald / Hardware Booths & Security Theme */
+.s2d-stat-card--emerald {
+  background: linear-gradient(145deg, #FFFFFF 0%, #ECFDF5 55%, #D1FAE5 100%) !important;
+  border: 1px solid rgba(110, 231, 183, 0.55) !important;
+  box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.08) !important;
+}
+.s2d-stat-card--emerald:hover {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  box-shadow: 0 16px 32px -6px rgba(16, 185, 129, 0.16) !important;
+}
+.s2d-stat-card--emerald .stat-card-label { color: #047857 !important; font-weight: 600; }
+.s2d-stat-card--emerald .stat-card-value { color: #064E3B !important; }
+.s2d-stat-card--emerald .stat-icon-well {
+  background: #FFFFFF !important;
+  color: #10B981 !important;
+  border: 1px solid rgba(167, 243, 208, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15) !important;
+}
+
+/* Sky / Boarders & Enrolled Cohorts Theme */
+.s2d-stat-card--sky {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F0F9FF 55%, #E0F2FE 100%) !important;
+  border: 1px solid rgba(125, 211, 252, 0.55) !important;
+  box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.08) !important;
+}
+.s2d-stat-card--sky:hover {
+  border-color: rgba(2, 132, 199, 0.45) !important;
+  box-shadow: 0 16px 32px -6px rgba(2, 132, 199, 0.16) !important;
+}
+.s2d-stat-card--sky .stat-card-label { color: #0369A1 !important; font-weight: 600; }
+.s2d-stat-card--sky .stat-card-value { color: #082F49 !important; }
+.s2d-stat-card--sky .stat-icon-well {
+  background: #FFFFFF !important;
+  color: #0284C7 !important;
+  border: 1px solid rgba(186, 230, 253, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15) !important;
+}
+
+/* Amber / Voice Minutes & Talktime Pool Theme */
+.s2d-stat-card--amber {
+  background: linear-gradient(145deg, #FFFFFF 0%, #FFFBEB 55%, #FEF3C7 100%) !important;
+  border: 1px solid rgba(252, 211, 77, 0.55) !important;
+  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.08) !important;
+}
+.s2d-stat-card--amber:hover {
+  border-color: rgba(245, 158, 11, 0.45) !important;
+  box-shadow: 0 16px 32px -6px rgba(245, 158, 11, 0.16) !important;
+}
+.s2d-stat-card--amber .stat-card-label { color: #B45309 !important; font-weight: 600; }
+.s2d-stat-card--amber .stat-card-value { color: #451A03 !important; }
+.s2d-stat-card--amber .stat-icon-well {
+  background: #FFFFFF !important;
+  color: #D97706 !important;
+  border: 1px solid rgba(253, 230, 138, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15) !important;
+}
+
+/* Violet / Duty Wardens & Shift Supervision Theme */
+.s2d-stat-card--violet {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F5F3FF 55%, #EDE9FE 100%) !important;
+  border: 1px solid rgba(196, 181, 253, 0.55) !important;
+  box-shadow: 0 4px 16px -2px rgba(139, 92, 246, 0.08) !important;
+}
+.s2d-stat-card--violet:hover {
+  border-color: rgba(139, 92, 246, 0.45) !important;
+  box-shadow: 0 16px 32px -6px rgba(139, 92, 246, 0.16) !important;
+}
+.s2d-stat-card--violet .stat-card-label { color: #6D28D9 !important; font-weight: 600; }
+.s2d-stat-card--violet .stat-card-value { color: #2E1065 !important; }
+.s2d-stat-card--violet .stat-icon-well {
+  background: #FFFFFF !important;
+  color: #7C3AED !important;
+  border: 1px solid rgba(221, 214, 254, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.15) !important;
+}
+
+/* Teal / Territory & Regional Partner Theme */
+.s2d-stat-card--teal {
+  background: linear-gradient(145deg, #FFFFFF 0%, #F0FDFA 55%, #CCFBF1 100%) !important;
+  border: 1px solid rgba(94, 234, 212, 0.55) !important;
+  box-shadow: 0 4px 16px -2px rgba(13, 148, 136, 0.08) !important;
+}
+.s2d-stat-card--teal:hover {
+  border-color: rgba(13, 148, 136, 0.45) !important;
+  box-shadow: 0 16px 32px -6px rgba(13, 148, 136, 0.16) !important;
+}
+.s2d-stat-card--teal .stat-card-label { color: #0F766E !important; font-weight: 600; }
+.s2d-stat-card--teal .stat-card-value { color: #134E4A !important; }
+.s2d-stat-card--teal .stat-icon-well {
+  background: #FFFFFF !important;
+  color: #0D9488 !important;
+  border: 1px solid rgba(153, 246, 228, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.15) !important;
+}
+
 /* Card Internal Typography & Layout */
 .stat-card-top,
 .kpi-top {

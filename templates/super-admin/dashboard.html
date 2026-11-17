@@ -63,10 +63,10 @@
 
           <!-- 2. Partner Campuses -->
           <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-2">
-            <div class="s2d-stat-card">
+            <div class="s2d-stat-card s2d-stat-card--indigo">
               <div class="stat-card-top">
                 <span class="stat-card-label">Partner Schools</span>
-                <span class="stat-icon-well stat-icon-well--indigo"><i data-lucide="building-2"></i></span>
+                <span class="stat-icon-well"><i data-lucide="building-2"></i></span>
               </div>
               <div class="stat-card-value">{{ total_campuses }}</div>
               <div class="stat-card-meta">
@@ -78,10 +78,10 @@
 
           <!-- 3. Enrolled Boarders -->
           <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-3">
-            <div class="s2d-stat-card">
+            <div class="s2d-stat-card s2d-stat-card--sky">
               <div class="stat-card-top">
                 <span class="stat-card-label">Active Boarders</span>
-                <span class="stat-icon-well stat-icon-well--sky"><i data-lucide="users"></i></span>
+                <span class="stat-icon-well"><i data-lucide="users"></i></span>
               </div>
               <div class="stat-card-value">{{ total_students }}</div>
               <div class="stat-card-meta">
@@ -93,10 +93,10 @@
 
           <!-- 4. Kiosk Calling Fleet -->
           <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-4">
-            <div class="s2d-stat-card">
+            <div class="s2d-stat-card s2d-stat-card--emerald">
               <div class="stat-card-top">
                 <span class="stat-card-label">Active Booths</span>
-                <span class="stat-icon-well stat-icon-well--emerald"><i data-lucide="tablet-smartphone"></i></span>
+                <span class="stat-icon-well"><i data-lucide="tablet-smartphone"></i></span>
               </div>
               <div class="stat-card-value d-flex align-items-center gap-2">
                 {{ active_kiosks|default:"418" }}
@@ -111,10 +111,10 @@
 
           <!-- 5. Voice Telemetry Pool -->
           <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-5">
-            <div class="s2d-stat-card">
+            <div class="s2d-stat-card s2d-stat-card--amber">
               <div class="stat-card-top">
                 <span class="stat-card-label">Voice Talktime</span>
-                <span class="stat-icon-well stat-icon-well--amber"><i data-lucide="phone-call"></i></span>
+                <span class="stat-icon-well"><i data-lucide="phone-call"></i></span>
               </div>
               <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes|default:"384,120" }}</div>
               <div class="stat-card-meta">
