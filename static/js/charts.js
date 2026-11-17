@@ -37,7 +37,17 @@
         }
       },
       dataLabels: { enabled: false },
-      stroke: { curve: 'smooth', width: type === 'bar' ? 0 : 2.5 },
+      stroke: {
+        curve: 'straight', // Technical telemetric spikes
+        width: type === 'bar' ? 0 : 2.5,
+        lineCap: 'round'
+      },
+      markers: {
+        size: type === 'bar' ? 0 : 3.5,
+        strokeWidth: 2,
+        strokeColors: '#FFFFFF',
+        hover: { size: 6 }
+      },
       grid: {
         borderColor: '#F1F5F9',
         strokeDashArray: 3,
@@ -46,9 +56,28 @@
       xaxis: {
         axisBorder: { show: false },
         axisTicks: { show: false },
+        crosshairs: {
+          show: true,
+          width: 1,
+          opacity: 0.85,
+          stroke: {
+            color: '#4F46E5',
+            width: 1,
+            dashArray: 3
+          }
+        },
         labels: { style: { colors: '#64748B', fontSize: '11.5px' } }
       },
       yaxis: {
+        crosshairs: {
+          show: true,
+          position: 'back',
+          stroke: {
+            color: '#94A3B8',
+            width: 1,
+            dashArray: 3
+          }
+        },
         labels: { style: { colors: '#64748B', fontSize: '11.5px' } }
       },
       legend: {
@@ -57,7 +86,11 @@
         fontSize: '12px',
         markers: { radius: 3, width: 9, height: 9 }
       },
-      tooltip: { theme: 'dark' }
+      tooltip: {
+        theme: 'dark',
+        shared: true,
+        intersect: false
+      }
     };
   }
 
@@ -68,18 +101,18 @@
         const map = {
           '12M': {
             cats: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
-            sub:  [24200, 26100, 27400, 28900, 30200, 31500, 33800, 35400, 41200, 43900, 46100, 48920],
-            rech: [11400, 12800, 13100, 14600, 15200, 14900, 16800, 18100, 22400, 24100, 25800, 27640]
+            sub:  [24200, 28100, 23800, 31900, 27400, 34500, 31800, 39400, 35200, 44900, 39100, 48920],
+            rech: [11400, 14200, 11800, 17900, 13400, 19800, 14900, 22400, 18100, 26400, 22100, 27640]
           },
           '90D': {
             cats: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8', 'Wk 9', 'Wk 10', 'Wk 11', 'Wk 12'],
-            sub:  [9800, 10200, 10400, 11100, 10900, 11500, 11800, 12100, 12000, 12400, 12700, 13200],
-            rech: [5200, 5400, 5900, 6100, 6000, 6350, 6500, 6800, 6700, 7100, 7250, 7540]
+            sub:  [9800, 11400, 9900, 12600, 10400, 13100, 11200, 13900, 11800, 14200, 12400, 15100],
+            rech: [5200, 6800, 5400, 7400, 5900, 7800, 6200, 8300, 6600, 8700, 7100, 9200]
           },
           '30D': {
             cats: ['Nov 1', 'Nov 4', 'Nov 7', 'Nov 10', 'Nov 13', 'Nov 16', 'Nov 19', 'Nov 22', 'Nov 25', 'Nov 28'],
-            sub:  [3900, 4200, 4150, 4680, 4520, 4890, 5100, 5040, 5380, 5620],
-            rech: [2100, 2340, 2280, 2610, 2590, 2740, 2880, 2910, 3100, 3290]
+            sub:  [3900, 4800, 3850, 5200, 4100, 5600, 4450, 5800, 4700, 6100],
+            rech: [2100, 2800, 2050, 3100, 2250, 3400, 2550, 3600, 2750, 3850]
           }
         };
         const d = map[range] || map['12M'];
@@ -127,31 +160,80 @@
       }
     },
 
+    'sa-subscription-bar': {
+      build: () => Object.assign(baseChartOptions('bar', 285), {
+        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.amber, PALETTE.rose],
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            columnWidth: '48%',
+            distributed: true
+          }
+        },
+        series: [{
+          name: 'Campuses Enrolled',
+          data: [24, 19, 7, 2]
+        }],
+        xaxis: {
+          categories: ['Enterprise Annual', 'Campus Growth', 'Standard Qtr', 'Suspended'],
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+        },
+        legend: { show: false },
+        tooltip: { y: { formatter: (v) => v + ' Schools' } }
+      })
+    },
+
     'sa-subscription-donut': {
-      build: () => ({
-        chart: { type: 'donut', height: 260, fontFamily: BASE_FONT },
-        colors: [PALETTE.indigo, PALETTE.emerald, PALETTE.amber, PALETTE.rose],
-        labels: ['Enterprise Annual (24)', 'Campus Growth (19)', 'Standard Quarterly (7)', 'Expired / Suspended (2)'],
-        series: [24, 19, 7, 2],
-        stroke: { width: 2, colors: ['#FFFFFF'] },
-        dataLabels: { enabled: false },
-        plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Total Schools', fontSize: '12px', color: '#64748B', formatter: () => '52' } } } } },
-        legend: { position: 'bottom', fontSize: '11.5px' },
-        tooltip: { theme: 'dark' }
+      // Modern bar chart replacing oval donut
+      build: () => Object.assign(baseChartOptions('bar', 285), {
+        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.amber, PALETTE.rose],
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            columnWidth: '48%',
+            distributed: true
+          }
+        },
+        series: [{
+          name: 'Campuses Enrolled',
+          data: [24, 19, 7, 2]
+        }],
+        xaxis: {
+          categories: ['Enterprise Annual', 'Campus Growth', 'Standard Qtr', 'Suspended'],
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+        },
+        legend: { show: false },
+        tooltip: { y: { formatter: (v) => v + ' Schools' } }
       })
     },
 
     'sa-student-status-donut': {
-      build: () => ({
-        chart: { type: 'donut', height: 260, fontFamily: BASE_FONT },
-        colors: [PALETTE.emerald, PALETTE.amber, PALETTE.muted],
-        labels: ['Active Accounts (17,210)', 'Expiring <14d (680)', 'Inactive / Expired (540)'],
-        series: [17210, 680, 540],
-        stroke: { width: 2, colors: ['#FFFFFF'] },
-        dataLabels: { enabled: false },
-        plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: 'Students', fontSize: '12px', color: '#64748B', formatter: () => '18,430' } } } } },
-        legend: { position: 'bottom', fontSize: '11.5px' },
-        tooltip: { theme: 'dark' }
+      // Modern bar chart replacing oval donut
+      build: () => Object.assign(baseChartOptions('bar', 260), {
+        colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            columnWidth: '45%',
+            distributed: true
+          }
+        },
+        series: [{
+          name: 'Student Accounts',
+          data: [17210, 680, 540]
+        }],
+        xaxis: {
+          categories: ['Active Accounts', 'Expiring <14d', 'Inactive / Expired'],
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+        },
+        legend: { show: false },
+        tooltip: { y: { formatter: (v) => Number(v).toLocaleString('en-IN') + ' Students' } }
       })
     },
 
@@ -180,8 +262,8 @@
       build: () => Object.assign(baseChartOptions('area', 275), {
         colors: [PALETTE.indigo, PALETTE.teal],
         series: [
-          { name: 'Gross Territory Revenue', data: [10200, 11400, 10900, 12300, 12800, 13400, 14900, 15800, 16200, 17400, 18100, 19450] },
-          { name: 'Net Partner Commission (18%)', data: [1836, 2052, 1962, 2214, 2304, 2412, 2682, 2844, 2916, 3132, 3258, 3501] }
+          { name: 'Gross Territory Revenue', data: [10200, 13400, 10800, 14200, 11900, 15800, 12600, 16800, 14100, 18400, 15600, 19450] },
+          { name: 'Net Partner Commission (18%)', data: [1836, 2412, 1944, 2556, 2142, 2844, 2268, 3024, 2538, 3312, 2808, 3501] }
         ],
         fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.22, opacityTo: 0.02 } },
         xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
@@ -203,24 +285,63 @@
       })
     },
 
-    'fr-school-students-donut': {
-      build: () => ({
-        chart: { type: 'donut', height: 265, fontFamily: BASE_FONT },
+    'fr-school-students-bar': {
+      build: () => Object.assign(baseChartOptions('bar', 275), {
         colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
-        labels: ['Doon Valley Residential (684)', 'Mayo International Boarding (512)', 'Scindia Residential Campus (430)', 'Bishop Cotton Boys (790)', 'Sahyadri International (345)'],
-        series: [684, 512, 430, 790, 345],
-        stroke: { width: 2, colors: ['#FFFFFF'] },
-        dataLabels: { enabled: false },
-        plotOptions: { pie: { donut: { size: '68%', labels: { show: true, total: { show: true, label: 'Assigned Students', fontSize: '11.5px', formatter: () => '2,761' } } } } },
-        legend: { position: 'bottom', fontSize: '11px' },
-        tooltip: { theme: 'dark' }
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            horizontal: true,
+            barHeight: '56%',
+            distributed: true
+          }
+        },
+        series: [{
+          name: 'Enrolled Boarders',
+          data: [790, 684, 512, 430, 345]
+        }],
+        xaxis: {
+          categories: ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'],
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+        },
+        legend: { show: false },
+        tooltip: { y: { formatter: (v) => v + ' Students' } }
+      })
+    },
+
+    'fr-school-students-donut': {
+      // Modern bar chart replacing oval donut
+      build: () => Object.assign(baseChartOptions('bar', 275), {
+        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
+        plotOptions: {
+          bar: {
+            borderRadius: 6,
+            horizontal: true,
+            barHeight: '56%',
+            distributed: true
+          }
+        },
+        series: [{
+          name: 'Enrolled Boarders',
+          data: [790, 684, 512, 430, 345]
+        }],
+        xaxis: {
+          categories: ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'],
+          axisBorder: { show: false },
+          axisTicks: { show: false },
+          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+        },
+        legend: { show: false },
+        tooltip: { y: { formatter: (v) => v + ' Students' } }
       })
     },
 
     'fr-calling-usage-line': {
       build: () => Object.assign(baseChartOptions('line', 255), {
         colors: [PALETTE.indigo],
-        series: [{ name: 'Territory Calling Minutes', data: [18400, 19200, 21500, 20900, 23400, 24800, 26120, 27940] }],
+        series: [{ name: 'Territory Calling Minutes', data: [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940] }],
         xaxis: { categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
       })
     },
@@ -237,10 +358,10 @@
     /* ==================== SCHOOL ADMIN CHARTS ==================== */
     'sch-daily-calls': {
       build: () => Object.assign(baseChartOptions('area', 270), {
-        colors: [PALETTE.indigo, PALETTE.emerald],
+        colors: [PALETTE.indigo, PALETTE.rose],
         series: [
-          { name: 'Completed Calls', data: [118, 124, 131, 196, 218, 129, 142] },
-          { name: 'Restricted / Outside Window', data: [6, 4, 8, 3, 2, 7, 5] }
+          { name: 'Completed Calls', data: [118, 184, 124, 246, 131, 218, 282] },
+          { name: 'Restricted / Blocked Attempts', data: [8, 24, 6, 38, 9, 29, 41] }
         ],
         fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.22, opacityTo: 0.02 } },
         xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
@@ -276,19 +397,28 @@
         const active = stats.active_students !== undefined ? stats.active_students : 644;
         const expiring = stats.expiring_count !== undefined ? stats.expiring_count : 14;
         const inactive = stats.inactive_students !== undefined ? stats.inactive_students : 26;
-        const total = stats.total_students !== undefined ? stats.total_students : 684;
-        const campusName = stats.school_name ? `${stats.school_name} Total` : 'Campus Total';
-        return {
-          chart: { type: 'donut', height: 260, fontFamily: BASE_FONT },
+        return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
-          labels: [`Active Accounts (${active})`, `Expiring Soon (${expiring})`, `Inactive / Expired (${inactive})`],
-          series: [active, expiring, inactive],
-          stroke: { width: 2, colors: ['#FFFFFF'] },
-          dataLabels: { enabled: false },
-          plotOptions: { pie: { donut: { size: '70%', labels: { show: true, total: { show: true, label: campusName, fontSize: '11.5px', formatter: () => String(total) } } } } },
-          legend: { position: 'bottom', fontSize: '11.5px' },
-          tooltip: { theme: 'dark' }
-        };
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              columnWidth: '45%',
+              distributed: true
+            }
+          },
+          series: [{
+            name: 'Student Accounts',
+            data: [active, expiring, inactive]
+          }],
+          xaxis: {
+            categories: ['Active Accounts', 'Expiring Soon', 'Inactive / Expired'],
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+          },
+          legend: { show: false },
+          tooltip: { y: { formatter: (v) => v + ' Students' } }
+        });
       }
     },
 
