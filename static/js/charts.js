@@ -96,6 +96,93 @@
     };
   }
 
+  function spikeChartOptions(height) {
+    return {
+      chart: {
+        type: 'bar',
+        height: height || 275,
+        fontFamily: BASE_FONT,
+        toolbar: { show: false },
+        zoom: { enabled: false },
+        animations: {
+          enabled: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+          easing: 'easeinout',
+          speed: 400
+        }
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+          columnWidth: '18%', // Ultra-slender telemetric spike needles
+          borderRadius: 4,
+          borderRadiusApplication: 'end'
+        }
+      },
+      dataLabels: { enabled: false },
+      stroke: {
+        show: true,
+        width: 0,
+        colors: ['transparent']
+      },
+      fill: {
+        type: 'gradient',
+        gradient: {
+          shade: 'light',
+          type: 'vertical',
+          shadeIntensity: 0.25,
+          opacityFrom: 0.96,
+          opacityTo: 0.40,
+          stops: [0, 85, 100]
+        }
+      },
+      grid: {
+        borderColor: '#F1F5F9',
+        strokeDashArray: 3,
+        padding: { left: 6, right: 8, top: 4, bottom: 0 }
+      },
+      xaxis: {
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+        crosshairs: {
+          show: true,
+          width: 1,
+          opacity: 0.85,
+          stroke: {
+            color: '#4F46E5',
+            width: 1,
+            dashArray: 3
+          }
+        },
+        labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } }
+      },
+      yaxis: {
+        crosshairs: {
+          show: true,
+          position: 'back',
+          stroke: {
+            color: '#94A3B8',
+            width: 1,
+            dashArray: 3
+          }
+        },
+        labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } }
+      },
+      legend: {
+        position: 'top',
+        horizontalAlign: 'right',
+        fontSize: '12px',
+        fontFamily: BASE_FONT,
+        markers: { radius: 3, width: 9, height: 9 }
+      },
+      tooltip: {
+        theme: 'dark',
+        shared: true,
+        intersect: false,
+        style: { fontSize: '12px', fontFamily: BASE_FONT }
+      }
+    };
+  }
+
   const CHART_REGISTRY = {
     /* ==================== SUPER ADMIN CHARTS ==================== */
     'sa-revenue-trend': {
@@ -118,31 +205,27 @@
           }
         };
         const d = map[range] || map['12M'];
-        return Object.assign(baseChartOptions('area', 285), {
+        return Object.assign(spikeChartOptions(285), {
           colors: [PALETTE.indigo, PALETTE.emerald],
           series: [
-            { name: 'Subscription Revenue', data: d.sub },
-            { name: 'Recharge Volume', data: d.rech }
+            { name: 'Subscription Revenue Spikes', data: d.sub },
+            { name: 'Recharge Volume Spikes', data: d.rech }
           ],
-          fill: {
-            type: 'gradient',
-            gradient: { shadeIntensity: 1, opacityFrom: 0.28, opacityTo: 0.02, stops: [0, 95, 100] }
-          },
-          xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
-          yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+          xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+          yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
           tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
         });
       }
     },
 
     'sa-school-growth': {
-      build: () => Object.assign(baseChartOptions('line', 265), {
+      build: () => Object.assign(spikeChartOptions(265), {
         colors: [PALETTE.indigo, PALETTE.teal],
         series: [
           { name: 'Total Registered Schools', data: [28, 31, 34, 36, 39, 41, 44, 46, 48, 50, 51, 52] },
           { name: 'Active Boarding Campuses', data: [26, 29, 32, 34, 37, 39, 42, 44, 46, 48, 49, 50] }
         ],
-        xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+        xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
       })
     },
 
@@ -151,13 +234,13 @@
         const d = range === '7D'
           ? { cats: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'], mins: [7820, 8140, 9420, 12680, 14120, 8390, 8940], calls: [910, 945, 1120, 1480, 1620, 980, 1040] }
           : { cats: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], mins: [52400, 54800, 56100, 58900, 61200, 59800, 63400, 66850], calls: [6120, 6380, 6510, 6890, 7120, 6940, 7410, 7820] };
-        return Object.assign(baseChartOptions('line', 265), {
+        return Object.assign(spikeChartOptions(265), {
           colors: [PALETTE.indigo, PALETTE.sky],
           series: [
-            { name: 'Calling Minutes', data: d.mins },
-            { name: 'Completed Sessions', data: d.calls }
+            { name: 'Calling Minutes Spikes', data: d.mins },
+            { name: 'Completed Sessions Spikes', data: d.calls }
           ],
-          xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+          xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
         });
       }
     },
@@ -261,15 +344,14 @@
 
     /* ==================== FRANCHISE CHARTS ==================== */
     'fr-revenue-chart': {
-      build: () => Object.assign(baseChartOptions('area', 275), {
+      build: () => Object.assign(spikeChartOptions(275), {
         colors: [PALETTE.indigo, PALETTE.teal],
         series: [
-          { name: 'Gross Territory Revenue', data: [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450] },
-          { name: 'Net Partner Commission (18%)', data: [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501] }
+          { name: 'Gross Territory Revenue Spikes', data: [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450] },
+          { name: 'Net Partner Commission Spikes (18%)', data: [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501] }
         ],
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.26, opacityTo: 0.02 } },
-        xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
-        yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+        xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+        yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
         tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
       })
     },
@@ -341,10 +423,11 @@
     },
 
     'fr-calling-usage-line': {
-      build: () => Object.assign(baseChartOptions('line', 255), {
+      build: () => Object.assign(spikeChartOptions(255), {
         colors: [PALETTE.indigo],
-        series: [{ name: 'Territory Calling Minutes', data: [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940] }],
-        xaxis: { categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+        plotOptions: { bar: { horizontal: false, columnWidth: '14%', borderRadius: 4, borderRadiusApplication: 'end' } },
+        series: [{ name: 'Territory Calling Minutes Spikes', data: [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940] }],
+        xaxis: { categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
       })
     },
 
@@ -359,23 +442,23 @@
 
     /* ==================== SCHOOL ADMIN CHARTS ==================== */
     'sch-daily-calls': {
-      build: () => Object.assign(baseChartOptions('area', 270), {
+      build: () => Object.assign(spikeChartOptions(270), {
         colors: [PALETTE.indigo, PALETTE.rose],
         series: [
-          { name: 'Completed Calls', data: [118, 132, 145, 188, 212, 154, 168] },
-          { name: 'Restricted / Blocked Attempts', data: [8, 6, 9, 14, 12, 7, 5] }
+          { name: 'Completed Calling Spikes', data: [118, 132, 145, 188, 212, 154, 168] },
+          { name: 'Restricted / Blocked Spikes', data: [8, 6, 9, 14, 12, 7, 5] }
         ],
-        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.26, opacityTo: 0.02 } },
-        xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+        xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+        tooltip: { y: { formatter: (v) => v + ' Calls' } }
       })
     },
 
     'sch-weekly-duration': {
-      build: () => Object.assign(baseChartOptions('bar', 270), {
+      build: () => Object.assign(spikeChartOptions(270), {
         colors: [PALETTE.sky],
-        plotOptions: { bar: { borderRadius: 5, columnWidth: '48%' } },
-        series: [{ name: 'Minutes Used', data: [1240, 1380, 1510, 2340, 2690, 1420, 1595] }],
-        xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
+        plotOptions: { bar: { horizontal: false, columnWidth: '16%', borderRadius: 4, borderRadiusApplication: 'end' } },
+        series: [{ name: 'Minutes Used Spikes', data: [1240, 1380, 1510, 2340, 2690, 1420, 1595] }],
+        xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
         tooltip: { y: { formatter: (v) => v + ' mins' } }
       })
     },
@@ -434,13 +517,13 @@
     },
 
     'sch-recharge-trend': {
-      build: () => Object.assign(baseChartOptions('line', 260), {
+      build: () => Object.assign(spikeChartOptions(260), {
         colors: [PALETTE.emerald, PALETTE.indigo],
         series: [
-          { name: 'Parent Portal Top-Ups', data: [38, 44, 52, 94, 61, 68] },
-          { name: 'School Desk Allocations', data: [14, 12, 18, 42, 19, 23] }
+          { name: 'Parent Portal Top-Ups Spikes', data: [38, 44, 52, 94, 61, 68] },
+          { name: 'School Desk Allocations Spikes', data: [14, 12, 18, 42, 19, 23] }
         ],
-        xaxis: { categories: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+        xaxis: { categories: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
       })
     }
   };
