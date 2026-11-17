@@ -13,7 +13,7 @@ from django.db.models import Sum, Count, Q
 from .models import (
     School, Franchise, Student, GlobalDurationRule, CampusDurationRule,
     CallingScheduleRule, GlobalValidityRule, RechargePlan, StudentRecharge,
-    ValidityExtensionLog
+    ValidityExtensionLog, KioskDevice
 )
 from .calling_services import (
     get_global_duration_rule, get_global_validity_rule,
