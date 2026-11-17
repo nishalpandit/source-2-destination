@@ -1,13 +1,140 @@
 /* ==========================================================================
-   Source 2 Destination — Restrained Micro-Interactions & Skeletons
-   File: assets/css/animations.css
+   Source 2 Destination — Modern Dashboard Animations & Micro-Interactions
+   File: static/css/animations.css
    ========================================================================== */
 
-@keyframes skeletonShimmer {
-  0% { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
+/* Staggered Page Entrance Animation */
+@keyframes s2dFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+@keyframes s2dScaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Shimmer Light Sweep Effect for Cards */
+@keyframes s2dShimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 160%;
+  }
+}
+
+/* Radar Ping Beacon for Live Kiosks & Hardware Status */
+@keyframes beaconPing {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 9px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+@keyframes beaconAmberPing {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 9px rgba(245, 158, 11, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+/* Soft Floating Micro-Movement */
+@keyframes softFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* Subtle Ambient Gradient Flow for Hero Cards */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Stagger Animation Utility Classes */
+.animate-fade-up {
+  animation: s2dFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.delay-1 { animation-delay: 0.04s; }
+.delay-2 { animation-delay: 0.08s; }
+.delay-3 { animation-delay: 0.12s; }
+.delay-4 { animation-delay: 0.16s; }
+.delay-5 { animation-delay: 0.20s; }
+.delay-6 { animation-delay: 0.24s; }
+.delay-7 { animation-delay: 0.28s; }
+
+/* Status Beacon Dot */
+.status-beacon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: beaconPing 1.8s infinite;
+}
+
+.status-beacon.amber {
+  background: #f59e0b;
+  animation: beaconAmberPing 1.8s infinite;
+}
+
+.status-beacon.pulse-fast {
+  animation-duration: 1.2s;
+}
+
+/* Floating Card Hover Effect */
+.card-hover-lift {
+  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.26s ease;
+}
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.09), 0 0 0 1px rgba(99, 102, 241, 0.12);
+}
+
+/* Modal and Drawer transitions */
 @keyframes modalEnter {
   from {
     opacity: 0;
@@ -20,12 +147,8 @@
 }
 
 @keyframes drawerEnter {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
 }
 
 @keyframes fadeInFast {
@@ -38,7 +161,7 @@
   border-radius: 5px;
   background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
   background-size: 800px 100%;
-  animation: skeletonShimmer 1.35s infinite linear;
+  animation: s2dShimmer 1.35s infinite linear;
 }
 
 .s2d-modal-backdrop.show .s2d-modal-dialog {
@@ -56,25 +179,6 @@
 .s2d-tab-panel.active {
   animation: fadeInFast 170ms ease-out;
 }
-
-/* Progress Bar Smooth Transition */
-.s2d-progress {
-  width: 100%;
-  height: 7px;
-  background: var(--s2d-surface-muted);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.s2d-progress-bar {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--s2d-primary);
-  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-.s2d-progress-bar.emerald { background: var(--s2d-success); }
-.s2d-progress-bar.amber   { background: var(--s2d-warning); }
-.s2d-progress-bar.rose    { background: var(--s2d-danger); }
 
 /* Accessibility: Honor Reduced Motion Preferences */
 @media (prefers-reduced-motion: reduce) {

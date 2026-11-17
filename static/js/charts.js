@@ -94,8 +94,8 @@
             gradient: { shadeIntensity: 1, opacityFrom: 0.24, opacityTo: 0.02, stops: [0, 95, 100] }
           },
           xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
-          yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '$' + (v / 1000).toFixed(1) + 'k' } },
-          tooltip: { y: { formatter: (v) => '$' + Number(v).toLocaleString('en-US') + '.00' } }
+          yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+          tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
         });
       }
     },
@@ -185,8 +185,8 @@
         ],
         fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.22, opacityTo: 0.02 } },
         xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
-        yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '$' + (v / 1000).toFixed(1) + 'k' } },
-        tooltip: { y: { formatter: (v) => '$' + Number(v).toLocaleString('en-US') } }
+        yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px' }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
+        tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
       })
     },
 
@@ -195,23 +195,23 @@
         colors: [PALETTE.teal, PALETTE.amber],
         plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
         series: [
-          { name: 'Settled Commission', data: [2210, 2390, 2580, 2740, 2910, 3258] },
-          { name: 'Pending Settlement', data: [0, 0, 0, 0, 180, 3420] }
+          { name: 'Settled Commission', data: [22100, 23900, 25800, 27400, 29100, 32580] },
+          { name: 'Pending Settlement', data: [0, 0, 0, 0, 1800, 34200] }
         ],
         xaxis: { categories: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
-        tooltip: { y: { formatter: (v) => '$' + Number(v).toLocaleString('en-US') } }
+        tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
       })
     },
 
     'fr-school-students-donut': {
       build: () => ({
         chart: { type: 'donut', height: 265, fontFamily: BASE_FONT },
-        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.muted],
-        labels: ['Oakridge Academy (684)', 'Westfield Hostel (512)', 'St. Jude Institute (430)', 'Silverstone Prep (295)', '14 Other Campuses (4,499)'],
-        series: [684, 512, 430, 295, 4499],
+        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
+        labels: ['Doon Valley Residential (684)', 'Mayo International Boarding (512)', 'Scindia Residential Campus (430)', 'Bishop Cotton Boys (790)', 'Sahyadri International (345)'],
+        series: [684, 512, 430, 790, 345],
         stroke: { width: 2, colors: ['#FFFFFF'] },
         dataLabels: { enabled: false },
-        plotOptions: { pie: { donut: { size: '68%', labels: { show: true, total: { show: true, label: 'Assigned Students', fontSize: '11.5px', formatter: () => '6,420' } } } } },
+        plotOptions: { pie: { donut: { size: '68%', labels: { show: true, total: { show: true, label: 'Assigned Students', fontSize: '11.5px', formatter: () => '2,761' } } } } },
         legend: { position: 'bottom', fontSize: '11px' },
         tooltip: { theme: 'dark' }
       })

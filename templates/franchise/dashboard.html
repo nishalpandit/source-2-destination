@@ -26,126 +26,247 @@
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Sleek Franchise Toolbar -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
-          <div class="d-flex align-items-center gap-2">
-            <span class="d-inline-block" style="width:9px;height:9px;border-radius:50%;background:#0d9488;box-shadow:0 0 0 3px rgba(13,148,136,0.2);"></span>
-            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ franchise.name|default:"North India EduNet Partners" }}</span>
-            <span class="badge s2d-badge-subtle mono-code" style="font-size:0.72rem;">{{ franchise.code|default:"FRN-101" }}</span>
-            <span class="text-secondary-s2d d-none d-md-inline" style="font-size:0.78rem;">· 18% Commission Tier</span>
+        <!-- Sleek Franchise Partner Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-3">
+            <span class="status-beacon"></span>
+            <div>
+              <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">{{ franchise.name|default:"North India EduNet Partners" }}</div>
+              <div class="text-secondary-s2d" style="font-size:0.78rem;">Territory Partner Command · {{ franchise.code|default:"FRN-101" }} · 18% Active Tier</div>
+            </div>
           </div>
           <div class="d-flex align-items-center gap-2">
             <a href="bulk-upload/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="file-spreadsheet"></i><span>Bulk Student Upload</span></a>
             <a href="commissions/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="coins"></i><span>Commission Ledger</span></a>
-            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Onboard Assigned School</span></a>
+            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Onboard Campus</span></a>
           </div>
         </div>
 
-        <!-- 10 Mandatory KPI Cards (Section 6.1) -->
+        <!-- 4 High-Impact Regional Metric Cards -->
         <div class="row g-3 mb-4">
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Assigned Schools</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">{{ total_campuses }}</div><div class="kpi-meta"><span class="kpi-delta up">Active</span><span>Territory</span></div></div>
+          <!-- 1. Hero Commission Card -->
+          <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
+            <div class="s2d-stat-card s2d-stat-card--hero">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Net Earned Commission</span>
+                <span class="stat-icon-well"><i data-lucide="coins"></i></span>
+              </div>
+              <div class="stat-card-value">₹{{ earned_commission|default:"2,24,805.60" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">18% Tier Settled</span>
+                <span>Next Payout Dec 5 (₹38.4k Pending)</span>
+              </div>
+            </div>
           </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Schools</span><span class="kpi-icon emerald"><i data-lucide="check-circle-2"></i></span></div><div class="kpi-value">{{ active_campuses }}</div><div class="kpi-meta"><span class="kpi-delta up">Operational</span></div></div>
+
+          <!-- 2. Assigned Campuses -->
+          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-2">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Assigned Campuses</span>
+                <span class="stat-icon-well stat-icon-well--indigo"><i data-lucide="building-2"></i></span>
+              </div>
+              <div class="stat-card-value">{{ total_campuses|default:"4" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">{{ active_campuses|default:"4" }} Active</span>
+                <span>Allocated Territory</span>
+              </div>
+            </div>
           </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon sky"><i data-lucide="users"></i></span></div><div class="kpi-value">{{ total_students }}</div><div class="kpi-meta"><span class="kpi-delta up">Enrolled</span></div></div>
+
+          <!-- 3. Territory Student Base -->
+          <div class="col-6 col-md-6 col-xl-3 animate-fade-up delay-3">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Territory Boarders</span>
+                <span class="stat-icon-well stat-icon-well--sky"><i data-lucide="users"></i></span>
+              </div>
+              <div class="stat-card-value">{{ total_students|default:"6,420" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">{{ active_students|default:"6,180" }} Active</span>
+                <span>Calling Enabled</span>
+              </div>
+            </div>
           </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon emerald"><i data-lucide="user-check"></i></span></div><div class="kpi-value">{{ active_students }}</div><div class="kpi-meta"><span>Calling Enabled</span></div></div>
-          </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Partner Commission</span><span class="kpi-icon"><i data-lucide="percent"></i></span></div><div class="kpi-value">{{ franchise.commission_rate }}%</div><div class="kpi-meta"><span class="kpi-delta up">Active Rate</span></div></div>
+
+          <!-- 4. Territory Voice Traffic -->
+          <div class="col-12 col-md-6 col-xl-3 animate-fade-up delay-4">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Monthly Voice Minutes</span>
+                <span class="stat-icon-well stat-icon-well--amber"><i data-lucide="timer"></i></span>
+              </div>
+              <div class="stat-card-value">{{ calling_minutes|default:"1,38,490" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--neutral">8.9m Avg Call</span>
+                <span>Territory MTD</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="row g-3 mb-4">
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Calling Minutes</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div><div class="kpi-value">138,490</div><div class="kpi-meta"><span>8.9m avg call</span></div></div>
-          </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Recharges</span><span class="kpi-icon sky"><i data-lucide="zap"></i></span></div><div class="kpi-value">1,492</div><div class="kpi-meta"><span class="kpi-delta up">246 Nov</span></div></div>
-          </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Total Revenue</span><span class="kpi-icon emerald"><i data-lucide="indian-rupee"></i></span></div><div class="kpi-value">₹12,48,920</div><div class="kpi-meta"><span class="kpi-delta up">+16.2%</span><span>Territory YTD</span></div></div>
-          </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Earned Commission</span><span class="kpi-icon emerald"><i data-lucide="coins"></i></span></div><div class="kpi-value">₹2,24,805.60</div><div class="kpi-meta"><span class="kpi-delta up">18% Tier</span><span>Settled YTD</span></div></div>
-          </div>
-          <div class="col-6 col-md-4 col-xl">
-            <div class="kpi-card"><div class="kpi-top"><span class="kpi-label">Pending Commission</span><span class="kpi-icon amber"><i data-lucide="clock"></i></span></div><div class="kpi-value">₹38,420.00</div><div class="kpi-meta"><span class="kpi-delta warn">Dec 5 Payout</span></div></div>
-          </div>
-        </div>
-
-        <!-- 5 Mandatory Franchise Charts (Section 6.1) -->
+        <!-- 2 Focused Analytics Charts -->
         <div class="row g-4 mb-4">
-          <div class="col-xl-8">
+          <div class="col-xl-8 animate-fade-up delay-3">
             <div class="chart-card">
               <div class="chart-card-header">
-                <div><h2 class="chart-card-title">Monthly Revenue &amp; Partner Commission</h2><p class="chart-card-subtitle">Gross assigned-campus volume vs net 18% franchise commission</p></div>
+                <div>
+                  <h2 class="chart-card-title">Territory Revenue &amp; Net Commission Earnings</h2>
+                  <p class="chart-card-subtitle">Monthly comparison of gross campus top-up volume vs net 18% partner commission</p>
+                </div>
               </div>
-              <div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="fr-revenue-chart"></div></div>
+              <div class="chart-card-body">
+                <div class="chart-canvas" data-s2d-chart="fr-revenue-chart"></div>
+              </div>
             </div>
           </div>
-          <div class="col-xl-4">
-            <div class="chart-card">
+          <div class="col-xl-4 animate-fade-up delay-4">
+            <div class="chart-card h-100">
               <div class="chart-card-header">
-                <div><h2 class="chart-card-title">School-wise Student Distribution</h2><p class="chart-card-subtitle">Active student share across assigned campuses</p></div>
+                <div>
+                  <h2 class="chart-card-title">Territory Student Share</h2>
+                  <p class="chart-card-subtitle">Student enrollment across assigned campuses</p>
+                </div>
               </div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="fr-school-students-donut"></div></div>
+              <div class="chart-card-body compact d-flex align-items-center justify-content-center">
+                <div class="chart-canvas w-100" data-s2d-chart="fr-school-students-donut"></div>
+              </div>
             </div>
           </div>
         </div>
 
+        <!-- 2 Authentic Regional Operations Tables -->
         <div class="row g-4 mb-4">
-          <div class="col-lg-4">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Commission Earnings</h2><p class="chart-card-subtitle">Settled vs pending monthly payout</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="fr-commission-bar"></div></div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Calling Usage</h2><p class="chart-card-subtitle">Weekly territory voice minutes</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="fr-calling-usage-line"></div></div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Recharge Trends</h2><p class="chart-card-subtitle">Monthly student top-up volume</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="fr-recharge-trend"></div></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4 Operational Sections (Section 6.1) -->
-        <div class="row g-4">
-          <div class="col-xl-6">
+          <!-- 1. Assigned Schools Performance -->
+          <div class="col-xl-6 animate-fade-up delay-4">
             <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Recent School Activity &amp; Recharge Requests</h3><a href="recharges/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Manage Requests</a></div>
+              <div class="s2d-card-header">
+                <div>
+                  <h3 class="s2d-card-title">Assigned Campuses Performance</h3>
+                  <p class="s2d-card-subtitle">Operational status of schools in your allocated territory</p>
+                </div>
+                <a href="schools/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Manage Schools</a>
+              </div>
               <div class="s2d-table-wrap">
                 <table class="s2d-table">
-                  <thead><tr><th>School</th><th>Event / Request</th><th>Value</th><th>Status</th></tr></thead>
+                  <thead><tr><th>School &amp; City</th><th>Students</th><th>Booths</th><th>Status</th></tr></thead>
                   <tbody>
-                    <tr><td class="cell-primary">Doon Valley Residential Academy</td><td>Bulk Credit Wallet Request (60 Students)</td><td class="mono-code">₹25,000.00</td><td><span class="s2d-badge s2d-badge-warning">Pending Approval</span></td></tr>
-                    <tr><td class="cell-primary">Bishop Cotton Boys School</td><td>Annual Pack Batch Completed</td><td class="mono-code">₹45,000.00</td><td><span class="s2d-badge s2d-badge-success">Allocated</span></td></tr>
-                    <tr><td class="cell-primary">Mayo International Boarding</td><td>Subscription Renewal Due Nov 24</td><td class="mono-code">₹95,000.00</td><td><span class="s2d-badge s2d-badge-warning">Expiring</span></td></tr>
+                    {% for sc in recent_schools %}
+                    <tr>
+                      <td>
+                        <a href="schools/details.html?id={{ sc.code }}" class="cell-primary">{{ sc.name }}</a>
+                        <span class="cell-sub">{{ sc.city }}</span>
+                      </td>
+                      <td class="mono-code">{{ sc.enrolled_students|default:"684" }}</td>
+                      <td class="mono-code">{{ sc.hostel_blocks_count|default:"4" }}</td>
+                      <td><span class="s2d-badge {% if sc.status == 'Active' %}s2d-badge-success{% else %}s2d-badge-danger{% endif %}">{{ sc.status }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td>
+                        <a href="schools/details.html?id=SCH-1001" class="cell-primary">Doon Valley Residential Academy</a>
+                        <span class="cell-sub">Dehradun, Uttarakhand</span>
+                      </td>
+                      <td class="mono-code">684</td>
+                      <td class="mono-code">4</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="schools/details.html?id=SCH-1004" class="cell-primary">Bishop Cotton Boys School &amp; Hostel</a>
+                        <span class="cell-sub">Shimla, Himachal Pradesh</span>
+                      </td>
+                      <td class="mono-code">790</td>
+                      <td class="mono-code">5</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="schools/details.html?id=SCH-1002" class="cell-primary">Mayo International Boarding School</a>
+                        <span class="cell-sub">Ajmer, Rajasthan</span>
+                      </td>
+                      <td class="mono-code">512</td>
+                      <td class="mono-code">4</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a href="schools/details.html?id=SCH-1003" class="cell-primary">Scindia Residential Campus</a>
+                        <span class="cell-sub">Gwalior, Madhya Pradesh</span>
+                      </td>
+                      <td class="mono-code">430</td>
+                      <td class="mono-code">3</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
-          <div class="col-xl-6">
+
+          <!-- 2. Territory Commission Ledger -->
+          <div class="col-xl-6 animate-fade-up delay-5">
             <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Recent Transactions &amp; Commission Summary</h3><a href="commissions/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Full Ledger</a></div>
+              <div class="s2d-card-header">
+                <div>
+                  <h3 class="s2d-card-title">Territory Recharges &amp; Commission Ledger</h3>
+                  <p class="s2d-card-subtitle">Recent student top-ups yielding partner commission</p>
+                </div>
+                <a href="commissions/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Full Ledger</a>
+              </div>
               <div class="s2d-table-wrap">
                 <table class="s2d-table">
-                  <thead><tr><th>Entry</th><th>Campus</th><th>Gross</th><th>18% Earned</th><th>Payout</th></tr></thead>
+                  <thead><tr><th>Campus / Student</th><th>Gross Paid</th><th>18% Commission</th><th>Status</th></tr></thead>
                   <tbody>
-                    <tr><td class="mono-code">COM-5001</td><td>Doon Valley Academy (Nov MTD)</td><td class="mono-code">₹48,200.00</td><td class="mono-code fw-semibold text-brand">₹8,676.00</td><td><span class="s2d-badge s2d-badge-warning">Pending</span></td></tr>
-                    <tr><td class="mono-code">COM-5002</td><td>Bishop Cotton (Nov MTD)</td><td class="mono-code">₹31,900.00</td><td class="mono-code fw-semibold text-brand">₹5,742.00</td><td><span class="s2d-badge s2d-badge-warning">Pending</span></td></tr>
-                    <tr><td class="mono-code">COM-5003</td><td>Doon Valley Academy (Oct)</td><td class="mono-code">₹1,42,000.00</td><td class="mono-code fw-semibold text-brand">₹25,560.00</td><td><span class="s2d-badge s2d-badge-success">Settled</span></td></tr>
+                    {% for r in recent_recharges %}
+                    <tr>
+                      <td>
+                        <span class="cell-primary">{{ r.student.name }}</span>
+                        <span class="cell-sub mono-code">{{ r.school.name|truncatewords:2 }}</span>
+                      </td>
+                      <td class="mono-code fw-semibold">₹{{ r.amount_paid }}</td>
+                      <td class="mono-code fw-semibold text-emerald-600">₹{{ r.amount_paid|floatformat:2 }}</td>
+                      <td><span class="s2d-badge s2d-badge-success">Settled</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td>
+                        <span class="cell-primary">Doon Valley Residential (Nov MTD)</span>
+                        <span class="cell-sub mono-code">684 Students Active</span>
+                      </td>
+                      <td class="mono-code">₹48,200.00</td>
+                      <td class="mono-code fw-semibold text-brand">₹8,676.00</td>
+                      <td><span class="s2d-badge s2d-badge-warning">Pending Dec 5</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="cell-primary">Bishop Cotton Boys (Nov MTD)</span>
+                        <span class="cell-sub mono-code">790 Students Active</span>
+                      </td>
+                      <td class="mono-code">₹31,900.00</td>
+                      <td class="mono-code fw-semibold text-brand">₹5,742.00</td>
+                      <td><span class="s2d-badge s2d-badge-warning">Pending Dec 5</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="cell-primary">Doon Valley Residential (Oct Cycle)</span>
+                        <span class="cell-sub mono-code">Batch Settlement Complete</span>
+                      </td>
+                      <td class="mono-code">₹1,42,000.00</td>
+                      <td class="mono-code fw-semibold text-brand">₹25,560.00</td>
+                      <td><span class="s2d-badge s2d-badge-success">Settled</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <span class="cell-primary">Mayo International (Oct Cycle)</span>
+                        <span class="cell-sub mono-code">Batch Settlement Complete</span>
+                      </td>
+                      <td class="mono-code">₹98,500.00</td>
+                      <td class="mono-code fw-semibold text-brand">₹17,730.00</td>
+                      <td><span class="s2d-badge s2d-badge-success">Settled</span></td>
+                    </tr>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>

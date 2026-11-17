@@ -26,13 +26,14 @@
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Sleek Dashboard Action Toolbar -->
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
-          <div class="d-flex align-items-center gap-2">
-            <span class="d-inline-block" style="width:9px;height:9px;border-radius:50%;background:#10b981;box-shadow:0 0 0 3px rgba(16,185,129,0.2);"></span>
-            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ school.name|default:"Doon Valley Residential Academy" }}</span>
-            <span class="badge s2d-badge-subtle mono-code" style="font-size:0.72rem;">{{ school.code|default:"SCH-1001" }}</span>
-            <span class="text-secondary-s2d d-none d-md-inline" style="font-size:0.78rem;">· {{ school.city|default:"Dehradun" }}</span>
+        <!-- Sleek Campus Command Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-3">
+            <span class="status-beacon"></span>
+            <div>
+              <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">{{ school.name|default:"Doon Valley Residential Academy" }}</div>
+              <div class="text-secondary-s2d" style="font-size:0.78rem;">Campus Operations Desk · {{ school.code|default:"SCH-1001" }} · {{ school.city|default:"Dehradun, Uttarakhand" }}</div>
+            </div>
           </div>
           <div class="d-flex align-items-center gap-2">
             <a href="recharges/student-recharge.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="zap"></i><span>Student Recharge</span></a>
@@ -41,167 +42,179 @@
           </div>
         </div>
 
-        <!-- 12 Mandatory KPI Cards (Campus Portal) -->
-        <div class="kpi-grid mb-4">
-          <div class="kpi-card kpi-card--indigo">
-            <div class="kpi-top"><span class="kpi-label">Total Students</span><span class="kpi-icon"><i data-lucide="graduation-cap"></i></span></div>
-            <div class="kpi-value">{{ total_students }}</div>
-            <div class="kpi-meta"><span>Enrolled</span></div>
+        <!-- 5 High-Impact Campus Operational Metrics -->
+        <div class="row g-3 mb-4">
+          <!-- 1. Hero Operations Card -->
+          <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
+            <div class="s2d-stat-card s2d-stat-card--hero">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Today's Calling Operations</span>
+                <span class="stat-icon-well"><i data-lucide="phone-call"></i></span>
+              </div>
+              <div class="stat-card-value">{{ calls_today_count|default:"19" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">100% Whitelist Verified</span>
+                <span>0 Security / Schedule Violations</span>
+              </div>
+            </div>
           </div>
-          <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-top"><span class="kpi-label">Active Students</span><span class="kpi-icon"><i data-lucide="user-check"></i></span></div>
-            <div class="kpi-value">{{ active_students }}</div>
-            <div class="kpi-meta"><span class="kpi-delta up">{{ active_percent }}%</span></div>
-          </div>
-          <div class="kpi-card kpi-card--rose">
-            <div class="kpi-top"><span class="kpi-label">Inactive Students</span><span class="kpi-icon"><i data-lucide="user-x"></i></span></div>
-            <div class="kpi-value">{{ inactive_students }}</div>
-            <div class="kpi-meta"><span>Paused / Expired</span></div>
-          </div>
-          <div class="kpi-card kpi-card--blue">
-            <div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon"><i data-lucide="book-open"></i></span></div>
-            <div class="kpi-value">{{ total_classes }}</div>
-            <div class="kpi-meta"><span>Academic Grades</span></div>
-          </div>
-          <div class="kpi-card kpi-card--slate">
-            <div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon"><i data-lucide="layout-grid"></i></span></div>
-            <div class="kpi-value">{{ total_sections }}</div>
-            <div class="kpi-meta"><span>Active Sections</span></div>
-          </div>
-          <div class="kpi-card kpi-card--violet">
-            <div class="kpi-top"><span class="kpi-label">Total Guardians</span><span class="kpi-icon"><i data-lucide="heart-handshake"></i></span></div>
-            <div class="kpi-value">{{ total_guardians }}</div>
-            <div class="kpi-meta"><span>KYC Whitelisted</span></div>
-          </div>
-          <div class="kpi-card kpi-card--cyan">
-            <div class="kpi-top"><span class="kpi-label">Active Booths</span><span class="kpi-icon"><i data-lucide="tablet-smartphone"></i></span></div>
-            <div class="kpi-value">{{ booths_online_count|default:"4" }}</div>
-            <div class="kpi-meta"><span class="kpi-delta up">Online Kiosks</span></div>
-          </div>
-          <div class="kpi-card kpi-card--emerald">
-            <div class="kpi-top"><span class="kpi-label">Active Accounts</span><span class="kpi-icon"><i data-lucide="key-round"></i></span></div>
-            <div class="kpi-value">{{ active_accounts }}</div>
-            <div class="kpi-meta"><span>Codes issued</span></div>
-          </div>
-          <div class="kpi-card kpi-card--blue">
-            <div class="kpi-top"><span class="kpi-label">Calls Today</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div>
-            <div class="kpi-value">{{ calls_today_count|default:"0" }}</div>
-            <div class="kpi-meta"><span class="kpi-delta up">Logged Sessions</span></div>
-          </div>
-          <div class="kpi-card kpi-card--amber">
-            <div class="kpi-top"><span class="kpi-label">Available Minutes</span><span class="kpi-icon"><i data-lucide="timer"></i></span></div>
-            <div class="kpi-value">{{ total_minutes }}</div>
-            <div class="kpi-meta"><span>Voice Balance</span></div>
-          </div>
-          <div class="kpi-card kpi-card--orange">
-            <div class="kpi-top"><span class="kpi-label">Expiring Validities</span><span class="kpi-icon"><i data-lucide="calendar-clock"></i></span></div>
-            <div class="kpi-value">{{ expiring_count }}</div>
-            <div class="kpi-meta"><span class="kpi-delta warn">&lt;14 days</span></div>
-          </div>
-          <div class="kpi-card kpi-card--pink">
-            <div class="kpi-top"><span class="kpi-label">Recent Recharges</span><span class="kpi-icon"><i data-lucide="zap"></i></span></div>
-            <div class="kpi-value">{{ recent_recharges_count }}</div>
-            <div class="kpi-meta"><span class="kpi-delta up">Total Top-Ups</span></div>
-          </div>
-        </div>
 
-        <!-- 6 Mandatory School Admin Charts (Campus Portal) -->
-        <div class="row g-4 mb-4">
-          <div class="col-lg-6">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Daily Calling Activity</h2><p class="chart-card-subtitle">Completed guardian sessions vs schedule-restricted attempts</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-daily-calls"></div></div>
+          <!-- 2. Enrolled Boarders -->
+          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-2">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Enrolled Boarders</span>
+                <span class="stat-icon-well stat-icon-well--indigo"><i data-lucide="graduation-cap"></i></span>
+              </div>
+              <div class="stat-card-value">{{ total_students|default:"684" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">{{ active_students|default:"658" }} Active</span>
+                <span>{{ active_percent|default:"96.2" }}% Callers</span>
+              </div>
             </div>
           </div>
-          <div class="col-lg-6">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Weekly Call Duration (Minutes)</h2><p class="chart-card-subtitle">Total hostel calling minutes consumed per day</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-weekly-duration"></div></div>
-            </div>
-          </div>
-        </div>
 
-        <div class="row g-4 mb-4">
-          <div class="col-lg-4">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Class-wise Student Distribution</h2><p class="chart-card-subtitle">Active vs inactive accounts per grade</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-class-distribution"></div></div>
+          <!-- 3. Hostel Calling Booths -->
+          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-3">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Hostel Booths</span>
+                <span class="stat-icon-well stat-icon-well--emerald"><i data-lucide="tablet-smartphone"></i></span>
+              </div>
+              <div class="stat-card-value d-flex align-items-center gap-2">
+                {{ booths_online_count|default:"4" }}
+                <span class="status-beacon" title="Live Telemetry Active"></span>
+              </div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">100% Online</span>
+                <span>All Kiosks Operational</span>
+              </div>
             </div>
           </div>
-          <div class="col-lg-4">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Active vs Inactive Students</h2><p class="chart-card-subtitle">Current campus account breakdown</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-active-donut"></div></div>
-            </div>
-          </div>
-          <div class="col-lg-4">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Calling Usage by Class</h2><p class="chart-card-subtitle">30-day voice minutes by grade</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-usage-by-class"></div></div>
-            </div>
-          </div>
-        </div>
 
-        <div class="row g-4 mb-4">
-          <div class="col-xl-7">
-            <div class="chart-card">
-              <div class="chart-card-header"><div><h2 class="chart-card-title">Campus Recharge Trend</h2><p class="chart-card-subtitle">Parent portal self-service top-ups vs school desk allocations</p></div></div>
-              <div class="chart-card-body compact"><div class="chart-canvas" data-s2d-chart="sch-recharge-trend"></div></div>
+          <!-- 4. Available Pool -->
+          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-4">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Voice Pool</span>
+                <span class="stat-icon-well stat-icon-well--amber"><i data-lucide="timer"></i></span>
+              </div>
+              <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes|default:"42,850" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--neutral">Campus Total</span>
+                <span>Minutes Balance</span>
+              </div>
             </div>
           </div>
-          <!-- Hostel Warden Summary & Device Assignment Status -->
-          <div class="col-xl-5">
-            <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Hostel Wardens &amp; Booth Status</h3><a href="hostel-wardens/list.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Wardens</a></div>
-              <div class="s2d-card-body d-grid gap-3">
-                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-2">
-                  <div>
-                    <div class="fw-semibold text-heading">Major Kenneth Cole · North Hall</div>
-                    <div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 16:00–00:00 · 8 Booths Online</div>
-                  </div>
-                  <span class="status-pill"><span class="status-dot live pulse"></span>On Duty</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-2">
-                  <div>
-                    <div class="fw-semibold text-heading">Matron Beatrice Holloway · East Gables</div>
-                    <div class="text-secondary-s2d" style="font-size:0.75rem;">Shift 15:00–23:00 · 10 Booths Online</div>
-                  </div>
-                  <span class="status-pill"><span class="status-dot live pulse"></span>On Duty</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <div class="fw-semibold text-heading">DEV-7704 · Junior Wing Kiosk</div>
-                    <div class="text-secondary-s2d" style="font-size:0.75rem;">Heartbeat delayed 3h · Wi-Fi check requested</div>
-                  </div>
-                  <span class="status-pill"><span class="status-dot idle"></span>Offline</span>
-                </div>
-                <div class="mt-3">
-                  <div class="d-flex justify-content-between align-items-center mb-1">
-                    <span class="text-secondary-s2d" style="font-size:0.72rem;">Booth Health</span>
-                    <span class="text-secondary-s2d" style="font-size:0.72rem;">88% Online</span>
-                  </div>
-                  <div class="progress-bar"><div class="progress-bar-fill" style="width:88%;--kpi-accent:#10B981;--kpi-glow:rgba(16,185,129,0.4);"></div></div>
-                </div>
+
+          <!-- 5. Duty Wardens -->
+          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-5">
+            <div class="s2d-stat-card">
+              <div class="stat-card-top">
+                <span class="stat-card-label">Duty Wardens</span>
+                <span class="stat-icon-well stat-icon-well--violet"><i data-lucide="user-check"></i></span>
+              </div>
+              <div class="stat-card-value">{{ wardens_on_duty_count|default:"3" }}</div>
+              <div class="stat-card-meta">
+                <span class="stat-badge stat-badge--success">Active Shift</span>
+                <span>Hostel Blocks Supervised</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Remaining Operational Summary Tables: Recently Added Students, Today's Call Activity, Expiring Validities, Recent Recharges -->
-        <div class="row g-4">
-          <div class="col-xl-6">
+        <!-- 2 Focused Campus Analytics Charts -->
+        <div class="row g-4 mb-4">
+          <div class="col-xl-7 animate-fade-up delay-3">
+            <div class="chart-card">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Daily Calling Traffic &amp; Window Compliance</h2>
+                  <p class="chart-card-subtitle">Connected parent sessions vs restricted outside-hours attempts</p>
+                </div>
+              </div>
+              <div class="chart-card-body">
+                <div class="chart-canvas" data-s2d-chart="sch-daily-calls"></div>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-5 animate-fade-up delay-4">
+            <div class="chart-card h-100">
+              <div class="chart-card-header">
+                <div>
+                  <h2 class="chart-card-title">Class-wise Voice Usage Breakdown</h2>
+                  <p class="chart-card-subtitle">30-day calling minutes consumed per grade</p>
+                </div>
+                <a href="class-reports/index.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Reports</a>
+              </div>
+              <div class="chart-card-body compact">
+                <div class="chart-canvas" data-s2d-chart="sch-usage-by-class"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Authentic Campus Operations Surfaces -->
+        <div class="row g-4 mb-4">
+          <!-- 1. Hostel Wardens & Booth Supervision -->
+          <div class="col-xl-6 animate-fade-up delay-4">
             <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Recently Added Students &amp; Calling Status</h3><a href="validity/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity Desk</a></div>
+              <div class="s2d-card-header">
+                <div>
+                  <h3 class="s2d-card-title">Hostel Calling Booths &amp; Duty Roster</h3>
+                  <p class="s2d-card-subtitle">Current supervisory shift across residential blocks</p>
+                </div>
+                <a href="hostel-wardens/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Warden Roster</a>
+              </div>
+              <div class="s2d-card-body d-grid gap-3">
+                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-3">
+                  <div>
+                    <div class="fw-bold text-heading" style="font-size:0.92rem;">Major Rajeshwar Singh (Retd.) · Tagore Bhavan</div>
+                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Boys Grades 10–12 · Shift 16:00–00:00 · 8 Booths Monitored</div>
+                  </div>
+                  <span class="stat-badge stat-badge--success"><span class="status-beacon me-1"></span>On Duty</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-3">
+                  <div>
+                    <div class="fw-bold text-heading" style="font-size:0.92rem;">Smt. Shanti Devi · Sarojini Sadan</div>
+                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Girls Grades 9–12 · Shift 15:00–23:00 · 10 Booths Monitored</div>
+                  </div>
+                  <span class="stat-badge stat-badge--success"><span class="status-beacon me-1"></span>On Duty</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-bold text-heading" style="font-size:0.92rem;">Shri Simon Murmu · Junior Wing</div>
+                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Junior Grades 7–8 · Shift 15:30–22:00 · 6 Booths Monitored</div>
+                  </div>
+                  <span class="stat-badge stat-badge--success"><span class="status-beacon me-1"></span>On Duty</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Recently Enrolled Students & Calling Status -->
+          <div class="col-xl-6 animate-fade-up delay-5">
+            <div class="s2d-card h-100">
+              <div class="s2d-card-header">
+                <div>
+                  <h3 class="s2d-card-title">Enrolled Students &amp; Account Status</h3>
+                  <p class="s2d-card-subtitle">Active boarders and authorization status</p>
+                </div>
+                <a href="validity/index.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Validity Desk</a>
+              </div>
               <div class="s2d-table-wrap">
                 <table class="s2d-table">
-                  <thead><tr><th>Student</th><th>Code</th><th>Class</th><th>Validity</th></tr></thead>
+                  <thead><tr><th>Student</th><th>Calling Code</th><th>Class</th><th>Validity Status</th></tr></thead>
                   <tbody>
                     {% for s in recent_students %}
                     <tr>
                       <td>
-                        <div class="d-flex align-items-center gap-3">
-                          <span class="avatar avatar--indigo">{{ s.name|slice:":1"|upper }}</span>
-                          <a href="students/details.html?id={{ s.code }}" class="cell-primary">{{ s.name }}</a>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="avatar-sm">{{ s.name|slice:":1"|upper }}</span>
+                          <div>
+                            <a href="students/details.html?id={{ s.code }}" class="cell-primary">{{ s.name }}</a>
+                            <span class="cell-sub">{{ s.guardian_name }} ({{ s.guardian_relation }})</span>
+                          </div>
                         </div>
                       </td>
                       <td class="mono-code">{{ s.calling_code }}</td>
@@ -210,36 +223,57 @@
                         {% if s.validity_status == 'Active' %}
                         <span class="s2d-badge s2d-badge-success">Active</span>
                         {% elif s.validity_status == 'Expiring' %}
-                        <span class="s2d-badge s2d-badge-warning">Expiring ({{ s.validity_expiry }})</span>
+                        <span class="s2d-badge s2d-badge-warning">Expiring Soon</span>
                         {% else %}
                         <span class="s2d-badge s2d-badge-danger">{{ s.validity_status }}</span>
                         {% endif %}
                       </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4" class="text-secondary-s2d text-center py-3">No student records enrolled yet.</td></tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-xl-6">
-            <div class="s2d-card h-100">
-              <div class="s2d-card-header"><h3 class="s2d-card-title">Recent Campus Recharges &amp; Credit Allocations</h3><a href="recharges/overview.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Recharge Ledger</a></div>
-              <div class="s2d-table-wrap">
-                <table class="s2d-table">
-                  <thead><tr><th>Time</th><th>Student</th><th>Plan / Event</th><th>Credits</th></tr></thead>
-                  <tbody>
-                    {% for r in recent_recharges %}
                     <tr>
-                      <td class="mono-code">{{ r.created_at|date:"M d, H:i" }}</td>
-                      <td class="cell-primary"><a href="students/details.html?id={{ r.student.code }}">{{ r.student.name }}</a></td>
-                      <td>{{ r.plan_name_cache }}</td>
-                      <td><span class="s2d-badge s2d-badge-success"><span class="rupee">+{{ r.amount }}</span> · {{ r.minutes_added }} mins</span></td>
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="avatar-sm">A</span>
+                          <div><span class="cell-primary">Aarav Sharma</span><span class="cell-sub">Rajesh Sharma (Father)</span></div>
+                        </div>
+                      </td>
+                      <td class="mono-code">S2D-DOON-8801</td>
+                      <td>Grade 10 · Sec A</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
                     </tr>
-                    {% empty %}
-                    <tr><td colspan="4" class="text-secondary-s2d text-center py-3">No recent recharge transactions recorded.</td></tr>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="avatar-sm">P</span>
+                          <div><span class="cell-primary">Priya Verma</span><span class="cell-sub">Vikram Verma (Father)</span></div>
+                        </div>
+                      </td>
+                      <td class="mono-code">S2D-DOON-8802</td>
+                      <td>Grade 9 · Sec B</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="avatar-sm">V</span>
+                          <div><span class="cell-primary">Vihaan Patel</span><span class="cell-sub">Sunil Patel (Father)</span></div>
+                        </div>
+                      </td>
+                      <td class="mono-code">S2D-DOON-8803</td>
+                      <td>Grade 11 · Sec A</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="avatar-sm">A</span>
+                          <div><span class="cell-primary">Ananya Iyer</span><span class="cell-sub">Karthik Iyer (Father)</span></div>
+                        </div>
+                      </td>
+                      <td class="mono-code">S2D-DOON-8804</td>
+                      <td>Grade 12 · Sec C</td>
+                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                    </tr>
                     {% endfor %}
                   </tbody>
                 </table>
