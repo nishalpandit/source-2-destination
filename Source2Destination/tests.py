@@ -189,8 +189,8 @@ class SchoolAdminFlowchartTests(TestCase):
         self.assertEqual(resp.context['total_booths_count'], 1)
         self.assertEqual(resp.context['booths_online_percent'], 100.0)
         self.assertContains(resp, 'window.S2D_SCHOOL_CHARTS')
-        self.assertContains(resp, 'Major Rajeshwar Singh (Retd.)')
-        self.assertContains(resp, 'Aarav Kulkarni')
+        self.assertNotContains(resp, 'Hostel Calling Booths &amp; Duty Roster')
+        self.assertNotContains(resp, 'Enrolled Students &amp; Account Status')
         # Active sidebar highlight on /school-admin/dashboard.html
         self.assertContains(resp, 'href="/school-admin/dashboard.html" class="sidebar-link active"')
 
