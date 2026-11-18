@@ -15,7 +15,7 @@
       notificationsRoute: 'super-admin/settings/notifications.html',
       groups: [
         {
-          label: 'Executive Command',
+          label: 'Overview',
           items: [
             { id: 'sa-dashboard', label: 'Dashboard Overview', icon: 'layout-dashboard', href: 'super-admin/dashboard.html' }
           ]
@@ -185,7 +185,7 @@
       notificationsRoute: 'school-admin/settings/index.html',
       groups: [
         {
-          label: 'Campus Command',
+          label: 'Overview',
           items: [
             { id: 'sa2-dashboard', label: 'School Dashboard', icon: 'layout-dashboard', href: 'school-admin/dashboard.html' }
           ]

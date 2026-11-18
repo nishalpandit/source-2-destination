@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="{% static 'css/animations.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body data-role="super-admin" data-root="../" data-route="super-admin/dashboard.html" data-section="Executive Command" data-page-title="Dashboard Overview">
+<body data-role="super-admin" data-root="../" data-route="super-admin/dashboard.html" data-section="Overview" data-page-title="Dashboard">
   <div class="app-shell">
     <aside class="app-sidebar" id="app-sidebar">
       {% include 'includes/sidebar_super_admin.html' %}
@@ -28,116 +28,108 @@
       <header class="app-topbar" id="app-topbar"></header>
 
       <main class="app-content">
-        <!-- Sleek Super Admin Action Toolbar -->
+        <!-- Header Toolbar -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-3">
-            <span class="status-beacon"></span>
             <div>
-              <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">Platform Fleet Command &amp; Governance</div>
-              <div class="text-secondary-s2d" style="font-size:0.78rem;">National Boarding Fleet · 52 Campuses Across India</div>
+              <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">Platform Overview</div>
+              <div class="text-secondary-s2d" style="font-size:0.78rem;">{{ total_campuses }} registered schools</div>
             </div>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <a href="reports/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="bar-chart-3"></i><span>Analytical Reports</span></a>
-            <a href="devices/register.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="tablet-smartphone"></i><span>Provision Kiosk</span></a>
-            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Onboard School</span></a>
+            <a href="reports/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="bar-chart-3"></i><span>Reports</span></a>
+            <a href="devices/register.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="tablet-smartphone"></i><span>Add Device</span></a>
+            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Add School</span></a>
           </div>
         </div>
 
-        <!-- 5 High-Impact Executive Metric Cards -->
+        <!-- 5 Key Metrics -->
         <div class="row g-3 mb-4">
-          <!-- 1. Hero Revenue Card -->
-          <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
+          <!-- 1. Revenue -->
+          <div class="col-12 col-md-6 col-xl-4">
             <div class="s2d-stat-card s2d-stat-card--hero">
               <div class="stat-card-top">
-                <span class="stat-card-label">Gross Platform Revenue</span>
+                <span class="stat-card-label">Total Revenue</span>
                 <span class="stat-icon-well"><i data-lucide="indian-rupee"></i></span>
               </div>
               <div class="stat-card-value">₹{{ total_revenue|default:"34,20,970" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">+14.6% YoY</span>
-                <span>₹48.9k Monthly Inflow</span>
+                <span>Monthly inflow: ₹48.9k</span>
               </div>
             </div>
           </div>
 
-          <!-- 2. Partner Campuses -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-2">
+          <!-- 2. Schools -->
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--indigo">
               <div class="stat-card-top">
-                <span class="stat-card-label">Partner Schools</span>
+                <span class="stat-card-label">Schools</span>
                 <span class="stat-icon-well"><i data-lucide="building-2"></i></span>
               </div>
               <div class="stat-card-value">{{ total_campuses }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_campuses }} Active</span>
-                <span>{{ active_school_percent }}% Operational</span>
+                <span class="stat-badge stat-badge--success">{{ active_campuses }} active</span>
+                <span>{{ active_school_percent }}%</span>
               </div>
             </div>
           </div>
 
-          <!-- 3. Enrolled Boarders -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-3">
+          <!-- 3. Students -->
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--sky">
               <div class="stat-card-top">
-                <span class="stat-card-label">Active Boarders</span>
+                <span class="stat-card-label">Students</span>
                 <span class="stat-icon-well"><i data-lucide="users"></i></span>
               </div>
               <div class="stat-card-value">{{ total_students }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_students }} Active</span>
-                <span>Calling Enabled</span>
+                <span class="stat-badge stat-badge--success">{{ active_students }} active</span>
               </div>
             </div>
           </div>
 
-          <!-- 4. Kiosk Calling Fleet -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-4">
+          <!-- 4. Calling Booths -->
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--emerald">
               <div class="stat-card-top">
-                <span class="stat-card-label">Active Booths</span>
+                <span class="stat-card-label">Calling Booths</span>
                 <span class="stat-icon-well"><i data-lucide="tablet-smartphone"></i></span>
               </div>
-              <div class="stat-card-value d-flex align-items-center gap-2">
-                {{ active_kiosks|default:"418" }}
-                <span class="status-beacon" title="Live Telemetry Active"></span>
-              </div>
+              <div class="stat-card-value">{{ active_kiosks|default:"418" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">98.1% Uptime</span>
-                <span>{{ total_kiosks|default:"426" }} Enrolled</span>
+                <span>of {{ total_kiosks|default:"426" }} online</span>
               </div>
             </div>
           </div>
 
-          <!-- 5. Voice Telemetry Pool -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-5">
+          <!-- 5. Available Minutes -->
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--amber">
               <div class="stat-card-top">
-                <span class="stat-card-label">Voice Talktime</span>
+                <span class="stat-card-label">Available Minutes</span>
                 <span class="stat-icon-well"><i data-lucide="phone-call"></i></span>
               </div>
               <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes|default:"384,120" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--neutral">8.9m Avg</span>
-                <span>Billed MTD</span>
+                <span>Across all schools</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 2 Focused Analytics Charts -->
+        <!-- Charts -->
         <div class="row g-4 mb-4">
-          <div class="col-xl-8 animate-fade-up delay-3">
+          <div class="col-xl-8">
             <div class="chart-card">
               <div class="chart-card-header">
                 <div>
-                  <h2 class="chart-card-title">Platform Calling Traffic &amp; Revenue Velocity</h2>
-                  <p class="chart-card-subtitle">Monthly comparison of institutional subscription volume vs student credit top-ups</p>
+                  <h2 class="chart-card-title">Monthly Revenue</h2>
+                  <p class="chart-card-subtitle">Subscriptions vs student recharges</p>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                   <div class="chart-range-group">
-                    <button type="button" class="chart-range-btn active" data-chart-target="sa-revenue-trend" data-view="bar" title="Substantial Column View">Bars</button>
-                    <button type="button" class="chart-range-btn" data-chart-target="sa-revenue-trend" data-view="area" title="Fluid Trend Flow">Trend</button>
+                    <button type="button" class="chart-range-btn active" data-chart-target="sa-revenue-trend" data-view="bar" title="Bar View">Bars</button>
+                    <button type="button" class="chart-range-btn" data-chart-target="sa-revenue-trend" data-view="area" title="Trend View">Trend</button>
                   </div>
                   <div class="chart-range-group">
                     <button type="button" class="chart-range-btn" data-chart-target="sa-revenue-trend" data-range="30D">30D</button>
@@ -151,12 +143,12 @@
               </div>
             </div>
           </div>
-          <div class="col-xl-4 animate-fade-up delay-4">
+          <div class="col-xl-4">
             <div class="chart-card h-100">
               <div class="chart-card-header">
                 <div>
-                  <h2 class="chart-card-title">Campus Fleet Distribution</h2>
-                  <p class="chart-card-subtitle">Active subscription plan tier breakdown</p>
+                  <h2 class="chart-card-title">Subscription Plans</h2>
+                  <p class="chart-card-subtitle">Schools by plan</p>
                 </div>
                 <a href="subscriptions/overview.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Manage</a>
               </div>

@@ -311,8 +311,8 @@
           return Object.assign(baseChartOptions('area', 275), {
             colors: [PALETTE.indigo, PALETTE.teal],
             series: [
-              { name: 'Gross Territory Revenue', data: gross },
-              { name: 'Net Partner Commission (18%)', data: comm }
+              { name: 'Gross Revenue', data: gross },
+              { name: 'Commission (18%)', data: comm }
             ],
             fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.32, opacityTo: 0.04 } },
             stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
@@ -334,8 +334,8 @@
             }
           },
           series: [
-            { name: 'Gross Territory Revenue', data: gross },
-            { name: 'Net Partner Commission (18%)', data: comm }
+            { name: 'Gross Revenue', data: gross },
+            { name: 'Commission (18%)', data: comm }
           ],
           fill: {
             type: 'gradient',
@@ -447,7 +447,7 @@
             colors: [PALETTE.indigo, PALETTE.rose],
             series: [
               { name: 'Completed Calls', data: completed },
-              { name: 'Restricted / Blocked Attempts', data: restricted }
+              { name: 'Blocked Calls', data: restricted }
             ],
             fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.32, opacityTo: 0.04 } },
             stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
@@ -469,7 +469,7 @@
           },
           series: [
             { name: 'Completed Calls', data: completed },
-            { name: 'Restricted / Blocked Attempts', data: restricted }
+            { name: 'Blocked Calls', data: restricted }
           ],
           fill: {
             type: 'gradient',

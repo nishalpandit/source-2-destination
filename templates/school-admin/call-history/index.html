@@ -38,34 +38,34 @@
           </div>
         </div>
 
-        <!-- Telemetry KPI Summary Cards -->
+        <!-- KPI Summary Cards -->
         <div class="row g-3 mb-4">
           <div class="col-md-3 col-6">
             <div class="kpi-card kpi-card--blue">
               <div class="kpi-top"><span class="kpi-label">Total Calls</span><span class="kpi-icon"><i data-lucide="phone"></i></span></div>
               <div class="kpi-value">{{ total_calls }}</div>
-              <div class="kpi-meta"><span class="kpi-delta neutral">All Recorded Sessions</span></div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">All recorded calls</span></div>
             </div>
           </div>
           <div class="col-md-3 col-6">
             <div class="kpi-card kpi-card--emerald">
               <div class="kpi-top"><span class="kpi-label">Completed Calls</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div>
               <div class="kpi-value">{{ completed_calls }}</div>
-              <div class="kpi-meta"><span class="kpi-delta up">Connected Successfully</span></div>
+              <div class="kpi-meta"><span class="kpi-delta up">Connected</span></div>
             </div>
           </div>
           <div class="col-md-3 col-6">
             <div class="kpi-card kpi-card--amber">
-              <div class="kpi-top"><span class="kpi-label">Flagged / Restricted</span><span class="kpi-icon"><i data-lucide="phone-missed"></i></span></div>
+              <div class="kpi-top"><span class="kpi-label">Blocked Calls</span><span class="kpi-icon"><i data-lucide="phone-missed"></i></span></div>
               <div class="kpi-value">{{ flagged_calls }}</div>
-              <div class="kpi-meta"><span class="kpi-delta warn">Schedule Restrictions</span></div>
+              <div class="kpi-meta"><span class="kpi-delta warn">Outside calling hours</span></div>
             </div>
           </div>
           <div class="col-md-3 col-6">
             <div class="kpi-card kpi-card--slate">
-              <div class="kpi-top"><span class="kpi-label">Voice Talktime</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div>
+              <div class="kpi-top"><span class="kpi-label">Total Talktime</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div>
               <div class="kpi-value">{{ total_duration_minutes }} <span style="font-size:0.95rem;font-weight:500;">min</span></div>
-              <div class="kpi-meta"><span class="kpi-delta neutral">Total Minutes Billed</span></div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">Minutes used</span></div>
             </div>
           </div>
         </div>

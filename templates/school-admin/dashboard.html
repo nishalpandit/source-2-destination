@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="{% static 'css/animations.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body data-role="school-admin" data-root="../" data-route="school-admin/dashboard.html" data-section="Campus Command" data-page-title="School Dashboard">
+<body data-role="school-admin" data-root="../" data-route="school-admin/dashboard.html" data-section="Overview" data-page-title="School Dashboard">
   <div class="app-shell">
     <aside class="app-sidebar" id="app-sidebar">
       {% include 'includes/sidebar_school_admin.html' %}
@@ -26,107 +26,105 @@
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Campus Command Action Toolbar -->
+        <!-- Header Toolbar -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-3">
             <div>
               <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">{{ school.name }}</div>
-              <div class="text-secondary-s2d" style="font-size:0.78rem;">Campus Operations Desk · {{ school.code }} · {{ school.city }}</div>
+              <div class="text-secondary-s2d" style="font-size:0.78rem;">{{ school.code }} · {{ school.city }}</div>
             </div>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <a href="recharges/student-recharge.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="zap"></i><span>Student Recharge</span></a>
-            <a href="calling-schedules/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="calendar-range"></i><span>Hostel Schedules</span></a>
-            <a href="students/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="user-plus"></i><span>Enroll Student</span></a>
+            <a href="recharges/student-recharge.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="zap"></i><span>Recharge Student</span></a>
+            <a href="calling-schedules/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="calendar-range"></i><span>Schedules</span></a>
+            <a href="students/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="user-plus"></i><span>Add Student</span></a>
           </div>
         </div>
 
-        <!-- 5 Campus Operational Metrics -->
+        <!-- 5 Key Metrics -->
         <div class="row g-3 mb-4">
-          <!-- 1. Hero Operations Card -->
+          <!-- 1. Today's Calls -->
           <div class="col-12 col-md-6 col-xl-4">
             <div class="s2d-stat-card s2d-stat-card--hero">
               <div class="stat-card-top">
-                <span class="stat-card-label">Today's Calling Operations</span>
+                <span class="stat-card-label">Today's Calls</span>
                 <span class="stat-icon-well"><i data-lucide="phone-call"></i></span>
               </div>
               <div class="stat-card-value">{{ calls_today_count }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ whitelist_compliance_percent }}% Whitelist Verified</span>
-                <span>{{ violations_today_count }} Schedule / Security Violation{{ violations_today_count|pluralize }}</span>
+                <span class="stat-badge stat-badge--success">{{ calls_completed_today }} completed</span>
+                <span>{{ violations_today_count }} blocked</span>
               </div>
             </div>
           </div>
 
-          <!-- 2. Enrolled Boarders -->
+          <!-- 2. Students -->
           <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--indigo">
               <div class="stat-card-top">
-                <span class="stat-card-label">Enrolled Boarders</span>
+                <span class="stat-card-label">Total Students</span>
                 <span class="stat-icon-well"><i data-lucide="graduation-cap"></i></span>
               </div>
               <div class="stat-card-value">{{ total_students }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_students }} Active</span>
-                <span>{{ active_percent }}% Callers</span>
+                <span class="stat-badge stat-badge--success">{{ active_students }} active</span>
+                <span>{{ active_percent }}%</span>
               </div>
             </div>
           </div>
 
-          <!-- 3. Hostel Calling Booths -->
+          <!-- 3. Calling Booths -->
           <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--emerald">
               <div class="stat-card-top">
-                <span class="stat-card-label">Hostel Booths</span>
+                <span class="stat-card-label">Calling Booths</span>
                 <span class="stat-icon-well"><i data-lucide="tablet-smartphone"></i></span>
               </div>
               <div class="stat-card-value">{{ booths_online_count }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge {% if booths_online_percent >= 80 %}stat-badge--success{% else %}stat-badge--warning{% endif %}">{{ booths_online_percent }}% Online</span>
-                <span>{{ booths_online_count }} of {{ total_booths_count }} Operational</span>
+                <span class="stat-badge {% if booths_online_percent >= 80 %}stat-badge--success{% else %}stat-badge--warning{% endif %}">{{ booths_online_count }} of {{ total_booths_count }}</span>
+                <span>online</span>
               </div>
             </div>
           </div>
 
-          <!-- 4. Available Pool -->
+          <!-- 4. Available Minutes -->
           <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--amber">
               <div class="stat-card-top">
-                <span class="stat-card-label">Voice Pool</span>
+                <span class="stat-card-label">Available Minutes</span>
                 <span class="stat-icon-well"><i data-lucide="timer"></i></span>
               </div>
               <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--neutral">Campus Total</span>
-                <span>Minutes Balance</span>
+                <span>Student balance</span>
               </div>
             </div>
           </div>
 
-          <!-- 5. Duty Wardens -->
+          <!-- 5. Hostel Wardens -->
           <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--violet">
               <div class="stat-card-top">
-                <span class="stat-card-label">Duty Wardens</span>
+                <span class="stat-card-label">Hostel Wardens</span>
                 <span class="stat-icon-well"><i data-lucide="user-check"></i></span>
               </div>
               <div class="stat-card-value">{{ wardens_on_duty_count }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">Active Shift</span>
-                <span>Hostel Blocks Supervised</span>
+                <span class="stat-badge stat-badge--success">On duty</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 2 Focused Campus Analytics Charts -->
+        <!-- Charts -->
         <div class="row g-4 mb-4">
           <div class="col-xl-7">
             <div class="chart-card">
               <div class="chart-card-header">
                 <div>
-                  <h2 class="chart-card-title">Daily Calling Traffic &amp; Window Compliance</h2>
-                  <p class="chart-card-subtitle">Connected parent sessions vs restricted outside-hours attempts</p>
+                  <h2 class="chart-card-title">Daily Calls</h2>
+                  <p class="chart-card-subtitle">Completed vs blocked calls over the last 7 days</p>
                 </div>
                 <div class="chart-range-group">
                   <button type="button" class="chart-range-btn active" data-chart-target="sch-daily-calls" data-view="bar" title="Column View">Bars</button>
@@ -142,8 +140,8 @@
             <div class="chart-card h-100">
               <div class="chart-card-header">
                 <div>
-                  <h2 class="chart-card-title">Class-wise Voice Usage Breakdown</h2>
-                  <p class="chart-card-subtitle">30-day calling minutes consumed per grade</p>
+                  <h2 class="chart-card-title">Minutes by Class</h2>
+                  <p class="chart-card-subtitle">Last 30 days</p>
                 </div>
                 <a href="class-reports/index.html" class="btn-s2d btn-s2d-ghost btn-xs-s2d">Reports</a>
               </div>

@@ -18,7 +18,7 @@
   <link rel="stylesheet" href="{% static 'css/animations.css' %}">
   <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
 </head>
-<body data-role="franchise" data-root="../" data-route="franchise/dashboard.html" data-section="Partner Overview" data-page-title="Franchise Dashboard">
+<body data-role="franchise" data-root="../" data-route="franchise/dashboard.html" data-section="Overview" data-page-title="Franchise Dashboard">
   <div class="app-shell">
     <aside class="app-sidebar" id="app-sidebar">
       {% include 'includes/sidebar_franchise.html' %}
@@ -26,97 +26,92 @@
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Sleek Franchise Partner Action Toolbar -->
+        <!-- Header Toolbar -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-3">
-            <span class="status-beacon"></span>
             <div>
               <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">{{ franchise.name|default:"North India EduNet Partners" }}</div>
-              <div class="text-secondary-s2d" style="font-size:0.78rem;">Territory Partner Command · {{ franchise.code|default:"FRN-101" }} · 18% Active Tier</div>
+              <div class="text-secondary-s2d" style="font-size:0.78rem;">{{ franchise.code|default:"FRN-101" }} · 18% commission</div>
             </div>
           </div>
           <div class="d-flex align-items-center gap-2">
-            <a href="bulk-upload/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="file-spreadsheet"></i><span>Bulk Student Upload</span></a>
-            <a href="commissions/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="coins"></i><span>Commission Ledger</span></a>
-            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Onboard Campus</span></a>
+            <a href="bulk-upload/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="file-spreadsheet"></i><span>Bulk Upload</span></a>
+            <a href="commissions/index.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="coins"></i><span>Commissions</span></a>
+            <a href="schools/add.html" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="plus"></i><span>Add School</span></a>
           </div>
         </div>
 
-        <!-- 4 High-Impact Regional Metric Cards -->
+        <!-- 4 Key Metrics -->
         <div class="row g-3 mb-4">
-          <!-- 1. Hero Commission Card -->
-          <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
+          <!-- 1. Commission -->
+          <div class="col-12 col-md-6 col-xl-4">
             <div class="s2d-stat-card s2d-stat-card--hero">
               <div class="stat-card-top">
-                <span class="stat-card-label">Net Earned Commission</span>
+                <span class="stat-card-label">Total Commission</span>
                 <span class="stat-icon-well"><i data-lucide="coins"></i></span>
               </div>
               <div class="stat-card-value">₹{{ earned_commission|default:"2,24,805.60" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">18% Tier Settled</span>
-                <span>Next Payout Dec 5 (₹38.4k Pending)</span>
+                <span>₹38.4k pending payout</span>
               </div>
             </div>
           </div>
 
-          <!-- 2. Assigned Campuses -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-2">
+          <!-- 2. Assigned Schools -->
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--teal">
               <div class="stat-card-top">
-                <span class="stat-card-label">Assigned Campuses</span>
+                <span class="stat-card-label">Assigned Schools</span>
                 <span class="stat-icon-well"><i data-lucide="building-2"></i></span>
               </div>
               <div class="stat-card-value">{{ total_campuses|default:"4" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_campuses|default:"4" }} Active</span>
-                <span>Allocated Territory</span>
+                <span class="stat-badge stat-badge--success">{{ active_campuses|default:"4" }} active</span>
               </div>
             </div>
           </div>
 
-          <!-- 3. Territory Student Base -->
-          <div class="col-6 col-md-6 col-xl-3 animate-fade-up delay-3">
+          <!-- 3. Students -->
+          <div class="col-6 col-md-6 col-xl-3">
             <div class="s2d-stat-card s2d-stat-card--sky">
               <div class="stat-card-top">
-                <span class="stat-card-label">Territory Boarders</span>
+                <span class="stat-card-label">Total Students</span>
                 <span class="stat-icon-well"><i data-lucide="users"></i></span>
               </div>
               <div class="stat-card-value">{{ total_students|default:"6,420" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_students|default:"6,180" }} Active</span>
-                <span>Calling Enabled</span>
+                <span class="stat-badge stat-badge--success">{{ active_students|default:"6,180" }} active</span>
               </div>
             </div>
           </div>
 
-          <!-- 4. Territory Voice Traffic -->
-          <div class="col-12 col-md-6 col-xl-3 animate-fade-up delay-4">
+          <!-- 4. Calling Minutes -->
+          <div class="col-12 col-md-6 col-xl-3">
             <div class="s2d-stat-card s2d-stat-card--amber">
               <div class="stat-card-top">
-                <span class="stat-card-label">Monthly Voice Minutes</span>
+                <span class="stat-card-label">Calling Minutes</span>
                 <span class="stat-icon-well"><i data-lucide="timer"></i></span>
               </div>
               <div class="stat-card-value">{{ calling_minutes|default:"1,38,490" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--neutral">8.9m Avg Call</span>
-                <span>Territory MTD</span>
+                <span>This month</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 2 Focused Analytics Charts -->
+        <!-- Charts -->
         <div class="row g-4 mb-4">
-          <div class="col-xl-8 animate-fade-up delay-3">
+          <div class="col-xl-8">
             <div class="chart-card">
               <div class="chart-card-header">
                 <div>
-                  <h2 class="chart-card-title">Territory Revenue &amp; Net Commission Earnings</h2>
-                  <p class="chart-card-subtitle">Monthly comparison of gross campus top-up volume vs net 18% partner commission</p>
+                  <h2 class="chart-card-title">Revenue &amp; Commission</h2>
+                  <p class="chart-card-subtitle">Monthly gross revenue vs commission</p>
                 </div>
                 <div class="chart-range-group">
-                  <button type="button" class="chart-range-btn active" data-chart-target="fr-revenue-chart" data-view="bar" title="Substantial Column View">Bars</button>
-                  <button type="button" class="chart-range-btn" data-chart-target="fr-revenue-chart" data-view="area" title="Fluid Trend Flow">Trend</button>
+                  <button type="button" class="chart-range-btn active" data-chart-target="fr-revenue-chart" data-view="bar" title="Bar View">Bars</button>
+                  <button type="button" class="chart-range-btn" data-chart-target="fr-revenue-chart" data-view="area" title="Trend View">Trend</button>
                 </div>
               </div>
               <div class="chart-card-body">
@@ -124,12 +119,12 @@
               </div>
             </div>
           </div>
-          <div class="col-xl-4 animate-fade-up delay-4">
+          <div class="col-xl-4">
             <div class="chart-card h-100">
               <div class="chart-card-header">
                 <div>
-                  <h2 class="chart-card-title">Territory Student Share</h2>
-                  <p class="chart-card-subtitle">Student enrollment across assigned campuses</p>
+                  <h2 class="chart-card-title">Students by School</h2>
+                  <p class="chart-card-subtitle">Assigned schools</p>
                 </div>
               </div>
               <div class="chart-card-body">

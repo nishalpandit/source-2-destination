@@ -1,9 +1,3 @@
-"""
-School Admin Views (school_views.py)
-Source 2 Destination — Campus & Hostel Operations Portal
-Handles campus-level student management, call allowances, hostel phone operations,
-bulk uploads, warden duty rosters, device assignments, and reporting per flowchart specifications.
-"""
 import os
 import io
 import csv
@@ -88,6 +82,7 @@ def dashboard(request):
     today = timezone.localdate()
     calls_today_qs = CallRecord.objects.filter(school=school, start_time__date=today) if school else CallRecord.objects.none()
     calls_today_count = calls_today_qs.count()
+    calls_completed_today = calls_today_qs.filter(call_status='Completed').count()
     violations_today_count = calls_today_qs.filter(
         call_status__in=['Restricted Schedule', 'Unauthorized Number']
     ).count()
@@ -171,6 +166,7 @@ def dashboard(request):
         "recent_recharges": recent_recharges,
         "recent_recharges_count": recent_recharges_count,
         "calls_today_count": calls_today_count,
+        "calls_completed_today": calls_completed_today,
         "violations_today_count": violations_today_count,
         "whitelist_compliance_percent": whitelist_compliance_percent,
         "total_booths_count": total_booths_count,
