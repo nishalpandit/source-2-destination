@@ -856,12 +856,28 @@ def student_codes(request):
         for s in students
     ]
 
+    issued_codes = [
+        {
+            "student_name": s.name,
+            "student_code": s.code,
+            "class_name": s.class_name,
+            "section": s.section,
+            "code": s.calling_code,
+            "pin_policy": s.pin_policy,
+            "status": s.code_status,
+            "issued_at": s.code_issued_at,
+            "last_used": s.code_last_used,
+        }
+        for s in students if s.calling_code
+    ]
+
     context = {
         "school": school,
         "students": students,
+        "issued_codes": issued_codes,
         "student_codes_json": json.dumps(student_codes_data),
         "issued_info": issued_info,
-        "total_codes": students.count(),
+        "total_codes": len(issued_codes),
         "active_codes": students.filter(code_status='Active').count(),
         "suspended_codes": students.filter(code_status='Suspended').count(),
     }

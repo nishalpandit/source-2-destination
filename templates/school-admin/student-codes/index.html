@@ -86,10 +86,21 @@
                   <tbody>
                     {% for c in issued_codes %}
                     <tr>
-                      <td class="cell-primary">{{ c.student_name }} <span class="mono-code">({{ c.student_code }})</span></td>
-                      <td class="mono-code">{{ c.code }}</td>
+                      <td>
+                        <span class="cell-primary">{{ c.student_name }}</span>
+                        <span class="cell-sub mono-code">{{ c.student_code }} · {{ c.class_name }} {{ c.section }}</span>
+                      </td>
+                      <td class="mono-code fw-semibold">{{ c.code }}</td>
                       <td><span class="action-chip">{{ c.pin_policy }}</span></td>
-                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
+                      <td>
+                        {% if c.status == 'Active' %}
+                        <span class="s2d-badge s2d-badge-success">Active</span>
+                        {% elif c.status == 'Suspended' %}
+                        <span class="s2d-badge s2d-badge-danger">Suspended</span>
+                        {% else %}
+                        <span class="s2d-badge s2d-badge-warning">{{ c.status }}</span>
+                        {% endif %}
+                      </td>
                       <td>
                         <button type="button" class="btn-copy" data-copy-text="{{ c.code }}" title="Copy calling code"><i data-lucide="copy" style="width:14px;height:14px;"></i></button>
                       </td>

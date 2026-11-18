@@ -280,6 +280,12 @@ class SchoolAdminFlowchartTests(TestCase):
         self.assertEqual(grd_det.status_code, 200)
         self.assertContains(grd_det, 'window.S2D_DEMO.callHistory')
 
+        codes_resp = self.client.get('/school-admin/student-codes/')
+        self.assertEqual(codes_resp.status_code, 200)
+        self.assertContains(codes_resp, 'Ananya Deshmukh')
+        self.assertContains(codes_resp, 'S2D-DOON-9002')
+        self.assertNotContains(codes_resp, 'No codes issued yet.')
+
     def test_all_four_settings_tabs_persist(self):
         # Tab 1: Profile (school_name bug fixed)
         r1 = self.client.post('/school-admin/settings/index.html', {
