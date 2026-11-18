@@ -92,7 +92,7 @@
       sidebarMount.innerHTML = `
         <div class="sidebar-brand">
           <a href="${resolveHref(navCfg.homeRoute)}" class="sidebar-brand-link" title="Source 2 Destination">
-            <img src="${resolveHref('assets/images/logo.svg')}" alt="Source 2 Destination Logo" class="sidebar-brand-logo">
+            <img src="${resolveHref('static/images/logo.png')}" alt="Source 2 Destination Logo" class="sidebar-brand-logo">
             <div class="sidebar-brand-text">
               <span class="sidebar-brand-name">Source 2 Destination</span>
               <span class="sidebar-brand-role">${navCfg.roleLabel}</span>

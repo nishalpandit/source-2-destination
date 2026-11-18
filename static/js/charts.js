@@ -7,12 +7,13 @@
   'use strict';
 
   const PALETTE = {
-    indigo: '#4F46E5',
-    indigoLight: '#818CF8',
-    indigoDark: '#3730A3',
+    indigo: '#0A2E52',      // S2D Brand Deep Navy (high contrast on white canvas)
+    indigoLight: '#1E5288',
+    indigoDark: '#02182D',
+    crimson: '#DB2A22',     // S2D Signature Crimson Red
     emerald: '#10B981',
     amber: '#F59E0B',
-    rose: '#EF4444',
+    rose: '#DB2A22',        // Aligned with S2D Brand Crimson
     sky: '#0284C7',
     teal: '#0D9488',
     slate: '#64748B',
@@ -61,7 +62,7 @@
           width: 1,
           opacity: 0.85,
           stroke: {
-            color: '#4F46E5',
+            color: '#DB2A22',
             width: 1,
             dashArray: 3
           }

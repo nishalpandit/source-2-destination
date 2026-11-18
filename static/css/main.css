@@ -6,23 +6,28 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Brand Palette */
-  --s2d-primary: #4F46E5;
-  --s2d-primary-hover: #4338CA;
-  --s2d-primary-dark: #3730A3;
-  --s2d-primary-soft: #EEF2FF;
-  --s2d-primary-border: #C7D2FE;
-  --s2d-primary-ring: rgba(79, 70, 229, 0.18);
+  /* S2D Official Brand Palette (Extracted from logo.png: #02182D Navy & #DB2A22 Crimson) */
+  --s2d-navy: #02182D;
+  --s2d-navy-deep: #01101F;
+  --s2d-navy-elevated: #062542;
+  --s2d-navy-soft: #EDF2F7;
+
+  --s2d-primary: #DB2A22;
+  --s2d-primary-hover: #B91C1C;
+  --s2d-primary-dark: #991B1B;
+  --s2d-primary-soft: #FEF2F2;
+  --s2d-primary-border: #FECACA;
+  --s2d-primary-ring: rgba(219, 42, 34, 0.20);
 
   /* Surfaces & Neutrals */
-  --s2d-bg: #F8FAFC;
+  --s2d-bg: #F6F8FB;
   --s2d-surface: #FFFFFF;
-  --s2d-surface-muted: #F1F5F9;
+  --s2d-surface-muted: #EEF2F6;
   --s2d-surface-subtle: #F8FAFC;
-  --s2d-heading: #0F172A;
-  --s2d-text: #1E293B;
-  --s2d-text-secondary: #64748B;
-  --s2d-text-muted: #94A3B8;
+  --s2d-heading: #02182D;
+  --s2d-text: #162638;
+  --s2d-text-secondary: #5B6E82;
+  --s2d-text-muted: #8B9CB0;
   --s2d-border: #E2E8F0;
   --s2d-border-strong: #CBD5E1;
 
@@ -37,7 +42,7 @@
   --s2d-warning-text: #B45309;
   --s2d-warning-border: #FDE68A;
 
-  --s2d-danger: #EF4444;
+  --s2d-danger: #DB2A22;
   --s2d-danger-bg: #FEF2F2;
   --s2d-danger-text: #B91C1C;
   --s2d-danger-border: #FECACA;
@@ -48,8 +53,8 @@
   --s2d-info-border: #BAE6FD;
 
   /* Role Subtle Accent Tokens */
-  --role-super: #4F46E5;
-  --role-franchise: #0D9488;
+  --role-super: #DB2A22;
+  --role-franchise: #02182D;
   --role-school: #0284C7;
 
   /* Layout Dimensions */

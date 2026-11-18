@@ -1,7 +1,7 @@
 {% load static %}
 <div class="sidebar-brand">
-  <a href="/super-admin/" class="sidebar-brand-link" title="Source 2 Destination">
-    <img src="{% static 'images/logo.svg' %}" alt="Source 2 Destination Logo" class="sidebar-brand-logo">
+  <a href="/super-admin/dashboard.html" class="sidebar-brand-link" title="Source 2 Destination IT Services">
+    <img src="{% static 'images/logo.png' %}" alt="Source 2 Destination Logo" class="sidebar-brand-logo">
     <div class="sidebar-brand-text">
       <span class="sidebar-brand-name">Source 2 Destination</span>
       <span class="sidebar-brand-role">Super Admin</span>
@@ -17,7 +17,7 @@
   <div class="sidebar-group">
     <div class="sidebar-group-label">Executive Command</div>
     <div class="nav-item-box">
-      <a href="/super-admin/" class="sidebar-link {% if request.path == '/super-admin/' or request.path == '/super-admin/dashboard/' or request.path == '/super-admin/dashboard/index.html' %}active{% endif %}">
+      <a href="/super-admin/dashboard.html" class="sidebar-link {% if request.path == '/super-admin/' or request.path == '/super-admin/dashboard/' or request.path == '/super-admin/dashboard.html' or request.path == '/super-admin/dashboard/index.html' %}active{% endif %}">
         <span class="sidebar-link-icon"><i data-lucide="layout-dashboard"></i></span>
         <span class="sidebar-link-label">Dashboard Overview</span>
       </a>

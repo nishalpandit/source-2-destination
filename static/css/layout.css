@@ -408,165 +408,209 @@ body.sidebar-collapsed .sidebar-user-card {
 }
 
 /* ==========================================================================
-   MODERN SIDEBAR OVERRIDES — Enterprise Campus Portal (Solid Dark Color)
+   S2D BRAND SIDEBAR THEME — Deep Midnight Navy (#02182D) + Crimson (#DB2A22)
    ========================================================================== */
 
-/* Sidebar shell — solid dark color */
+/* Sidebar shell — exact logo Midnight Navy */
 .app-sidebar {
-  background: #0F172A !important;
-  border-right: 1px solid rgba(255,255,255,0.08);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(180deg, #02182D 0%, #01101F 100%) !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 4px 0 24px rgba(2, 24, 45, 0.18);
 }
 
-/* Brand header on dark sidebar */
+/* Crisp White Brand Showcase Header — ensures razor-sharp contrast for S2D logo.png */
 .sidebar-brand {
-  background: #0B1120 !important;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  gap: 12px;
+  height: 76px;
+  padding: 10px 14px;
+  background: #FFFFFF !important;
+  border-bottom: 2px solid #DB2A22 !important;
+  box-shadow: 0 4px 16px rgba(1, 16, 31, 0.22);
+  gap: 8px;
 }
-.sidebar-brand-name { color: #FFFFFF !important; font-size: 0.95rem; }
-.sidebar-brand-role { color: var(--s2d-primary) !important; margin-top: 1px; }
+.sidebar-brand-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+  color: #02182D !important;
+}
 .sidebar-brand-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.18);
+  height: 44px;
+  width: auto;
+  max-width: 138px;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+  flex-shrink: 0;
 }
-
-/* Nav area on dark sidebar */
-.sidebar-nav-scroll { padding: 20px 10px 24px; }
-.sidebar-group { margin-bottom: 24px; }
-.sidebar-group-label {
-  font-size: 0.66rem;
+body.sidebar-collapsed .sidebar-brand-logo {
+  height: auto;
+  max-width: 52px;
+}
+.sidebar-brand-text {
+  align-items: flex-end;
+  justify-content: center;
+}
+.sidebar-brand-name {
+  display: none; /* Wordmark is already printed inside logo.png */
+}
+.sidebar-brand-role {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #DB2A22 !important;
+  font-size: 0.60rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #94A3B8 !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  margin-top: 0;
 }
 
-/* Category links — each category gets its own accent color on hover/active */
+/* Nav area on Midnight Navy sidebar */
+.sidebar-nav-scroll { padding: 18px 10px 24px; }
+.sidebar-group { margin-bottom: 22px; }
+.sidebar-group-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  color: #7D97B3 !important;
+}
+
+/* Navigation links */
 .sidebar-link,
 .sidebar-parent-btn {
-  padding: 11px 14px;
+  padding: 10px 13px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 180ms ease;
-  color: #CBD5E1 !important;
+  color: #D5E2EE !important;
   background: transparent;
 }
 
 .sidebar-link:hover,
 .sidebar-parent-btn:hover {
-  background-color: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.1);
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.10);
   color: #FFFFFF !important;
 }
 
-/* Active category — bright accent with glow */
+/* Active item — signature S2D Crimson Red accent */
 .sidebar-link.active,
 .sidebar-parent-btn.active-parent {
-  background-color: rgba(79, 70, 229, 0.15);
-  border-color: rgba(79, 70, 229, 0.35);
+  background: linear-gradient(90deg, rgba(219, 42, 34, 0.26) 0%, rgba(219, 42, 34, 0.09) 100%) !important;
+  border-color: rgba(219, 42, 34, 0.45);
   color: #FFFFFF !important;
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(79, 70, 229, 0.4);
+  box-shadow: inset 0 0 0 1px rgba(219, 42, 34, 0.35);
 }
 
 .sidebar-link.active::before {
   left: 0;
-  top: 0;
-  bottom: 0;
+  top: 4px;
+  bottom: 4px;
   width: 4px;
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  background-color: var(--s2d-primary);
+  background-color: #DB2A22;
+  box-shadow: 0 0 10px rgba(219, 42, 34, 0.75);
 }
 
 .sidebar-link-icon,
 .sidebar-link-icon [data-lucide] { color: currentColor !important; }
 .sidebar-link-label { color: currentColor !important; }
-.sidebar-chevron { color: #94A3B8 !important; }
+.sidebar-chevron { color: #7D97B3 !important; }
 
 .nav-item-box.open > .sidebar-parent-btn .sidebar-chevron {
   transform: rotate(90deg);
-  color: var(--s2d-primary) !important;
+  color: #DB2A22 !important;
 }
 
-/* Submenu — lighter, distinct color */
+/* Submenu on Midnight Navy */
 .sidebar-submenu {
-  padding: 5px 0 7px 28px;
-  margin-left: 20px;
-  border-left: 1px solid rgba(255,255,255,0.06);
+  padding: 5px 0 7px 26px;
+  margin-left: 19px;
+  border-left: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .sidebar-sublink {
   padding: 8px 12px;
   border-radius: 6px;
-  font-size: 0.78rem;
+  font-size: 0.79rem;
   font-weight: 500;
-  color: #94A3B8 !important;
+  color: #9EB5CC !important;
   transition: all 150ms ease;
   background: transparent;
 }
 
 .sidebar-sublink:hover {
   color: #FFFFFF !important;
-  background-color: rgba(255,255,255,0.06);
+  background-color: rgba(255, 255, 255, 0.06);
   padding-left: 16px;
 }
 
-/* Active subcategory — distinct emerald accent color */
+/* Active sublink — crisp S2D Crimson highlight */
 .sidebar-sublink.active {
-  color: #10B981 !important;
-  background-color: rgba(16, 185, 129, 0.15);
+  color: #FF8A84 !important;
+  background-color: rgba(219, 42, 34, 0.18);
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(219, 42, 34, 0.35);
 }
 
-/* Tooltips on dark sidebar */
+/* Tooltips on Midnight Navy sidebar */
 .sidebar-tooltip {
-  background: #0F172A !important;
+  background: #02182D !important;
   color: #FFFFFF !important;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(219, 42, 34, 0.35);
 }
-.sidebar-tooltip::before { background: #0F172A !important; }
+.sidebar-tooltip::before { background: #02182D !important; }
 
-/* Footer user card on dark sidebar */
+/* Footer user card on Midnight Navy sidebar */
 .sidebar-footer {
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 16px 12px;
-  background-color: #0B1120 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  padding: 14px 12px;
+  background-color: #010E1B !important;
   margin-top: auto;
 }
 
 .sidebar-user-card {
-  padding: 11px 14px;
+  padding: 11px 13px;
   border-radius: var(--radius-lg);
-  border: 1px solid rgba(255,255,255,0.08);
-  background: #111827 !important;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: #062440 !important;
   box-shadow: var(--shadow-sm);
 }
 
 .sidebar-user-name { color: #FFFFFF !important; }
-.sidebar-user-email { color: #94A3B8 !important; }
+.sidebar-user-email { color: #9EB5CC !important; }
 .sidebar-user-avatar {
   width: 38px;
   height: 38px;
   border-radius: 10px;
   font-size: 0.82rem;
-  background: var(--s2d-primary) !important;
+  background: #DB2A22 !important;
   color: #FFFFFF !important;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+  box-shadow: 0 3px 10px rgba(219, 42, 34, 0.38);
 }
 
 .sidebar-logout-btn {
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: #111827 !important;
-  color: #CBD5E1 !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #02182D !important;
+  color: #D5E2EE !important;
   transition: all 150ms ease;
+}
+.sidebar-logout-btn:hover {
+  background: #DB2A22 !important;
+  border-color: #DB2A22 !important;
+  color: #FFFFFF !important;
 }
 
 .sidebar-logout-btn:hover {
