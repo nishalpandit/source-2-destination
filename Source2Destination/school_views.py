@@ -30,12 +30,32 @@ from .calling_services import (
 
 
 def get_current_school(request):
-    """Retrieve active school tenant (defaults to Doon Valley Residential Academy SCH-1001)."""
-    code = request.GET.get('school_code') or request.session.get('school_code', 'SCH-1001')
-    school = School.objects.filter(code=code).first()
-    if not school:
-        school = School.objects.filter(code='SCH-1001').first() or School.objects.first()
-    return school
+    """
+    Resolve active school tenant:
+    1. Explicit query parameter (?school_code=...) saved into session when valid
+    2. Persisted session school_code
+    3. Authenticated user's matched school by admin_email
+    4. Default campus fallback (SCH-1001 or first available School)
+    """
+    query_code = (request.GET.get('school_code') or '').strip()
+    if query_code:
+        school = School.objects.filter(code=query_code).first()
+        if school:
+            request.session['school_code'] = school.code
+            return school
+
+    session_code = request.session.get('school_code')
+    if session_code:
+        school = School.objects.filter(code=session_code).first()
+        if school:
+            return school
+
+    if getattr(request, 'user', None) and request.user.is_authenticated and request.user.email:
+        school = School.objects.filter(admin_email__iexact=request.user.email).first()
+        if school:
+            return school
+
+    return School.objects.filter(code='SCH-1001').first() or School.objects.first()
 
 
 # ==============================================================================
@@ -50,9 +70,9 @@ def dashboard(request):
     inactive_students = students_qs.filter(status__in=['Inactive', 'Suspended']).count()
     active_percent = round((active_students / total_students * 100), 1) if total_students > 0 else 0
 
-    total_classes = AcademicClass.objects.filter(school=school).count()
-    total_sections = ClassSection.objects.filter(school=school).count()
-    total_guardians = Guardian.objects.filter(school=school).count()
+    total_classes = AcademicClass.objects.filter(school=school).count() if school else 0
+    total_sections = ClassSection.objects.filter(school=school).count() if school else 0
+    total_guardians = Guardian.objects.filter(school=school).count() if school else 0
     active_accounts = students_qs.filter(code_status='Active').count()
     total_minutes = students_qs.aggregate(total=Sum('remaining_minutes'))['total'] or 0
 
@@ -61,14 +81,79 @@ def dashboard(request):
 
     # Recent student additions and recharges
     recent_students = students_qs.order_by('-id')[:5]
-    recent_recharges = StudentRecharge.objects.filter(school=school).select_related('student', 'plan').order_by('-created_at')[:5]
-    recent_recharges_count = StudentRecharge.objects.filter(school=school).count()
+    recent_recharges = StudentRecharge.objects.filter(school=school).select_related('student', 'plan').order_by('-created_at')[:5] if school else []
+    recent_recharges_count = StudentRecharge.objects.filter(school=school).count() if school else 0
 
-    # Flowchart Telemetry: Calls today, Active booths, and On-Duty Wardens
-    calls_today_count = CallRecord.objects.filter(school=school).count()
-    booths_online_count = KioskDevice.objects.filter(school=school, status='Online').count()
-    wardens_on_duty_count = HostelWarden.objects.filter(school=school, status='On Duty').count()
-    recent_wardens = HostelWarden.objects.filter(school=school)[:3]
+    # Accurate Today-Only Calling Telemetry & Whitelist Compliance
+    today = timezone.localdate()
+    calls_today_qs = CallRecord.objects.filter(school=school, start_time__date=today) if school else CallRecord.objects.none()
+    calls_today_count = calls_today_qs.count()
+    violations_today_count = calls_today_qs.filter(
+        call_status__in=['Restricted Schedule', 'Unauthorized Number']
+    ).count()
+    unauthorized_today_count = calls_today_qs.filter(call_status='Unauthorized Number').count()
+    whitelist_compliance_percent = (
+        round(((calls_today_count - unauthorized_today_count) / calls_today_count) * 100, 1)
+        if calls_today_count > 0 else 100.0
+    )
+
+    # Kiosk Booth Fleet Health
+    total_booths_count = KioskDevice.objects.filter(school=school).count() if school else 0
+    booths_online_count = KioskDevice.objects.filter(school=school, status='Online').count() if school else 0
+    booths_online_percent = (
+        round((booths_online_count / total_booths_count) * 100, 1)
+        if total_booths_count > 0 else 0.0
+    )
+
+    # Hostel Wardens On-Duty Roster
+    wardens_on_duty_count = HostelWarden.objects.filter(school=school, status='On Duty').count() if school else 0
+    recent_wardens = HostelWarden.objects.filter(school=school).order_by('status', 'name')[:4] if school else []
+
+    # Live Chart 1: Last 7 Days Calling Traffic & Window Compliance
+    daily_labels = []
+    daily_completed = []
+    daily_restricted = []
+    for offset in range(6, -1, -1):
+        day = today - timedelta(days=offset)
+        day_qs = CallRecord.objects.filter(school=school, start_time__date=day) if school else CallRecord.objects.none()
+        daily_labels.append('Today' if offset == 0 else day.strftime('%a'))
+        daily_completed.append(day_qs.filter(call_status='Completed').count())
+        daily_restricted.append(
+            day_qs.filter(call_status__in=['Restricted Schedule', 'Unauthorized Number', 'Insufficient Credits']).count()
+        )
+
+    daily_calls_chart = {
+        "labels": daily_labels,
+        "completed": daily_completed,
+        "restricted": daily_restricted,
+        "hasData": any(daily_completed) or any(daily_restricted),
+    }
+
+    # Live Chart 2: 30-Day Class-wise Voice Usage Breakdown
+    thirty_days_ago = today - timedelta(days=30)
+    academic_classes = list(AcademicClass.objects.filter(school=school).order_by('name')) if school else []
+    class_names = [c.name for c in academic_classes]
+    if not class_names and school:
+        class_names = list(
+            students_qs.exclude(class_name='').values_list('class_name', flat=True).distinct().order_by('class_name')
+        )
+
+    class_usage_labels = []
+    class_usage_minutes = []
+    for cname in class_names:
+        mins = CallRecord.objects.filter(
+            school=school,
+            student__class_name__iexact=cname,
+            start_time__date__gte=thirty_days_ago
+        ).aggregate(total=Sum('minutes_deducted'))['total'] or 0
+        class_usage_labels.append(cname)
+        class_usage_minutes.append(int(mins))
+
+    class_usage_chart = {
+        "labels": class_usage_labels,
+        "minutes": class_usage_minutes,
+        "hasData": bool(class_usage_labels),
+    }
 
     context = {
         "school": school,
@@ -86,9 +171,15 @@ def dashboard(request):
         "recent_recharges": recent_recharges,
         "recent_recharges_count": recent_recharges_count,
         "calls_today_count": calls_today_count,
+        "violations_today_count": violations_today_count,
+        "whitelist_compliance_percent": whitelist_compliance_percent,
+        "total_booths_count": total_booths_count,
         "booths_online_count": booths_online_count,
+        "booths_online_percent": booths_online_percent,
         "wardens_on_duty_count": wardens_on_duty_count,
         "recent_wardens": recent_wardens,
+        "daily_calls_chart_json": json.dumps(daily_calls_chart),
+        "class_usage_chart_json": json.dumps(class_usage_chart),
     }
     return render(request, 'school-admin/dashboard.html', context)
 
@@ -196,19 +287,62 @@ def student_add(request):
 
 def student_details(request):
     """School Admin: View 360 profile of student."""
+    school = get_current_school(request)
     student_id = request.GET.get('id')
-    stu = Student.objects.filter(Q(code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0)).select_related('school').first()
+    stu = Student.objects.filter(
+        Q(code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0)
+    ).select_related('school').first()
     if not stu:
-        stu = Student.objects.first()
+        stu = Student.objects.filter(school=school).select_related('school').first() or Student.objects.select_related('school').first()
 
     guardians = Guardian.objects.filter(student=stu) if stu else []
-    calls = CallRecord.objects.filter(student=stu).order_by('-start_time')[:10] if stu else []
+    calls = CallRecord.objects.filter(student=stu).select_related('guardian', 'school').order_by('-start_time')[:20] if stu else []
+    recharges = StudentRecharge.objects.filter(student=stu).select_related('plan', 'school').order_by('-created_at')[:20] if stu else []
+
+    call_history_data = [
+        {
+            "id": c.call_id,
+            "studentName": stu.name if stu else "Student",
+            "studentCode": stu.calling_code if stu else "N/A",
+            "school": c.school.name if c.school else "",
+            "authorizedNumber": c.destination_number,
+            "guardianName": c.guardian.name if c.guardian else c.call_type,
+            "startTime": c.start_time.strftime("%Y-%m-%d %H:%M"),
+            "duration": f"{c.duration_seconds // 60}m {c.duration_seconds % 60:02d}s" if c.duration_seconds > 0 else "0m 00s",
+            "minutesUsed": c.minutes_deducted,
+            "status": c.call_status,
+            "dateOnly": c.start_time.strftime("%Y-%m-%d"),
+            "recordingUrl": c.audio_recording_url,
+        }
+        for c in calls
+    ]
+
+    recharges_data = [
+        {
+            "id": r.recharge_id,
+            "date": r.created_at.strftime("%Y-%m-%d %H:%M"),
+            "studentName": stu.name if stu else "Student",
+            "studentCode": stu.calling_code if stu else "N/A",
+            "school": r.school.name if r.school else "",
+            "planName": r.plan_name_cache,
+            "minutesAdded": r.minutes_added,
+            "validityDays": r.validity_days_added,
+            "amount": float(r.amount),
+            "status": r.status,
+            "paymentMode": r.payment_mode,
+            "voucherRef": r.voucher_ref,
+        }
+        for r in recharges
+    ]
 
     context = {
         "student": stu,
         "guardians": guardians,
         "calls": calls,
-        "school": stu.school if stu else get_current_school(request),
+        "recharges": recharges,
+        "call_history_json": json.dumps(call_history_data),
+        "recharges_json": json.dumps(recharges_data),
+        "school": stu.school if stu else school,
     }
     return render(request, 'school-admin/students/details.html', context)
 
@@ -582,15 +716,45 @@ def guardian_add(request):
 
 def guardian_details(request):
     """School Admin: View guardian whitelist profile & verified contact details."""
+    school = get_current_school(request)
     guardian_id = request.GET.get('id')
-    guardian = Guardian.objects.filter(Q(code=guardian_id) | Q(id=guardian_id if str(guardian_id).isdigit() else 0)).select_related('student', 'school').first()
+    guardian = Guardian.objects.filter(
+        Q(code=guardian_id) | Q(id=guardian_id if str(guardian_id).isdigit() else 0)
+    ).select_related('student', 'school').first()
     if not guardian:
-        guardian = Guardian.objects.first()
+        guardian = Guardian.objects.filter(school=school).select_related('student', 'school').first() or Guardian.objects.select_related('student', 'school').first()
+
+    calls_qs = CallRecord.objects.none()
+    if guardian:
+        phones = [p for p in [guardian.father_phone, guardian.mother_phone, guardian.emergency_phone] if p]
+        q_filter = Q(guardian=guardian)
+        if phones:
+            q_filter |= Q(destination_number__in=phones)
+        calls_qs = CallRecord.objects.filter(q_filter).select_related('student', 'guardian', 'school').order_by('-start_time')[:20]
+
+    call_history_data = [
+        {
+            "id": c.call_id,
+            "studentName": c.student.name if c.student else "Student",
+            "studentCode": c.student.calling_code if c.student else "N/A",
+            "school": c.school.name if c.school else "",
+            "authorizedNumber": c.destination_number,
+            "guardianName": guardian.name if guardian else c.call_type,
+            "startTime": c.start_time.strftime("%Y-%m-%d %H:%M"),
+            "duration": f"{c.duration_seconds // 60}m {c.duration_seconds % 60:02d}s" if c.duration_seconds > 0 else "0m 00s",
+            "minutesUsed": c.minutes_deducted,
+            "status": c.call_status,
+            "dateOnly": c.start_time.strftime("%Y-%m-%d"),
+            "recordingUrl": c.audio_recording_url,
+        }
+        for c in calls_qs
+    ]
 
     context = {
         "guardian": guardian,
         "student": guardian.student if guardian else None,
-        "school": guardian.school if guardian else get_current_school(request),
+        "call_history_json": json.dumps(call_history_data),
+        "school": guardian.school if guardian else school,
     }
     return render(request, 'school-admin/guardians/details.html', context)
 
@@ -1080,7 +1244,9 @@ def call_history(request):
         "total_calls": total_calls,
         "completed_calls": completed_calls,
         "restricted_calls": restricted_calls,
+        "flagged_calls": restricted_calls,
         "total_minutes": total_minutes,
+        "total_duration_minutes": total_minutes,
         "q": q,
         "status_filter": status_filter,
     }
@@ -1177,12 +1343,44 @@ def hostel_warden_edit(request):
 
 
 def hostel_warden_details(request):
-    """View warden shift record."""
+    """View warden shift record and supervised kiosk devices."""
+    school = get_current_school(request)
     warden_id = request.GET.get('id')
-    warden = HostelWarden.objects.filter(Q(code=warden_id) | Q(id=warden_id if str(warden_id).isdigit() else 0)).first()
+    warden = HostelWarden.objects.filter(
+        Q(code=warden_id) | Q(id=warden_id if str(warden_id).isdigit() else 0)
+    ).select_related('school').first()
     if not warden:
-        warden = HostelWarden.objects.first()
-    return render(request, 'school-admin/hostel-wardens/details.html', {"warden": warden, "school": warden.school if warden else None})
+        warden = HostelWarden.objects.filter(school=school).select_related('school').first() or HostelWarden.objects.select_related('school').first()
+
+    target_school = warden.school if warden else school
+    devices_qs = KioskDevice.objects.filter(school=target_school) if target_school else KioskDevice.objects.none()
+    if warden and warden.hostel_block:
+        block_devices = devices_qs.filter(hostel_block__icontains=warden.hostel_block)
+        if block_devices.exists():
+            devices_qs = block_devices
+
+    devices_data = [
+        {
+            "id": d.device_id,
+            "deviceName": d.name,
+            "model": d.app_version,
+            "schoolId": target_school.code if target_school else "",
+            "wingLocation": d.hostel_block,
+            "assignedMode": d.assigned_wing or "Hostel Wing Booth",
+            "enrollmentStatus": "Enrolled",
+            "onlineStatus": d.status,
+            "lastHeartbeat": d.last_heartbeat.strftime("%H:%M Today") if d.last_heartbeat else "Just now",
+            "status": "Active" if d.status == "Online" else "Available",
+        }
+        for d in devices_qs
+    ]
+
+    context = {
+        "warden": warden,
+        "school": target_school,
+        "devices_json": json.dumps(devices_data),
+    }
+    return render(request, 'school-admin/hostel-wardens/details.html', context)
 
 
 # ==============================================================================
@@ -1206,9 +1404,9 @@ def device_assignments_list(request):
             "id": d.device_id,
             "deviceName": d.name,
             "model": d.app_version,
-            "schoolId": school.code,
+            "schoolId": school.code if school else "",
             "wingLocation": d.hostel_block,
-            "assignedMode": "Grade 9–12 Cohort",
+            "assignedMode": d.assigned_wing or "Grade 9–12 Cohort",
             "enrollmentStatus": "Enrolled",
             "onlineStatus": d.status,
             "lastHeartbeat": d.last_heartbeat.strftime("%H:%M Today") if d.last_heartbeat else "Just now",
@@ -1235,35 +1433,45 @@ def device_assign(request):
     Flowchart: Device Available and Enrolled? -> [Yes] Save Device Mapping / [No] Show Device Assignment Error.
     """
     school = get_current_school(request)
-    devices = KioskDevice.objects.filter(school=school)
-    classes = AcademicClass.objects.filter(school=school)
+    devices = KioskDevice.objects.filter(school=school).order_by('name') if school else KioskDevice.objects.none()
+    classes = AcademicClass.objects.filter(school=school).order_by('name') if school else AcademicClass.objects.none()
+    wardens = HostelWarden.objects.filter(school=school).order_by('name') if school else HostelWarden.objects.none()
 
     error = None
     if request.method == "POST":
-        device_id = request.POST.get('device_id')
+        device_id = (request.POST.get('device_id') or '').strip()
         device = KioskDevice.objects.filter(device_id=device_id, school=school).first()
 
         if not device:
-            error = "Device is not enrolled in MDM or does not exist."
+            error = "Device is not enrolled in MDM or does not exist for this campus."
         elif device.status == 'Offline':
             error = "Device is currently Offline. Please ensure kiosk heartbeat is restored before assignment."
         else:
-            hostel_wing = request.POST.get('hostel_wing', 'North Wing')
-            academic_class = request.POST.get('academic_class', 'All Classes')
+            hostel_wing = (request.POST.get('hostel_wing') or request.POST.get('target') or 'Tagore Bhavan').strip()
+            academic_class = (request.POST.get('academic_class') or request.POST.get('mode') or 'All Classes').strip()
+            assigned_by = (
+                request.user.get_full_name()
+                if getattr(request, 'user', None) and request.user.is_authenticated and request.user.get_full_name()
+                else "Campus Admin"
+            )
             DeviceAssignment.objects.create(
                 school=school,
                 device=device,
                 hostel_wing=hostel_wing,
                 academic_class=academic_class,
-                assigned_by=request.user.get_full_name() or "Campus Admin",
+                assigned_by=assigned_by,
                 status='Active'
             )
+            device.hostel_block = hostel_wing
+            device.assigned_wing = academic_class
+            device.save(update_fields=['hostel_block', 'assigned_wing'])
             return redirect('/school-admin/device-assignments/list.html')
 
     context = {
         "school": school,
         "devices": devices,
         "classes": classes,
+        "wardens": wardens,
         "error": error,
     }
     return render(request, 'school-admin/device-assignments/assign.html', context)
@@ -1278,12 +1486,17 @@ def student_reports(request):
     Flowchart: Filter by Student / Class / Section / Date -> Generate and Export Reports.
     """
     school = get_current_school(request)
-    students = Student.objects.filter(school=school).order_by('name')
-    classes = AcademicClass.objects.filter(school=school)
+    students = Student.objects.filter(school=school).order_by('name') if school else Student.objects.none()
+    classes = AcademicClass.objects.filter(school=school).order_by('name') if school else AcademicClass.objects.none()
 
     class_filter = request.GET.get('class')
     if class_filter:
         students = students.filter(class_name=class_filter)
+
+    total_students = students.count()
+    active_students = students.filter(status='Active').count()
+    total_minutes = students.aggregate(total=Sum('remaining_minutes'))['total'] or 0
+    avg_minutes = round(total_minutes / total_students) if total_students > 0 else 0
 
     students_data = [
         {
@@ -1291,14 +1504,17 @@ def student_reports(request):
             "code": s.code,
             "name": s.name,
             "studentCode": s.calling_code,
-            "school": school.name,
+            "school": school.name if school else "",
             "className": s.class_name,
             "section": s.section,
+            "hostelWing": s.hostel_wing or "Boarding Wing",
             "guardianName": s.guardian_name,
+            "guardianRelation": s.guardian_relation,
             "primaryPhone": s.primary_phone,
             "remainingMinutes": s.remaining_minutes,
             "dailyLimitMin": s.daily_limit_min,
             "totalCalls": s.call_records.count(),
+            "validityExpiry": s.validity_expiry.strftime("%Y-%m-%d") if s.validity_expiry else "2027-05-31",
             "status": s.status,
         }
         for s in students
@@ -1308,6 +1524,10 @@ def student_reports(request):
         "school": school,
         "students": students,
         "classes": classes,
+        "total_students": total_students,
+        "active_students": active_students,
+        "total_minutes": total_minutes,
+        "avg_minutes": avg_minutes,
         "students_json": json.dumps(students_data),
     }
     return render(request, 'school-admin/student-reports/index.html', context)
@@ -1338,24 +1558,52 @@ def class_reports(request):
     School Admin: Class-wise calling activity and duration breakdown.
     """
     school = get_current_school(request)
-    classes = AcademicClass.objects.filter(school=school).order_by('name')
+    classes = AcademicClass.objects.filter(school=school).order_by('name') if school else AcademicClass.objects.none()
 
     total_classes = classes.count()
-    total_sections = ClassSection.objects.filter(school=school).count()
-    total_minutes = CallRecord.objects.filter(school=school).aggregate(total=Sum('minutes_deducted'))['total'] or 0
+    total_sections = ClassSection.objects.filter(school=school).count() if school else 0
+    total_minutes = CallRecord.objects.filter(school=school).aggregate(total=Sum('minutes_deducted'))['total'] or 0 if school else 0
 
-    classes_data = [
-        {
+    classes_data = []
+    usage_labels = []
+    usage_minutes = []
+    dist_active = []
+    dist_inactive = []
+
+    for c in classes:
+        st_qs = Student.objects.filter(school=school, class_name__iexact=c.name)
+        st_count = st_qs.count()
+        act_count = st_qs.filter(status='Active').count()
+        inact_count = st_count - act_count
+        mins = CallRecord.objects.filter(
+            school=school, student__class_name__iexact=c.name
+        ).aggregate(total=Sum('minutes_deducted'))['total'] or 0
+
+        classes_data.append({
             "id": c.code,
             "className": c.name,
             "supervisor": c.supervisor,
             "sectionsCount": c.sections.count(),
-            "studentsCount": Student.objects.filter(school=school, class_name__iexact=c.name).count(),
-            "activeCallers": Student.objects.filter(school=school, class_name__iexact=c.name, status='Active').count(),
-            "totalMinutesConsumed": CallRecord.objects.filter(school=school, student__class_name__iexact=c.name).aggregate(total=Sum('minutes_deducted'))['total'] or 0,
-        }
-        for c in classes
-    ]
+            "studentsCount": st_count,
+            "activeCallers": act_count,
+            "totalMinutesConsumed": int(mins),
+        })
+        usage_labels.append(c.name)
+        usage_minutes.append(int(mins))
+        dist_active.append(act_count)
+        dist_inactive.append(inact_count)
+
+    class_usage_chart = {
+        "labels": usage_labels,
+        "minutes": usage_minutes,
+        "hasData": bool(usage_labels),
+    }
+    class_distribution_chart = {
+        "labels": usage_labels,
+        "active": dist_active,
+        "inactive": dist_inactive,
+        "hasData": bool(usage_labels),
+    }
 
     context = {
         "school": school,
@@ -1364,6 +1612,8 @@ def class_reports(request):
         "total_sections": total_sections,
         "total_minutes": total_minutes,
         "classes_json": json.dumps(classes_data),
+        "class_usage_chart_json": json.dumps(class_usage_chart),
+        "class_distribution_chart_json": json.dumps(class_distribution_chart),
     }
     return render(request, 'school-admin/class-reports/index.html', context)
 
@@ -1392,31 +1642,56 @@ def export_class_reports_csv(request):
 # ==============================================================================
 def school_settings(request):
     """
-    School Admin: Profile & Campus Operational Preferences.
+    School Admin: Profile & Campus Operational Preferences (4 tabbed forms).
     Flowchart: Update School Profile and Settings.
     """
     school = get_current_school(request)
 
     status_message = None
-    if request.method == "POST":
-        school.name = request.POST.get('name', school.name).strip()
-        school.admin_name = request.POST.get('admin_name', school.admin_name).strip()
-        school.admin_email = request.POST.get('admin_email', school.admin_email).strip()
-        school.admin_phone = request.POST.get('admin_phone', school.admin_phone).strip()
-        if 'hostel_blocks_count' in request.POST:
-            school.hostel_blocks_count = int(request.POST['hostel_blocks_count'])
-        if 'daily_duration_cap' in request.POST:
-            school.daily_duration_cap = int(request.POST['daily_duration_cap'])
-        if 'calling_window_start' in request.POST:
-            school.calling_window_start = request.POST['calling_window_start']
-        if 'calling_window_end' in request.POST:
-            school.calling_window_end = request.POST['calling_window_end']
+    active_tab = request.GET.get('tab', 'profile')
+
+    if request.method == "POST" and school:
+        section = request.POST.get('settings_section', 'profile')
+        active_tab = section
+
+        if section == 'callerid':
+            school.display_school_caller_id = request.POST.get('display_school_caller_id') == 'on'
+            school.show_guardian_whitelist_numbers = request.POST.get('show_guardian_whitelist_numbers') == 'on'
+            school.emergency_override_caller_id = request.POST.get('emergency_override_caller_id') == 'on'
+            status_message = "Caller ID policies saved successfully."
+        elif section == 'emergency':
+            school.primary_emergency_phone = request.POST.get('primary_emergency_phone', school.primary_emergency_phone).strip()
+            school.secondary_emergency_phone = request.POST.get('secondary_emergency_phone', school.secondary_emergency_phone).strip()
+            school.warden_escalation_phone = request.POST.get('warden_escalation_phone', school.warden_escalation_phone).strip()
+            status_message = "Emergency override contacts updated successfully."
+        elif section == 'notify':
+            school.notify_sms_guardians = request.POST.get('notify_sms_guardians') == 'on'
+            school.notify_email_recharges = request.POST.get('notify_email_recharges') == 'on'
+            school.notify_push_validity = request.POST.get('notify_push_validity') == 'on'
+            status_message = "Notification channel preferences saved successfully."
+        else:
+            new_name = (request.POST.get('school_name') or request.POST.get('name') or school.name).strip()
+            school.name = new_name
+            school.admin_name = request.POST.get('admin_name', school.admin_name).strip()
+            school.admin_email = request.POST.get('admin_email', school.admin_email).strip()
+            school.admin_phone = request.POST.get('admin_phone', school.admin_phone).strip()
+            if 'hostel_blocks_count' in request.POST and request.POST['hostel_blocks_count'].isdigit():
+                school.hostel_blocks_count = int(request.POST['hostel_blocks_count'])
+            if 'daily_duration_cap' in request.POST and request.POST['daily_duration_cap'].isdigit():
+                school.daily_duration_cap = int(request.POST['daily_duration_cap'])
+            if 'calling_window_start' in request.POST:
+                school.calling_window_start = request.POST['calling_window_start']
+            if 'calling_window_end' in request.POST:
+                school.calling_window_end = request.POST['calling_window_end']
+            status_message = "Campus identity & operational profile saved successfully."
+
         school.save()
-        status_message = "Campus operational settings and profile saved successfully."
 
     context = {
         "school": school,
+        "message": status_message,
         "status_message": status_message,
+        "active_tab": active_tab,
     }
     return render(request, 'school-admin/settings/index.html', context)
 

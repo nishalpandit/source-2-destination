@@ -36,25 +36,27 @@
           
         </div>
 
+        {% if message %}
+        <div class="s2d-alert s2d-alert-success mb-3">
+          <i data-lucide="check-circle-2"></i>
+          <span>{{ message }}</span>
+        </div>
+        {% endif %}
+
         <!-- Tabbed Configuration Cards -->
         <div class="settings-tabs">
-          <button type="button" class="settings-tab active" data-tab="settings-profile">School Identity</button>
-          <button type="button" class="settings-tab" data-tab="settings-callerid">Caller ID Policies</button>
-          <button type="button" class="settings-tab" data-tab="settings-emergency">Emergency Override</button>
-          <button type="button" class="settings-tab" data-tab="settings-notify">Notification Channels</button>
+          <button type="button" class="settings-tab {% if active_tab == 'profile' or not active_tab %}active{% endif %}" data-tab="settings-profile">School Identity</button>
+          <button type="button" class="settings-tab {% if active_tab == 'callerid' %}active{% endif %}" data-tab="settings-callerid">Caller ID Policies</button>
+          <button type="button" class="settings-tab {% if active_tab == 'emergency' %}active{% endif %}" data-tab="settings-emergency">Emergency Override</button>
+          <button type="button" class="settings-tab {% if active_tab == 'notify' %}active{% endif %}" data-tab="settings-notify">Notification Channels</button>
         </div>
 
-        <div class="settings-tab-panel active" id="settings-profile">
+        <div class="settings-tab-panel {% if active_tab == 'profile' or not active_tab %}active{% endif %}" id="settings-profile">
           <div class="s2d-card">
             <div class="s2d-card-body">
-              {% if message %}
-              <div class="s2d-alert s2d-alert-success mb-3">
-                <i data-lucide="check-circle-2"></i>
-                <span>{{ message }}</span>
-              </div>
-              {% endif %}
               <form method="POST" action="/school-admin/settings/index.html">
                 {% csrf_token %}
+                <input type="hidden" name="settings_section" value="profile">
                 <div class="s2d-form-section">
                   <div class="form-section-meta"><h3>Campus Profile</h3><p>Displayed on guardian communications and student recharge receipts.</p></div>
                   <div class="row g-3">
@@ -70,59 +72,74 @@
           </div>
         </div>
 
-        <div class="settings-tab-panel" id="settings-callerid">
+        <div class="settings-tab-panel {% if active_tab == 'callerid' %}active{% endif %}" id="settings-callerid">
           <div class="settings-card">
             <h4>Caller ID Policies</h4>
-            <div class="s2d-switch-row mb-3">
-              <span>Display School Name on Outbound Calls</span>
-              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
-            </div>
-            <div class="s2d-switch-row mb-3">
-              <span>Show Guardian Whitelist Numbers</span>
-              <label class="status-toggle"><input type="checkbox"><span class="status-toggle-slider"></span></label>
-            </div>
-            <div class="s2d-switch-row">
-              <span>Enable Emergency Override Caller ID</span>
-              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
-            </div>
+            <form method="POST" action="/school-admin/settings/index.html">
+              {% csrf_token %}
+              <input type="hidden" name="settings_section" value="callerid">
+              <div class="s2d-switch-row mb-3">
+                <span>Display School Name on Outbound Calls</span>
+                <label class="status-toggle"><input type="checkbox" name="display_school_caller_id" {% if school.display_school_caller_id %}checked{% endif %}><span class="status-toggle-slider"></span></label>
+              </div>
+              <div class="s2d-switch-row mb-3">
+                <span>Show Guardian Whitelist Numbers</span>
+                <label class="status-toggle"><input type="checkbox" name="show_guardian_whitelist_numbers" {% if school.show_guardian_whitelist_numbers %}checked{% endif %}><span class="status-toggle-slider"></span></label>
+              </div>
+              <div class="s2d-switch-row mb-4">
+                <span>Enable Emergency Override Caller ID</span>
+                <label class="status-toggle"><input type="checkbox" name="emergency_override_caller_id" {% if school.emergency_override_caller_id %}checked{% endif %}><span class="status-toggle-slider"></span></label>
+              </div>
+              <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Caller ID Policies</span></button></div></div>
+            </form>
           </div>
         </div>
 
-        <div class="settings-tab-panel" id="settings-emergency">
+        <div class="settings-tab-panel {% if active_tab == 'emergency' %}active{% endif %}" id="settings-emergency">
           <div class="settings-card">
             <h4>Emergency Override Contacts</h4>
-            <div class="row g-3">
-              <div class="col-md-6 s2d-field">
-                <label class="s2d-label">Primary Emergency Contact <span class="req-star">*</span></label>
-                <input type="tel" class="s2d-input" data-validate-phone="true" value="+91 98765 43210" required>
+            <form method="POST" action="/school-admin/settings/index.html">
+              {% csrf_token %}
+              <input type="hidden" name="settings_section" value="emergency">
+              <div class="row g-3 mb-4">
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Primary Emergency Contact <span class="req-star">*</span></label>
+                  <input type="tel" name="primary_emergency_phone" class="s2d-input" data-validate-phone="true" value="{{ school.primary_emergency_phone|default:'+91 98765 43210' }}" required>
+                </div>
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Secondary Emergency Contact</label>
+                  <input type="tel" name="secondary_emergency_phone" class="s2d-input" data-validate-phone="true" value="{{ school.secondary_emergency_phone|default:'+91 98765 43211' }}">
+                </div>
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Warden Escalation Number</label>
+                  <input type="tel" name="warden_escalation_phone" class="s2d-input" data-validate-phone="true" value="{{ school.warden_escalation_phone|default:'+91 98765 43212' }}">
+                </div>
               </div>
-              <div class="col-md-6 s2d-field">
-                <label class="s2d-label">Secondary Emergency Contact</label>
-                <input type="tel" class="s2d-input" data-validate-phone="true" value="+91 98765 43211">
-              </div>
-              <div class="col-md-6 s2d-field">
-                <label class="s2d-label">Warden Escalation Number</label>
-                <input type="tel" class="s2d-input" data-validate-phone="true" value="+91 98765 43212">
-              </div>
-            </div>
+              <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Emergency Contacts</span></button></div></div>
+            </form>
           </div>
         </div>
 
-        <div class="settings-tab-panel" id="settings-notify">
+        <div class="settings-tab-panel {% if active_tab == 'notify' %}active{% endif %}" id="settings-notify">
           <div class="settings-card">
             <h4>Notification Channels</h4>
-            <div class="s2d-switch-row mb-3">
-              <span>SMS Alerts to Guardians</span>
-              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
-            </div>
-            <div class="s2d-switch-row mb-3">
-              <span>Email Receipts for Recharges</span>
-              <label class="status-toggle"><input type="checkbox"><span class="status-toggle-slider"></span></label>
-            </div>
-            <div class="s2d-switch-row">
-              <span>Push Notifications for Validity Expiry</span>
-              <label class="status-toggle"><input type="checkbox" checked><span class="status-toggle-slider"></span></label>
-            </div>
+            <form method="POST" action="/school-admin/settings/index.html">
+              {% csrf_token %}
+              <input type="hidden" name="settings_section" value="notify">
+              <div class="s2d-switch-row mb-3">
+                <span>SMS Alerts to Guardians</span>
+                <label class="status-toggle"><input type="checkbox" name="notify_sms_guardians" {% if school.notify_sms_guardians %}checked{% endif %}><span class="status-toggle-slider"></span></label>
+              </div>
+              <div class="s2d-switch-row mb-3">
+                <span>Email Receipts for Recharges</span>
+                <label class="status-toggle"><input type="checkbox" name="notify_email_recharges" {% if school.notify_email_recharges %}checked{% endif %}><span class="status-toggle-slider"></span></label>
+              </div>
+              <div class="s2d-switch-row mb-4">
+                <span>Push Notifications for Validity Expiry</span>
+                <label class="status-toggle"><input type="checkbox" name="notify_push_validity" {% if school.notify_push_validity %}checked{% endif %}><span class="status-toggle-slider"></span></label>
+              </div>
+              <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Notification Settings</span></button></div></div>
+            </form>
           </div>
         </div>
     

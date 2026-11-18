@@ -112,6 +112,17 @@ class School(models.Model):
     emergency_calling_allowed = models.BooleanField(default=True, help_text="Allow emergency outbound calls 24/7")
     kiosk_group_tag = models.CharField(max_length=64, default="AE-HOSTEL-BOOTH", blank=True, help_text="Android Enterprise kiosk device policy tag")
 
+    # Caller ID Policies, Emergency Overrides & Notification Preferences
+    display_school_caller_id = models.BooleanField(default=True, help_text="Display School Name on outbound calls")
+    show_guardian_whitelist_numbers = models.BooleanField(default=False, help_text="Show guardian whitelist numbers on kiosk screen")
+    emergency_override_caller_id = models.BooleanField(default=True, help_text="Enable emergency override Caller ID")
+    primary_emergency_phone = models.CharField(max_length=32, blank=True, default="")
+    secondary_emergency_phone = models.CharField(max_length=32, blank=True, default="")
+    warden_escalation_phone = models.CharField(max_length=32, blank=True, default="")
+    notify_sms_guardians = models.BooleanField(default=True, help_text="Send SMS alerts to guardians")
+    notify_email_recharges = models.BooleanField(default=False, help_text="Send email receipts for recharges")
+    notify_push_validity = models.BooleanField(default=True, help_text="Send push alerts for validity expiry")
+
     # Subscription, Billing & Capacity
     subscription_plan = models.CharField(
         max_length=100,

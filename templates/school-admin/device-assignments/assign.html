@@ -35,14 +35,48 @@
           </div>
           <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Device List</span></a></div>
         </div>
-        <div class="s2d-callout emerald mb-4"><i data-lucide="check-circle-2"></i><div><strong>Pre-Flight Check Passed:</strong> <code>DEV-7709 (Oakridge Spare Unit 05)</code> is Enrolled (AE Dedicated), Kiosk Compliant, Online, and currently in the Available Pool.</div></div>
+        {% if error %}
+        <div class="s2d-callout rose mb-4"><i data-lucide="alert-triangle"></i><div><strong>Device Assignment Error:</strong> {{ error }}</div></div>
+        {% else %}
+        <div class="s2d-callout emerald mb-4"><i data-lucide="check-circle-2"></i><div><strong>MDM Pre-Flight Active:</strong> Select an enrolled, online kiosk booth below to map it to a residential hostel wing or class cohort.</div></div>
+        {% endif %}
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-redirect="list.html" data-success-title="Device Assignment Saved (Demo)">
+          <form method="POST" action="assign.html">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Available Enrolled Device <span class="req-star">*</span></label><select name="device_id" class="s2d-select" required><option value="DEV-7709">DEV-7709 · Oakridge Spare Unit 05 (Available · Online)</option><option value="DEV-7701">DEV-7701 · North Hall Booth 1 (Shared Pool)</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Assignment Mode <span class="req-star">*</span></label><select name="mode" class="s2d-select" required><option>Shared Hostel Wing Booth (Recommended)</option><option>Individual Student / Medical Room Assignment</option></select></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Target Hostel Wing / Student <span class="req-star">*</span></label><input type="text" name="target" class="s2d-input" value="North Hall · Floor 3 (Grade 11-A)" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Supervising Hostel Warden <span class="req-star">*</span></label><select name="warden" class="s2d-select" required><option>Major Kenneth Cole (North Hall)</option><option>Matron Beatrice Holloway (East Gables)</option></select></div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Available Enrolled Device <span class="req-star">*</span></label>
+                <select name="device_id" class="s2d-select" required>
+                  {% for d in devices %}
+                  <option value="{{ d.device_id }}">{{ d.device_id }} · {{ d.name }} ({{ d.status }} · {{ d.hostel_block }})</option>
+                  {% empty %}
+                  <option value="">No enrolled kiosk devices found</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Target Class Cohort <span class="req-star">*</span></label>
+                <select name="academic_class" class="s2d-select" required>
+                  <option value="All Classes">All Classes (Shared Hostel Wing Booth)</option>
+                  {% for c in classes %}
+                  <option value="{{ c.name }}">{{ c.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Target Hostel Wing / Block <span class="req-star">*</span></label>
+                <input type="text" name="hostel_wing" class="s2d-input" placeholder="e.g. Tagore Bhavan · Floor 2" required>
+              </div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Supervising Hostel Warden</label>
+                <select name="warden" class="s2d-select">
+                  {% for w in wardens %}
+                  <option value="{{ w.code }}">{{ w.name }} ({{ w.hostel_block }})</option>
+                  {% empty %}
+                  <option value="">Campus Operations Desk</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Confirm Device Assignment</span></button></div></div>
           </form>

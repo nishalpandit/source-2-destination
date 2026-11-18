@@ -51,10 +51,10 @@
                 <span class="stat-card-label">Today's Calling Operations</span>
                 <span class="stat-icon-well"><i data-lucide="phone-call"></i></span>
               </div>
-              <div class="stat-card-value">{{ calls_today_count|default:"19" }}</div>
+              <div class="stat-card-value">{{ calls_today_count }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">100% Whitelist Verified</span>
-                <span>0 Security / Schedule Violations</span>
+                <span class="stat-badge stat-badge--success">{{ whitelist_compliance_percent }}% Whitelist Verified</span>
+                <span>{{ violations_today_count }} Schedule / Security Violation{{ violations_today_count|pluralize }}</span>
               </div>
             </div>
           </div>
@@ -66,10 +66,10 @@
                 <span class="stat-card-label">Enrolled Boarders</span>
                 <span class="stat-icon-well"><i data-lucide="graduation-cap"></i></span>
               </div>
-              <div class="stat-card-value">{{ total_students|default:"684" }}</div>
+              <div class="stat-card-value">{{ total_students }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_students|default:"658" }} Active</span>
-                <span>{{ active_percent|default:"96.2" }}% Callers</span>
+                <span class="stat-badge stat-badge--success">{{ active_students }} Active</span>
+                <span>{{ active_percent }}% Callers</span>
               </div>
             </div>
           </div>
@@ -82,12 +82,12 @@
                 <span class="stat-icon-well"><i data-lucide="tablet-smartphone"></i></span>
               </div>
               <div class="stat-card-value d-flex align-items-center gap-2">
-                {{ booths_online_count|default:"4" }}
-                <span class="status-beacon" title="Live Telemetry Active"></span>
+                {{ booths_online_count }}
+                {% if booths_online_count > 0 %}<span class="status-beacon" title="Live Telemetry Active"></span>{% endif %}
               </div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">100% Online</span>
-                <span>All Kiosks Operational</span>
+                <span class="stat-badge {% if booths_online_percent >= 80 %}stat-badge--success{% else %}stat-badge--warning{% endif %}">{{ booths_online_percent }}% Online</span>
+                <span>{{ booths_online_count }} of {{ total_booths_count }} Operational</span>
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@
                 <span class="stat-card-label">Voice Pool</span>
                 <span class="stat-icon-well"><i data-lucide="timer"></i></span>
               </div>
-              <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes|default:"42,850" }}</div>
+              <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes }}</div>
               <div class="stat-card-meta">
                 <span class="stat-badge stat-badge--neutral">Campus Total</span>
                 <span>Minutes Balance</span>
@@ -114,7 +114,7 @@
                 <span class="stat-card-label">Duty Wardens</span>
                 <span class="stat-icon-well"><i data-lucide="user-check"></i></span>
               </div>
-              <div class="stat-card-value">{{ wardens_on_duty_count|default:"3" }}</div>
+              <div class="stat-card-value">{{ wardens_on_duty_count }}</div>
               <div class="stat-card-meta">
                 <span class="stat-badge stat-badge--success">Active Shift</span>
                 <span>Hostel Blocks Supervised</span>
@@ -171,27 +171,25 @@
                 <a href="hostel-wardens/list.html" class="btn-s2d btn-s2d-secondary btn-xs-s2d">Warden Roster</a>
               </div>
               <div class="s2d-card-body d-grid gap-3">
-                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-3">
+                {% for w in recent_wardens %}
+                <div class="d-flex justify-content-between align-items-center {% if not forloop.last %}border-bottom border-s2d pb-3{% endif %}">
                   <div>
-                    <div class="fw-bold text-heading" style="font-size:0.92rem;">Major Rajeshwar Singh (Retd.) · Tagore Bhavan</div>
-                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Boys Grades 10–12 · Shift 16:00–00:00 · 8 Booths Monitored</div>
+                    <a href="hostel-wardens/details.html?id={{ w.code }}" class="fw-bold text-heading text-decoration-none" style="font-size:0.92rem;">{{ w.name }} · {{ w.hostel_block }}</a>
+                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Shift {{ w.shift_timings }} · {{ w.booths_monitored }} Booth{{ w.booths_monitored|pluralize }} Monitored · {{ w.phone }}</div>
                   </div>
+                  {% if w.status == 'On Duty' %}
                   <span class="stat-badge stat-badge--success"><span class="status-beacon me-1"></span>On Duty</span>
+                  {% elif w.status == 'Off Duty' %}
+                  <span class="stat-badge stat-badge--neutral">Off Duty</span>
+                  {% else %}
+                  <span class="stat-badge stat-badge--warning">{{ w.status }}</span>
+                  {% endif %}
                 </div>
-                <div class="d-flex justify-content-between align-items-center border-bottom border-s2d pb-3">
-                  <div>
-                    <div class="fw-bold text-heading" style="font-size:0.92rem;">Smt. Shanti Devi · Sarojini Sadan</div>
-                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Girls Grades 9–12 · Shift 15:00–23:00 · 10 Booths Monitored</div>
-                  </div>
-                  <span class="stat-badge stat-badge--success"><span class="status-beacon me-1"></span>On Duty</span>
+                {% empty %}
+                <div class="text-center py-4 text-secondary-s2d" style="font-size:0.85rem;">
+                  No hostel wardens assigned yet. <a href="hostel-wardens/add.html" class="fw-semibold">Add a duty warden</a> to monitor calling booths.
                 </div>
-                <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                    <div class="fw-bold text-heading" style="font-size:0.92rem;">Shri Simon Murmu · Junior Wing</div>
-                    <div class="text-secondary-s2d" style="font-size:0.76rem;">Junior Grades 7–8 · Shift 15:30–22:00 · 6 Booths Monitored</div>
-                  </div>
-                  <span class="stat-badge stat-badge--success"><span class="status-beacon me-1"></span>On Duty</span>
-                </div>
+                {% endfor %}
               </div>
             </div>
           </div>
@@ -235,48 +233,9 @@
                     </tr>
                     {% empty %}
                     <tr>
-                      <td>
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="avatar-sm">A</span>
-                          <div><span class="cell-primary">Aarav Sharma</span><span class="cell-sub">Rajesh Sharma (Father)</span></div>
-                        </div>
+                      <td colspan="4" class="text-center py-4 text-secondary-s2d">
+                        No students enrolled yet. <a href="students/add.html" class="fw-semibold">Enroll your first boarder</a>.
                       </td>
-                      <td class="mono-code">S2D-DOON-8801</td>
-                      <td>Grade 10 · Sec A</td>
-                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="avatar-sm">P</span>
-                          <div><span class="cell-primary">Priya Verma</span><span class="cell-sub">Vikram Verma (Father)</span></div>
-                        </div>
-                      </td>
-                      <td class="mono-code">S2D-DOON-8802</td>
-                      <td>Grade 9 · Sec B</td>
-                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="avatar-sm">V</span>
-                          <div><span class="cell-primary">Vihaan Patel</span><span class="cell-sub">Sunil Patel (Father)</span></div>
-                        </div>
-                      </td>
-                      <td class="mono-code">S2D-DOON-8803</td>
-                      <td>Grade 11 · Sec A</td>
-                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <div class="d-flex align-items-center gap-2">
-                          <span class="avatar-sm">A</span>
-                          <div><span class="cell-primary">Ananya Iyer</span><span class="cell-sub">Karthik Iyer (Father)</span></div>
-                        </div>
-                      </td>
-                      <td class="mono-code">S2D-DOON-8804</td>
-                      <td>Grade 12 · Sec C</td>
-                      <td><span class="s2d-badge s2d-badge-success">Active</span></td>
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -307,6 +266,10 @@
       inactive_students: {{ inactive_students|default:0 }},
       expiring_count: {{ expiring_count|default:0 }},
       school_name: "{{ school.name|default:'Campus'|escapejs }}"
+    };
+    window.S2D_SCHOOL_CHARTS = {
+      dailyCalls: {{ daily_calls_chart_json|default:"null"|safe }},
+      classUsage: {{ class_usage_chart_json|default:"null"|safe }}
     };
   </script>
   <script src="{% static 'js/charts.js' %}"></script>

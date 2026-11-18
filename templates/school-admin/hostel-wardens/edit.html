@@ -31,18 +31,27 @@
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-2">
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
-            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Edit <span data-bind-field="name">Major Kenneth Cole (Ret.)</span></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Edit {{ warden.name|default:"Hostel Warden" }}</span>
           </div>
           <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="details.html?id=WRD-601" data-success-title="Warden Assignment Updated (Demo)">
+          <form method="POST" action="edit.html?id={{ warden.code }}" data-warn-unsaved="true">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Warden Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="Major Kenneth Cole (Ret.)" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Wing <span class="req-star">*</span></label><input type="text" name="hostelWing" class="s2d-input" data-bind-field="hostelWing" value="North Hall (Boys Grades 10–11)" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Shift Hours <span class="req-star">*</span></label><input type="text" name="shiftHours" class="s2d-input mono-code" data-bind-field="shiftHours" value="16:00 – 00:00" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="+1 (555) 210-9101" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Status</label><select name="status" class="s2d-select" data-bind-field="status"><option value="Active">Active</option><option value="Inactive">On Leave / Inactive</option></select></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Warden Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" value="{{ warden.name }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Institutional Email</label><input type="email" name="email" class="s2d-input" value="{{ warden.email }}"></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Block <span class="req-star">*</span></label><input type="text" name="hostel_block" class="s2d-input" value="{{ warden.hostel_block }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Shift Hours <span class="req-star">*</span></label><input type="text" name="shift_timings" class="s2d-input mono-code" value="{{ warden.shift_timings }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" value="{{ warden.phone }}" required></div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Status</label>
+                <select name="status" class="s2d-select">
+                  <option value="On Duty" {% if warden.status == 'On Duty' %}selected{% endif %}>On Duty</option>
+                  <option value="Off Duty" {% if warden.status == 'Off Duty' %}selected{% endif %}>Off Duty</option>
+                  <option value="On Leave" {% if warden.status == 'On Leave' %}selected{% endif %}>On Leave</option>
+                </select>
+              </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Warden</span></button></div></div>
           </form>

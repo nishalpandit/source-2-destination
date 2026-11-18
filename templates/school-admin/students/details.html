@@ -145,6 +145,15 @@
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
   <script src="{% static 'js/demo-data.js' %}"></script>
+  <script>
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    {% if call_history_json %}
+    window.S2D_DEMO.callHistory = {{ call_history_json|safe }};
+    {% endif %}
+    {% if recharges_json %}
+    window.S2D_DEMO.recharges = {{ recharges_json|safe }};
+    {% endif %}
+  </script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

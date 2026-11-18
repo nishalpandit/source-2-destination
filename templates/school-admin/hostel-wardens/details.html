@@ -31,15 +31,15 @@
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-2">
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
-            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Major Kenneth Cole (Ret.)</span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">{{ warden.name|default:"Hostel Warden" }} · {{ warden.hostel_block }}</span>
           </div>
-          <div class="d-flex align-items-center gap-2"><a href="edit.html?id=WRD-601" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Assignment</span></a></div>
+          <div class="d-flex align-items-center gap-2"><a href="edit.html?id={{ warden.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="pencil"></i><span>Edit Assignment</span></a></div>
         </div>
         <div class="s2d-card mb-4"><div class="s2d-card-body"><div class="kv-grid">
-          <div><div class="kv-item-label">Email</div><div class="kv-item-value" data-bind-field="email">k.cole@oakridge-academy.edu</div></div>
-          <div><div class="kv-item-label">Phone</div><div class="kv-item-value mono-code" data-bind-field="phone">+1 (555) 210-9101</div></div>
-          <div><div class="kv-item-label">Supervised Students</div><div class="kv-item-value" data-bind-field="supervisedStudents">185</div></div>
-          <div><div class="kv-item-label">Supervised Booths</div><div class="kv-item-value" data-bind-field="supervisedDevices">8</div></div>
+          <div><div class="kv-item-label">Email</div><div class="kv-item-value">{{ warden.email|default:"Not provided" }}</div></div>
+          <div><div class="kv-item-label">Phone</div><div class="kv-item-value mono-code">{{ warden.phone|default:"Not provided" }}</div></div>
+          <div><div class="kv-item-label">Shift Timings</div><div class="kv-item-value mono-code">{{ warden.shift_timings|default:"16:00 – 00:00" }}</div></div>
+          <div><div class="kv-item-label">Supervised Booths</div><div class="kv-item-value">{{ warden.booths_monitored|default:0 }}</div></div>
         </div></div></div>
         <div data-s2d-table="sch-devices-table"></div>
     
@@ -51,6 +51,12 @@
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
   <script src="{% static 'js/demo-data.js' %}"></script>
+  <script>
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    {% if devices_json %}
+    window.S2D_DEMO.devices = {{ devices_json|safe }};
+    {% endif %}
+  </script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

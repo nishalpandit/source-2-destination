@@ -42,8 +42,8 @@
         <!-- Analytics Summary Cards -->
         <div class="row g-3 mb-4">
           <div class="col-md-4"><div class="kpi-card kpi-card--indigo"><div class="kpi-top"><span class="kpi-label">Total Classes</span><span class="kpi-icon"><i data-lucide="book-open"></i></span></div><div class="kpi-value">{{ total_classes|default:"6" }}</div><div class="kpi-meta"><span>Academic Grades</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">{{ total_sections|default:"18" }}</div><div class="kpi-meta"><span>Active Sections</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Total Call Minutes</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">{{ total_minutes|default:"3000" }}</div><div class="kpi-meta"><span>Allocated Minutes</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Total Sections</span><span class="kpi-icon"><i data-lucide="layout-grid"></i></span></div><div class="kpi-value">{{ total_sections|default:0 }}</div><div class="kpi-meta"><span>Active Sections</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Total Call Minutes</span><span class="kpi-icon"><i data-lucide="phone-call"></i></span></div><div class="kpi-value">{{ total_minutes|default:0 }}</div><div class="kpi-meta"><span>Consumed Minutes</span></div></div></div>
         </div>
 
         <div class="row g-4 mb-4">
@@ -61,6 +61,16 @@
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
   <script src="{% static 'js/demo-data.js' %}"></script>
+  <script>
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    {% if classes_json %}
+    window.S2D_DEMO.classes = {{ classes_json|safe }};
+    {% endif %}
+    window.S2D_SCHOOL_CHARTS = {
+      classUsage: {{ class_usage_chart_json|default:"null"|safe }},
+      classDistribution: {{ class_distribution_chart_json|default:"null"|safe }}
+    };
+  </script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

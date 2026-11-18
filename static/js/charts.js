@@ -438,9 +438,11 @@
     'sch-daily-calls': {
       build: (range, viewType) => {
         const type = viewType || 'bar';
-        const cats = ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'];
-        const completed = [118, 132, 145, 188, 212, 154, 168];
-        const restricted = [8, 6, 9, 14, 12, 7, 5];
+        const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.dailyCalls;
+        const useLive = live && Array.isArray(live.labels) && live.labels.length > 0 && live.hasData;
+        const cats = useLive ? live.labels : ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'];
+        const completed = useLive ? live.completed : [118, 132, 145, 188, 212, 154, 168];
+        const restricted = useLive ? live.restricted : [8, 6, 9, 14, 12, 7, 5];
 
         if (type === 'area') {
           return Object.assign(baseChartOptions('area', 270), {
@@ -493,16 +495,24 @@
     },
 
     'sch-class-distribution': {
-      build: () => Object.assign(baseChartOptions('bar', 260), {
-        colors: [PALETTE.indigo, PALETTE.muted],
-        chart: Object.assign(baseChartOptions('bar', 260).chart, { stacked: true }),
-        plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
-        series: [
-          { name: 'Active Calling Accounts', data: [89, 98, 119, 125, 111, 116] },
-          { name: 'Inactive / Expired', data: [3, 6, 3, 3, 7, 4] }
-        ],
-        xaxis: { categories: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
-      })
+      build: () => {
+        const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.classDistribution;
+        const useLive = live && Array.isArray(live.labels) && live.labels.length > 0 && live.hasData;
+        const cats = useLive ? live.labels : ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
+        const activeData = useLive ? live.active : [89, 98, 119, 125, 111, 116];
+        const inactiveData = useLive ? live.inactive : [3, 6, 3, 3, 7, 4];
+
+        return Object.assign(baseChartOptions('bar', 260), {
+          colors: [PALETTE.indigo, PALETTE.muted],
+          chart: Object.assign(baseChartOptions('bar', 260).chart, { stacked: true }),
+          plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+          series: [
+            { name: 'Active Calling Accounts', data: activeData },
+            { name: 'Inactive / Expired', data: inactiveData }
+          ],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
+        });
+      }
     },
 
     'sch-active-donut': {
@@ -537,12 +547,20 @@
     },
 
     'sch-usage-by-class': {
-      build: () => Object.assign(baseChartOptions('bar', 260), {
-        colors: [PALETTE.teal],
-        plotOptions: { bar: { borderRadius: 5, horizontal: true, barHeight: '55%' } },
-        series: [{ name: 'Calling Minutes (30d)', data: [4820, 5390, 7410, 8620, 7890, 8720] }],
-        xaxis: { categories: ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
-      })
+      build: () => {
+        const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.classUsage;
+        const useLive = live && Array.isArray(live.labels) && live.labels.length > 0 && live.hasData;
+        const cats = useLive ? live.labels : ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
+        const mins = useLive ? live.minutes : [4820, 5390, 7410, 8620, 7890, 8720];
+
+        return Object.assign(baseChartOptions('bar', 260), {
+          colors: [PALETTE.teal],
+          plotOptions: { bar: { borderRadius: 5, horizontal: true, barHeight: '55%' } },
+          series: [{ name: 'Calling Minutes (30d)', data: mins }],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+          tooltip: { y: { formatter: (v) => v + ' mins' } }
+        });
+      }
     },
 
     'sch-recharge-trend': {

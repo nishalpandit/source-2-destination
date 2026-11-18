@@ -36,13 +36,23 @@
           <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Warden List</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Hostel Warden Added (Demo)">
+          <form method="POST" action="add.html" data-warn-unsaved="true">
+            {% csrf_token %}
             <div class="row g-3">
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Warden Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Mrs. Martha Jennings" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Institutional Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" placeholder="m.jennings@oakridge-academy.edu" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Mobile Number <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 210-9120" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Assigned Hostel Wing <span class="req-star">*</span></label><select name="hostelWing" class="s2d-select" required><option>North Hall (Boys)</option><option>East Gables (Girls)</option><option>Junior Wing (Grades 7–8)</option></select></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Duty Shift Hours <span class="req-star">*</span></label><input type="text" name="shiftHours" class="s2d-input mono-code" value="15:30 – 23:30" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Warden Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="e.g. Subedar Rajeshwar Singh" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Institutional Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" placeholder="warden@doonvalley.edu.in" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Mobile Number <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23456" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Assigned Hostel Block <span class="req-star">*</span></label><input type="text" name="hostel_block" class="s2d-input" placeholder="e.g. Tagore Bhavan (Boys)" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Duty Shift Hours <span class="req-star">*</span></label><input type="text" name="shift_timings" class="s2d-input mono-code" value="15:30 – 23:30" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Booths Monitored</label><input type="number" name="booths_monitored" class="s2d-input mono-code" value="4" min="1" max="50"></div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Duty Status</label>
+                <select name="status" class="s2d-select">
+                  <option value="On Duty" selected>On Duty</option>
+                  <option value="Off Duty">Off Duty</option>
+                  <option value="On Leave">On Leave</option>
+                </select>
+              </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Create Warden Profile</span></button></div></div>
           </form>
