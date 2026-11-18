@@ -26,13 +26,12 @@
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Sleek Campus Command Action Toolbar -->
+        <!-- Campus Command Action Toolbar -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4 pb-3 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-3">
-            <span class="status-beacon"></span>
             <div>
-              <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">{{ school.name|default:"Doon Valley Residential Academy" }}</div>
-              <div class="text-secondary-s2d" style="font-size:0.78rem;">Campus Operations Desk · {{ school.code|default:"SCH-1001" }} · {{ school.city|default:"Dehradun, Uttarakhand" }}</div>
+              <div class="fw-bold text-heading" style="font-size:1.05rem;letter-spacing:-0.01em;">{{ school.name }}</div>
+              <div class="text-secondary-s2d" style="font-size:0.78rem;">Campus Operations Desk · {{ school.code }} · {{ school.city }}</div>
             </div>
           </div>
           <div class="d-flex align-items-center gap-2">
@@ -42,10 +41,10 @@
           </div>
         </div>
 
-        <!-- 5 High-Impact Campus Operational Metrics -->
+        <!-- 5 Campus Operational Metrics -->
         <div class="row g-3 mb-4">
           <!-- 1. Hero Operations Card -->
-          <div class="col-12 col-md-6 col-xl-4 animate-fade-up delay-1">
+          <div class="col-12 col-md-6 col-xl-4">
             <div class="s2d-stat-card s2d-stat-card--hero">
               <div class="stat-card-top">
                 <span class="stat-card-label">Today's Calling Operations</span>
@@ -60,7 +59,7 @@
           </div>
 
           <!-- 2. Enrolled Boarders -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-2">
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--indigo">
               <div class="stat-card-top">
                 <span class="stat-card-label">Enrolled Boarders</span>
@@ -75,16 +74,13 @@
           </div>
 
           <!-- 3. Hostel Calling Booths -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-3">
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--emerald">
               <div class="stat-card-top">
                 <span class="stat-card-label">Hostel Booths</span>
                 <span class="stat-icon-well"><i data-lucide="tablet-smartphone"></i></span>
               </div>
-              <div class="stat-card-value d-flex align-items-center gap-2">
-                {{ booths_online_count }}
-                {% if booths_online_count > 0 %}<span class="status-beacon" title="Live Telemetry Active"></span>{% endif %}
-              </div>
+              <div class="stat-card-value">{{ booths_online_count }}</div>
               <div class="stat-card-meta">
                 <span class="stat-badge {% if booths_online_percent >= 80 %}stat-badge--success{% else %}stat-badge--warning{% endif %}">{{ booths_online_percent }}% Online</span>
                 <span>{{ booths_online_count }} of {{ total_booths_count }} Operational</span>
@@ -93,7 +89,7 @@
           </div>
 
           <!-- 4. Available Pool -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-4">
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--amber">
               <div class="stat-card-top">
                 <span class="stat-card-label">Voice Pool</span>
@@ -108,7 +104,7 @@
           </div>
 
           <!-- 5. Duty Wardens -->
-          <div class="col-6 col-md-6 col-xl-2 animate-fade-up delay-5">
+          <div class="col-6 col-md-6 col-xl-2">
             <div class="s2d-stat-card s2d-stat-card--violet">
               <div class="stat-card-top">
                 <span class="stat-card-label">Duty Wardens</span>
@@ -125,7 +121,7 @@
 
         <!-- 2 Focused Campus Analytics Charts -->
         <div class="row g-4 mb-4">
-          <div class="col-xl-7 animate-fade-up delay-3">
+          <div class="col-xl-7">
             <div class="chart-card">
               <div class="chart-card-header">
                 <div>
@@ -133,8 +129,8 @@
                   <p class="chart-card-subtitle">Connected parent sessions vs restricted outside-hours attempts</p>
                 </div>
                 <div class="chart-range-group">
-                  <button type="button" class="chart-range-btn active" data-chart-target="sch-daily-calls" data-view="bar" title="Substantial Column View">Bars</button>
-                  <button type="button" class="chart-range-btn" data-chart-target="sch-daily-calls" data-view="area" title="Fluid Trend Flow">Trend</button>
+                  <button type="button" class="chart-range-btn active" data-chart-target="sch-daily-calls" data-view="bar" title="Column View">Bars</button>
+                  <button type="button" class="chart-range-btn" data-chart-target="sch-daily-calls" data-view="area" title="Trend View">Trend</button>
                 </div>
               </div>
               <div class="chart-card-body">
@@ -142,7 +138,7 @@
               </div>
             </div>
           </div>
-          <div class="col-xl-5 animate-fade-up delay-4">
+          <div class="col-xl-5">
             <div class="chart-card h-100">
               <div class="chart-card-header">
                 <div>
@@ -165,7 +161,6 @@
   <script src="{% static 'vendor/apexcharts.min.js' %}"></script>
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
-  <script src="{% static 'js/demo-data.js' %}"></script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

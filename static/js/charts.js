@@ -32,9 +32,7 @@
         toolbar: { show: false },
         zoom: { enabled: false },
         animations: {
-          enabled: !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-          easing: 'easeinout',
-          speed: 400
+          enabled: false
         }
       },
       dataLabels: { enabled: false },
@@ -440,10 +438,9 @@
       build: (range, viewType) => {
         const type = viewType || 'bar';
         const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.dailyCalls;
-        const useLive = live && Array.isArray(live.labels) && live.labels.length > 0 && live.hasData;
-        const cats = useLive ? live.labels : ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'];
-        const completed = useLive ? live.completed : [118, 132, 145, 188, 212, 154, 168];
-        const restricted = useLive ? live.restricted : [8, 6, 9, 14, 12, 7, 5];
+        const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
+        const completed = (live && Array.isArray(live.completed)) ? live.completed : [];
+        const restricted = (live && Array.isArray(live.restricted)) ? live.restricted : [];
 
         if (type === 'area') {
           return Object.assign(baseChartOptions('area', 270), {
@@ -486,22 +483,26 @@
     },
 
     'sch-weekly-duration': {
-      build: () => Object.assign(baseChartOptions('bar', 270), {
-        colors: [PALETTE.sky],
-        plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
-        series: [{ name: 'Minutes Used', data: [1240, 1380, 1510, 2340, 2690, 1420, 1595] }],
-        xaxis: { categories: ['Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue', 'Today'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
-        tooltip: { y: { formatter: (v) => v + ' mins' } }
-      })
+      build: () => {
+        const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.dailyCalls;
+        const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
+        const completed = (live && Array.isArray(live.completed)) ? live.completed : [];
+        return Object.assign(baseChartOptions('bar', 270), {
+          colors: [PALETTE.sky],
+          plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
+          series: [{ name: 'Completed Calls', data: completed }],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+          tooltip: { y: { formatter: (v) => v + ' calls' } }
+        });
+      }
     },
 
     'sch-class-distribution': {
       build: () => {
         const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.classDistribution;
-        const useLive = live && Array.isArray(live.labels) && live.labels.length > 0 && live.hasData;
-        const cats = useLive ? live.labels : ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
-        const activeData = useLive ? live.active : [89, 98, 119, 125, 111, 116];
-        const inactiveData = useLive ? live.inactive : [3, 6, 3, 3, 7, 4];
+        const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
+        const activeData = (live && Array.isArray(live.active)) ? live.active : [];
+        const inactiveData = (live && Array.isArray(live.inactive)) ? live.inactive : [];
 
         return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.indigo, PALETTE.muted],
@@ -519,9 +520,9 @@
     'sch-active-donut': {
       build: () => {
         const stats = window.S2D_SCHOOL_STATS || {};
-        const active = stats.active_students !== undefined ? stats.active_students : 644;
-        const expiring = stats.expiring_count !== undefined ? stats.expiring_count : 14;
-        const inactive = stats.inactive_students !== undefined ? stats.inactive_students : 26;
+        const active = stats.active_students || 0;
+        const expiring = stats.expiring_count || 0;
+        const inactive = stats.inactive_students || 0;
         return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
           plotOptions: {
@@ -550,9 +551,8 @@
     'sch-usage-by-class': {
       build: () => {
         const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.classUsage;
-        const useLive = live && Array.isArray(live.labels) && live.labels.length > 0 && live.hasData;
-        const cats = useLive ? live.labels : ['Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
-        const mins = useLive ? live.minutes : [4820, 5390, 7410, 8620, 7890, 8720];
+        const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
+        const mins = (live && Array.isArray(live.minutes)) ? live.minutes : [];
 
         return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.teal],

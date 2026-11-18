@@ -955,34 +955,6 @@
   border: 1px solid rgba(226, 232, 240, 0.9);
   box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
   overflow: hidden;
-  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.28s ease;
-}
-
-.s2d-stat-card::after,
-.kpi-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -120%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-  pointer-events: none;
-  transition: left 0.75s ease;
-}
-
-.s2d-stat-card:hover,
-.kpi-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.09), 0 0 0 1px rgba(99, 102, 241, 0.15);
-  border-color: rgba(99, 102, 241, 0.25);
-}
-
-.s2d-stat-card:hover::after,
-.kpi-card:hover::after {
-  left: 160%;
 }
 
 /* Flagship Hero Card Variant (S2D Brand Midnight Navy + Crimson Anchor) */
@@ -991,11 +963,6 @@
   border: 1px solid rgba(219, 42, 34, 0.35) !important;
   box-shadow: 0 10px 26px -4px rgba(2, 24, 45, 0.42), 0 2px 6px rgba(0, 0, 0, 0.14) !important;
   color: #ffffff;
-}
-
-.s2d-stat-card--hero:hover {
-  box-shadow: 0 20px 40px -8px rgba(2, 24, 45, 0.56), 0 0 0 1px rgba(219, 42, 34, 0.45) !important;
-  border-color: rgba(219, 42, 34, 0.55) !important;
 }
 
 .s2d-stat-card--hero .stat-card-label,
@@ -1038,10 +1005,6 @@
   border: 1px solid rgba(2, 24, 45, 0.16) !important;
   box-shadow: 0 4px 16px -2px rgba(2, 24, 45, 0.08) !important;
 }
-.s2d-stat-card--indigo:hover {
-  border-color: rgba(219, 42, 34, 0.35) !important;
-  box-shadow: 0 16px 32px -6px rgba(2, 24, 45, 0.15) !important;
-}
 .s2d-stat-card--indigo .stat-card-label { color: #02182D !important; font-weight: 700; }
 .s2d-stat-card--indigo .stat-card-value { color: #02182D !important; }
 .s2d-stat-card--indigo .stat-icon-well {
@@ -1056,10 +1019,6 @@
   background: linear-gradient(145deg, #FFFFFF 0%, #ECFDF5 55%, #D1FAE5 100%) !important;
   border: 1px solid rgba(110, 231, 183, 0.55) !important;
   box-shadow: 0 4px 16px -2px rgba(16, 185, 129, 0.08) !important;
-}
-.s2d-stat-card--emerald:hover {
-  border-color: rgba(16, 185, 129, 0.45) !important;
-  box-shadow: 0 16px 32px -6px rgba(16, 185, 129, 0.16) !important;
 }
 .s2d-stat-card--emerald .stat-card-label { color: #047857 !important; font-weight: 600; }
 .s2d-stat-card--emerald .stat-card-value { color: #064E3B !important; }
@@ -1076,10 +1035,6 @@
   border: 1px solid rgba(125, 211, 252, 0.55) !important;
   box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.08) !important;
 }
-.s2d-stat-card--sky:hover {
-  border-color: rgba(2, 132, 199, 0.45) !important;
-  box-shadow: 0 16px 32px -6px rgba(2, 132, 199, 0.16) !important;
-}
 .s2d-stat-card--sky .stat-card-label { color: #0369A1 !important; font-weight: 600; }
 .s2d-stat-card--sky .stat-card-value { color: #082F49 !important; }
 .s2d-stat-card--sky .stat-icon-well {
@@ -1094,10 +1049,6 @@
   background: linear-gradient(145deg, #FFFFFF 0%, #FFFBEB 55%, #FEF3C7 100%) !important;
   border: 1px solid rgba(252, 211, 77, 0.55) !important;
   box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.08) !important;
-}
-.s2d-stat-card--amber:hover {
-  border-color: rgba(245, 158, 11, 0.45) !important;
-  box-shadow: 0 16px 32px -6px rgba(245, 158, 11, 0.16) !important;
 }
 .s2d-stat-card--amber .stat-card-label { color: #B45309 !important; font-weight: 600; }
 .s2d-stat-card--amber .stat-card-value { color: #451A03 !important; }
@@ -1114,10 +1065,6 @@
   border: 1px solid rgba(196, 181, 253, 0.55) !important;
   box-shadow: 0 4px 16px -2px rgba(139, 92, 246, 0.08) !important;
 }
-.s2d-stat-card--violet:hover {
-  border-color: rgba(139, 92, 246, 0.45) !important;
-  box-shadow: 0 16px 32px -6px rgba(139, 92, 246, 0.16) !important;
-}
 .s2d-stat-card--violet .stat-card-label { color: #6D28D9 !important; font-weight: 600; }
 .s2d-stat-card--violet .stat-card-value { color: #2E1065 !important; }
 .s2d-stat-card--violet .stat-icon-well {
@@ -1132,10 +1079,6 @@
   background: linear-gradient(145deg, #FFFFFF 0%, #F0FDFA 55%, #CCFBF1 100%) !important;
   border: 1px solid rgba(94, 234, 212, 0.55) !important;
   box-shadow: 0 4px 16px -2px rgba(13, 148, 136, 0.08) !important;
-}
-.s2d-stat-card--teal:hover {
-  border-color: rgba(13, 148, 136, 0.45) !important;
-  box-shadow: 0 16px 32px -6px rgba(13, 148, 136, 0.16) !important;
 }
 .s2d-stat-card--teal .stat-card-label { color: #0F766E !important; font-weight: 600; }
 .s2d-stat-card--teal .stat-card-value { color: #134E4A !important; }

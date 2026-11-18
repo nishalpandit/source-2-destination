@@ -98,8 +98,28 @@
 
   /* ==================== DECLARATIVE TABLE REGISTRY ==================== */
   function initDeclarativeTables() {
-    const D = window.S2D_DEMO;
-    if (!D || !window.S2DTables) return;
+    if (!window.S2DTables) return;
+    const raw = window.S2D_DEMO || {};
+    const D = {
+      schools: raw.schools || [],
+      schoolAdmins: raw.schoolAdmins || [],
+      franchises: raw.franchises || [],
+      students: raw.students || [],
+      studentCodes: raw.studentCodes || [],
+      classes: raw.classes || [],
+      sections: raw.sections || [],
+      guardians: raw.guardians || [],
+      wardens: raw.wardens || [],
+      devices: raw.devices || [],
+      callHistory: raw.callHistory || [],
+      recharges: raw.recharges || [],
+      transactions: raw.transactions || [],
+      subscriptions: raw.subscriptions || [],
+      validityPlans: raw.validityPlans || [],
+      callingSchedules: raw.callingSchedules || [],
+      commissions: raw.commissions || [],
+      roles: raw.roles || []
+    };
     const T = window.S2DTables.EnterpriseTable;
     const href = window.S2DNavigation.resolveHref;
 
@@ -640,9 +660,9 @@
     if (!recordId) return;
 
     const allCollections = [
-      ...D.schools, ...D.schoolAdmins, ...D.students,
-      ...D.guardians, ...D.wardens, ...D.devices,
-      ...D.transactions, ...D.subscriptions
+      ...(D.schools || []), ...(D.schoolAdmins || []), ...(D.students || []),
+      ...(D.guardians || []), ...(D.wardens || []), ...(D.devices || []),
+      ...(D.transactions || []), ...(D.subscriptions || [])
     ];
     const found = allCollections.find((item) => item.id === recordId);
     if (!found) return;

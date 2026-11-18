@@ -47,7 +47,6 @@
   <script src="{% static 'vendor/lucide.min.js' %}"></script>
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
-  <script src="{% static 'js/demo-data.js' %}"></script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>
@@ -57,7 +56,8 @@
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
   <script>
-    if (window.S2D_DEMO && {{ recharges_json|safe }}) {
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    if ({{ recharges_json|safe }}) {
       window.S2D_DEMO.recharges = {{ recharges_json|safe }};
     }
   </script>

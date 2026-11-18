@@ -1,191 +1,44 @@
 /* ==========================================================================
-   Source 2 Destination — Modern Dashboard Animations & Micro-Interactions
+   Source 2 Destination — Clean Static Motion & Structural Transitions
    File: static/css/animations.css
+   (All distracting pings, hover lifts, shimmers, and entrance bounces removed)
    ========================================================================== */
 
-/* Staggered Page Entrance Animation */
-@keyframes s2dFadeUp {
-  0% {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Neutralized utility classes (preserve layout without entrance jitter) */
+.animate-fade-up,
+.delay-1,
+.delay-2,
+.delay-3,
+.delay-4,
+.delay-5,
+.delay-6,
+.delay-7 {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-@keyframes s2dScaleIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Shimmer Light Sweep Effect for Cards */
-@keyframes s2dShimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 160%;
-  }
-}
-
-/* Radar Ping Beacon for Live Kiosks & Hardware Status */
-@keyframes beaconPing {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.65);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 9px rgba(16, 185, 129, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-  }
-}
-
-@keyframes beaconAmberPing {
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.65);
-  }
-  70% {
-    transform: scale(1);
-    box-shadow: 0 0 0 9px rgba(245, 158, 11, 0);
-  }
-  100% {
-    transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
-  }
-}
-
-/* Soft Floating Micro-Movement */
-@keyframes softFloat {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-/* Subtle Ambient Gradient Flow for Hero Cards */
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Stagger Animation Utility Classes */
-.animate-fade-up {
-  animation: s2dFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.delay-1 { animation-delay: 0.04s; }
-.delay-2 { animation-delay: 0.08s; }
-.delay-3 { animation-delay: 0.12s; }
-.delay-4 { animation-delay: 0.16s; }
-.delay-5 { animation-delay: 0.20s; }
-.delay-6 { animation-delay: 0.24s; }
-.delay-7 { animation-delay: 0.28s; }
-
-/* Status Beacon Dot */
+/* Status indicator — plain static dot, zero ping/pulse */
 .status-beacon {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #10b981;
-  animation: beaconPing 1.8s infinite;
+  display: none !important;
 }
 
-.status-beacon.amber {
-  background: #f59e0b;
-  animation: beaconAmberPing 1.8s infinite;
-}
-
-.status-beacon.pulse-fast {
-  animation-duration: 1.2s;
-}
-
-/* Floating Card Hover Effect */
-.card-hover-lift {
-  transition: transform 0.26s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.26s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.26s ease;
-}
+/* Neutralized hover-lift utility */
+.card-hover-lift,
 .card-hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.09), 0 0 0 1px rgba(99, 102, 241, 0.12);
-}
-
-/* Modal and Drawer transitions */
-@keyframes modalEnter {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes drawerEnter {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0); }
-}
-
-@keyframes fadeInFast {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  transform: none !important;
+  transition: none !important;
 }
 
 .skeleton-bar {
   height: 13px;
   border-radius: 5px;
-  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
-  background-size: 800px 100%;
-  animation: s2dShimmer 1.35s infinite linear;
+  background: #E2E8F0;
 }
 
-.s2d-modal-backdrop.show .s2d-modal-dialog {
-  animation: modalEnter 190ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.s2d-drawer-backdrop.show .s2d-drawer {
-  animation: drawerEnter 220ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.s2d-dropdown-menu.show {
-  animation: fadeInFast 150ms ease-out;
-}
-
+.s2d-modal-backdrop.show .s2d-modal-dialog,
+.s2d-drawer-backdrop.show .s2d-drawer,
+.s2d-dropdown-menu.show,
 .s2d-tab-panel.active {
-  animation: fadeInFast 170ms ease-out;
-}
-
-/* Accessibility: Honor Reduced Motion Preferences */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+  animation: none;
 }
