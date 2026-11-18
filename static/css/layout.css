@@ -408,204 +408,229 @@ body.sidebar-collapsed .sidebar-user-card {
 }
 
 /* ==========================================================================
-   S2D BRAND SIDEBAR THEME — Deep Midnight Navy (#02182D) + Crimson (#DB2A22)
+   S2D ARCHITECTURAL SIDEBAR — Seamless Midnight Navy (#02182D) + Crimson (#DB2A22)
    ========================================================================== */
 
-/* Sidebar shell — exact logo Midnight Navy */
+/* Sidebar shell — seamless edge-to-edge S2D Midnight Navy */
 .app-sidebar {
-  background: linear-gradient(180deg, #02182D 0%, #01101F 100%) !important;
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 4px 0 24px rgba(2, 24, 45, 0.18);
+  background: #02182D !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: none;
 }
 
-/* Crisp White Brand Showcase Header — ensures razor-sharp contrast for S2D logo.png */
+/* Seamless Dark-Canvas Brand Header (uses logo-dark-bg.png directly on #02182D) */
 .sidebar-brand {
-  height: 76px;
-  padding: 10px 14px;
-  background: #FFFFFF !important;
-  border-bottom: 2px solid #DB2A22 !important;
-  box-shadow: 0 4px 16px rgba(1, 16, 31, 0.22);
+  height: 82px;
+  padding: 14px 18px 12px;
+  background: #02182D !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow: none;
   gap: 8px;
 }
 .sidebar-brand-link {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   width: 100%;
-  gap: 8px;
-  color: #02182D !important;
+  gap: 5px;
+  color: #FFFFFF !important;
 }
 .sidebar-brand-logo {
-  height: 44px;
+  height: 36px;
   width: auto;
-  max-width: 138px;
+  max-width: 168px;
   object-fit: contain;
   border-radius: 0;
   box-shadow: none;
   flex-shrink: 0;
+}
+body.sidebar-collapsed .sidebar-brand {
+  height: 68px;
+  padding: 0 10px;
+}
+body.sidebar-collapsed .sidebar-brand-link {
+  align-items: center;
 }
 body.sidebar-collapsed .sidebar-brand-logo {
   height: auto;
   max-width: 52px;
 }
 .sidebar-brand-text {
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
 }
 .sidebar-brand-name {
-  display: none; /* Wordmark is already printed inside logo.png */
+  display: none; /* Wordmark is rendered crisply inside logo-dark-bg.png */
 }
 .sidebar-brand-role {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: #FEF2F2;
-  border: 1px solid #FECACA;
-  color: #DB2A22 !important;
-  font-size: 0.60rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  display: inline-block;
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #7E9BB8 !important;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  line-height: 1.2;
+  line-height: 1;
   margin-top: 0;
 }
 
-/* Nav area on Midnight Navy sidebar */
-.sidebar-nav-scroll { padding: 18px 10px 24px; }
-.sidebar-group { margin-bottom: 22px; }
-.sidebar-group-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  color: #7D97B3 !important;
+/* Nav scroll area + clean ultra-thin scrollbar */
+.sidebar-nav-scroll {
+  padding: 16px 12px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+}
+.sidebar-nav-scroll::-webkit-scrollbar { width: 4px; }
+.sidebar-nav-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-nav-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
 }
 
-/* Navigation links */
+.sidebar-group { margin-bottom: 20px; }
+.sidebar-group-label {
+  padding: 0 10px 7px;
+  font-size: 0.63rem;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  color: #5E7D9C !important;
+}
+
+/* Navigation links — clean, crisp, zero border clutter */
 .sidebar-link,
 .sidebar-parent-btn {
-  padding: 10px 13px;
-  border-radius: var(--radius-md);
-  border: 1px solid transparent;
-  font-size: 0.85rem;
+  padding: 9px 12px;
+  border-radius: 9px;
+  border: none;
+  font-size: 0.84rem;
   font-weight: 500;
-  transition: all 180ms ease;
-  color: #D5E2EE !important;
+  transition: background-color 140ms ease, color 140ms ease;
+  color: #C5D6E8 !important;
   background: transparent;
 }
 
 .sidebar-link:hover,
 .sidebar-parent-btn:hover {
-  background-color: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.10);
+  background-color: rgba(255, 255, 255, 0.06);
   color: #FFFFFF !important;
 }
 
-/* Active item — signature S2D Crimson Red accent */
-.sidebar-link.active,
-.sidebar-parent-btn.active-parent {
-  background: linear-gradient(90deg, rgba(219, 42, 34, 0.26) 0%, rgba(219, 42, 34, 0.09) 100%) !important;
-  border-color: rgba(219, 42, 34, 0.45);
+/* Active leaf link — crisp solid S2D Crimson pill */
+.sidebar-link.active {
+  background: #DB2A22 !important;
   color: #FFFFFF !important;
   font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(219, 42, 34, 0.35);
+  box-shadow: 0 2px 10px rgba(219, 42, 34, 0.28);
 }
 
 .sidebar-link.active::before {
-  left: 0;
-  top: 4px;
-  bottom: 4px;
-  width: 4px;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  background-color: #DB2A22;
-  box-shadow: 0 0 10px rgba(219, 42, 34, 0.75);
+  display: none;
+}
+
+/* Active expanded parent — elevated Midnight Navy with crimson chevron */
+.sidebar-parent-btn.active-parent {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+  font-weight: 600;
+  box-shadow: none;
 }
 
 .sidebar-link-icon,
 .sidebar-link-icon [data-lucide] { color: currentColor !important; }
 .sidebar-link-label { color: currentColor !important; }
-.sidebar-chevron { color: #7D97B3 !important; }
+.sidebar-chevron { color: #6E8BA8 !important; }
 
 .nav-item-box.open > .sidebar-parent-btn .sidebar-chevron {
   transform: rotate(90deg);
   color: #DB2A22 !important;
 }
 
-/* Submenu on Midnight Navy */
+/* Submenu */
 .sidebar-submenu {
-  padding: 5px 0 7px 26px;
+  padding: 4px 0 6px 22px;
   margin-left: 19px;
   border-left: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .sidebar-sublink {
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.79rem;
+  position: relative;
+  padding: 7px 11px;
+  border-radius: 7px;
+  font-size: 0.80rem;
   font-weight: 500;
-  color: #9EB5CC !important;
-  transition: all 150ms ease;
+  color: #93ADC7 !important;
+  transition: background-color 140ms ease, color 140ms ease;
   background: transparent;
 }
 
 .sidebar-sublink:hover {
   color: #FFFFFF !important;
-  background-color: rgba(255, 255, 255, 0.06);
-  padding-left: 16px;
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Active sublink — crisp S2D Crimson highlight */
+/* Active sublink — crisp white text with signature crimson dot */
 .sidebar-sublink.active {
-  color: #FF8A84 !important;
-  background-color: rgba(219, 42, 34, 0.18);
-  font-weight: 600;
-  box-shadow: inset 0 0 0 1px rgba(219, 42, 34, 0.35);
-}
-
-/* Tooltips on Midnight Navy sidebar */
-.sidebar-tooltip {
-  background: #02182D !important;
   color: #FFFFFF !important;
-  border: 1px solid rgba(219, 42, 34, 0.35);
+  background-color: rgba(255, 255, 255, 0.08);
+  font-weight: 600;
+  box-shadow: none;
 }
-.sidebar-tooltip::before { background: #02182D !important; }
+.sidebar-sublink.active::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #DB2A22;
+  flex-shrink: 0;
+}
 
-/* Footer user card on Midnight Navy sidebar */
+/* Tooltips on collapsed sidebar */
+.sidebar-tooltip {
+  background: #01101F !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.sidebar-tooltip::before { background: #01101F !important; }
+
+/* Grounded Footer User Card */
 .sidebar-footer {
-  border-top: 1px solid rgba(255, 255, 255, 0.09);
-  padding: 14px 12px;
-  background-color: #010E1B !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 12px;
+  background-color: #011223 !important;
   margin-top: auto;
 }
 
 .sidebar-user-card {
-  padding: 11px 13px;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.09);
-  background: #062440 !important;
-  box-shadow: var(--shadow-sm);
+  padding: 10px 12px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #07213B !important;
+  box-shadow: none;
 }
 
-.sidebar-user-name { color: #FFFFFF !important; }
-.sidebar-user-email { color: #9EB5CC !important; }
+.sidebar-user-name { color: #FFFFFF !important; font-size: 0.82rem; }
+.sidebar-user-email { color: #8AA4BE !important; font-size: 0.71rem; }
 .sidebar-user-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  background: #DB2A22 !important;
-  color: #FFFFFF !important;
-  box-shadow: 0 3px 10px rgba(219, 42, 34, 0.38);
-}
-
-.sidebar-logout-btn {
   width: 36px;
   height: 36px;
   border-radius: 9px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #02182D !important;
-  color: #D5E2EE !important;
-  transition: all 150ms ease;
+  font-size: 0.80rem;
+  background: #DB2A22 !important;
+  color: #FFFFFF !important;
+  box-shadow: none;
+}
+
+.sidebar-logout-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #C5D6E8 !important;
+  transition: background-color 140ms ease, color 140ms ease;
 }
 .sidebar-logout-btn:hover {
   background: #DB2A22 !important;
