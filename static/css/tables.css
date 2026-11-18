@@ -261,13 +261,19 @@ th.sorted-desc .sort-indicator {
   justify-content: center;
   transition: all 140ms ease;
 }
-.page-btn:hover:not(:disabled) {
+.page-btn:hover:not(:disabled):not(.active) {
   border-color: var(--s2d-border-strong);
-  background: var(--s2d-surface-subtle);
+  background: var(--s2d-surface-muted);
+  color: var(--s2d-heading);
 }
 .page-btn.active {
   background: var(--s2d-primary);
   border-color: var(--s2d-primary);
+  color: #FFFFFF;
+}
+.page-btn.active:hover {
+  background: var(--s2d-primary-hover);
+  border-color: var(--s2d-primary-hover);
   color: #FFFFFF;
 }
 .page-btn:disabled {
