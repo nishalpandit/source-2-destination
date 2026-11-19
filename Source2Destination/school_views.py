@@ -228,7 +228,7 @@ def student_add(request):
     school = get_current_school(request)
 
     if request.method == "POST":
-        name = request.POST.get('name', '').strip()
+        name = (request.POST.get('name') or request.POST.get('student_name') or '').strip()
         if not name:
             return HttpResponseBadRequest("Student name is required.")
 
@@ -239,11 +239,15 @@ def student_add(request):
         if not validity_expiry:
             validity_expiry = timezone.now().date() + timedelta(days=365)
 
+        dob = request.POST.get('date_of_birth') or request.POST.get('dob')
+        pin = (request.POST.get('pin') or '1234').strip()
+
         stu = Student.objects.create(
             code=code,
             calling_code=calling_code,
             name=name,
             gender=request.POST.get('gender', 'Male'),
+            date_of_birth=dob if dob else None,
             school=school,
             class_name=request.POST.get('className') or request.POST.get('class_name', 'Grade 10'),
             section=request.POST.get('section', 'Section A'),
@@ -257,6 +261,7 @@ def student_add(request):
             daily_limit_min=int(request.POST.get('dailyLimitMin') or (school.daily_duration_cap if school else 15)),
             wallet_balance=float(request.POST.get('wallet_balance') or 50.00),
             validity_expiry=validity_expiry,
+            pin=pin,
             status=request.POST.get('status', 'Active')
         )
 
@@ -375,6 +380,16 @@ def student_edit(request):
     if request.method == "POST" and stu:
         stu.name = request.POST.get('name', stu.name).strip()
         stu.gender = request.POST.get('gender', stu.gender)
+        dob = request.POST.get('date_of_birth') or request.POST.get('dob')
+        if dob:
+            stu.date_of_birth = dob
+        if request.POST.get('pin'):
+            stu.pin = request.POST['pin'].strip()
+        if request.POST.get('wallet_balance'):
+            try:
+                stu.wallet_balance = float(request.POST['wallet_balance'])
+            except ValueError:
+                pass
         stu.class_name = (request.POST.get('className') or request.POST.get('class_name', stu.class_name)).strip()
         stu.section = (request.POST.get('section', stu.section)).strip()
         stu.roll_number = (request.POST.get('roll_number') or request.POST.get('rollNumber', stu.roll_number)).strip()
@@ -562,6 +577,31 @@ def classes_list(request):
     school = get_current_school(request)
 
     if request.method == "POST":
+        action = request.POST.get('action')
+        if action == 'edit':
+            cls_code = request.POST.get('class_code') or request.POST.get('code')
+            c = AcademicClass.objects.filter(Q(code=cls_code) | Q(name=request.POST.get('original_name')), school=school).first()
+            if c:
+                if request.POST.get('className') or request.POST.get('name'):
+                    c.name = (request.POST.get('className') or request.POST.get('name')).strip()
+                if request.POST.get('supervisor'):
+                    c.supervisor = request.POST.get('supervisor').strip()
+                if request.POST.get('defaultDailyMinutes') or request.POST.get('default_daily_minutes'):
+                    c.default_daily_minutes = int(request.POST.get('defaultDailyMinutes') or request.POST.get('default_daily_minutes'))
+                if request.POST.get('schedule_group'):
+                    c.schedule_group = request.POST.get('schedule_group')
+                if request.POST.get('status'):
+                    c.status = request.POST.get('status')
+                c.save()
+            return redirect('/school-admin/classes/list.html')
+        elif action in ['delete', 'archive']:
+            cls_code = request.POST.get('class_code') or request.POST.get('code')
+            c = AcademicClass.objects.filter(Q(code=cls_code) | Q(name=cls_code), school=school).first()
+            if c:
+                c.status = 'Archived'
+                c.save(update_fields=['status'])
+            return redirect('/school-admin/classes/list.html')
+
         name = (request.POST.get('className') or request.POST.get('name') or '').strip()
         if name:
             supervisor = request.POST.get('supervisor', '').strip()
@@ -613,6 +653,31 @@ def sections_list(request):
     school = get_current_school(request)
 
     if request.method == "POST":
+        action = request.POST.get('action')
+        if action == 'edit':
+            sec_code = request.POST.get('section_code') or request.POST.get('code')
+            s = ClassSection.objects.filter(code=sec_code, school=school).first()
+            if s:
+                if request.POST.get('sectionName'):
+                    s.name = request.POST.get('sectionName').strip()
+                if request.POST.get('roomWing'):
+                    s.room_wing = request.POST.get('roomWing').strip()
+                if request.POST.get('advisor'):
+                    s.advisor = request.POST.get('advisor').strip()
+                if request.POST.get('assignedBooth'):
+                    s.assigned_booth = request.POST.get('assignedBooth').strip()
+                if request.POST.get('status'):
+                    s.status = request.POST.get('status')
+                s.save()
+            return redirect('/school-admin/classes/sections.html')
+        elif action in ['delete', 'archive']:
+            sec_code = request.POST.get('section_code') or request.POST.get('code')
+            s = ClassSection.objects.filter(code=sec_code, school=school).first()
+            if s:
+                s.status = 'Archived'
+                s.save(update_fields=['status'])
+            return redirect('/school-admin/classes/sections.html')
+
         parent_class_name = request.POST.get('parent_class') or request.POST.get('className')
         parent_class = AcademicClass.objects.filter(
             Q(name__iexact=parent_class_name) | Q(code=parent_class_name),

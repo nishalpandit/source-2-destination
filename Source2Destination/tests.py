@@ -2,7 +2,7 @@ from datetime import timedelta
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import School, Student, Guardian, HostelWarden, KioskDevice, DeviceAssignment, CallRecord, AcademicClass
+from .models import School, Student, Guardian, HostelWarden, KioskDevice, DeviceAssignment, CallRecord, AcademicClass, ClassSection
 
 
 class SchoolAdminFlowchartTests(TestCase):
@@ -447,3 +447,151 @@ class SchoolAdminFlowchartTests(TestCase):
         self.assertEqual(self.school.admin_phone, '+91 98101 99999')
         self.assertEqual(self.school.daily_duration_cap, 20)
         self.assertTrue(self.school.emergency_calling_allowed)
+
+    def test_student_pin_dob_wallet_crud(self):
+        # 1. Enroll new student with DOB, PIN, and initial prepaid wallet balance
+        resp = self.client.post('/school-admin/students/add.html', {
+            'name': 'Vihaan Kapoor',
+            'gender': 'Male',
+            'date_of_birth': '2010-06-18',
+            'pin': '7788',
+            'wallet_balance': '350.00',
+            'class_grade': 'Grade 10',
+            'section': 'Section A',
+            'roll_number': '1042',
+            'hostel_wing': 'Tagore Wing · Rm 302',
+            'guardian_name': 'Rajesh Kapoor',
+            'relation': 'Father',
+            'primary_phone': '+91 98222 11111',
+            'secondary_phone': '+91 98222 22222',
+            'validity_expiry': '2028-06-30',
+            'allocated_minutes': 200,
+            'daily_limit_minutes': 25,
+            'status': 'Active'
+        })
+        self.assertIn(resp.status_code, [200, 302])
+
+        stu = Student.objects.filter(school=self.school, name='Vihaan Kapoor').first()
+        self.assertIsNotNone(stu)
+        self.assertEqual(str(stu.date_of_birth), '2010-06-18')
+        self.assertEqual(stu.pin, '7788')
+        self.assertEqual(float(stu.wallet_balance), 350.00)
+        self.assertEqual(stu.roll_number, '1042')
+
+        # 2. Edit student details including updated PIN, DOB, and wallet balance
+        edit_resp = self.client.post(f'/school-admin/students/edit.html?id={stu.code}', {
+            'name': 'Vihaan Kapoor',
+            'gender': 'Male',
+            'date_of_birth': '2010-06-18',
+            'pin': '9900',
+            'wallet_balance': '500.00',
+            'className': 'Grade 10',
+            'section': 'Section A',
+            'rollNumber': '1042',
+            'hostelWing': 'Tagore Wing · Rm 302',
+            'guardianName': 'Rajesh Kapoor',
+            'primaryPhone': '+91 98222 11111',
+            'secondaryPhone': '+91 98222 33333',
+            'validityExpiry': '2028-12-31',
+            'remainingMinutes': '250',
+            'dailyLimitMin': '30',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+
+        stu.refresh_from_db()
+        self.assertEqual(stu.pin, '9900')
+        self.assertEqual(float(stu.wallet_balance), 500.00)
+        self.assertEqual(stu.remaining_minutes, 250)
+
+    def test_classes_and_sections_edit_and_archive(self):
+        # 1. Edit existing academic class
+        edit_cls_resp = self.client.post('/school-admin/classes/', {
+            'action': 'edit',
+            'class_code': self.academic_class.code,
+            'className': 'Grade 10 Advanced STEM',
+            'supervisor': 'Prof. Ananya Sen',
+            'defaultDailyMinutes': '25',
+            'schedule_group': 'Extended Boarding Window',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_cls_resp.status_code, 302)
+        self.academic_class.refresh_from_db()
+        self.assertEqual(self.academic_class.name, 'Grade 10 Advanced STEM')
+        self.assertEqual(self.academic_class.supervisor, 'Prof. Ananya Sen')
+        self.assertEqual(self.academic_class.default_daily_minutes, 25)
+
+        # 2. Archive class
+        del_cls_resp = self.client.post('/school-admin/classes/', {
+            'action': 'archive',
+            'class_code': self.academic_class.code
+        })
+        self.assertEqual(del_cls_resp.status_code, 302)
+        self.academic_class.refresh_from_db()
+        self.assertEqual(self.academic_class.status, 'Archived')
+
+        # 3. Create, Edit, and Archive Section
+        section = ClassSection.objects.create(
+            school=self.school,
+            academic_class=self.academic_class,
+            code='SEC-10A',
+            name='Section 10-A',
+            room_wing='East Wing - Rm 101',
+            advisor='Dr. Sen',
+            status='Active'
+        )
+
+        edit_sec_resp = self.client.post('/school-admin/classes/sections.html', {
+            'action': 'edit',
+            'section_code': section.code,
+            'sectionName': 'Section 10-A Prime',
+            'roomWing': 'East Wing - Rm 105',
+            'advisor': 'Dr. Vikram Sen',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_sec_resp.status_code, 302)
+        section.refresh_from_db()
+        self.assertEqual(section.name, 'Section 10-A Prime')
+        self.assertEqual(section.room_wing, 'East Wing - Rm 105')
+
+        del_sec_resp = self.client.post('/school-admin/classes/sections.html', {
+            'action': 'archive',
+            'section_code': section.code
+        })
+        self.assertEqual(del_sec_resp.status_code, 302)
+        section.refresh_from_db()
+        self.assertEqual(section.status, 'Archived')
+
+    def test_super_admin_school_caller_id_and_emergency_overrides(self):
+        admin_user, _ = User.objects.get_or_create(username='admin', defaults={'email': 'admin@s2d.com', 'is_staff': True, 'is_superuser': True})
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+
+        admin_client = Client()
+        admin_client.login(username='admin', password='12345')
+
+        # Test updating emergency overrides and caller ID on school
+        edit_resp = admin_client.post(f'/super-admin/schools/edit.html?id={self.school.code}', {
+            'name': 'Doon Valley International School',
+            'city': 'Dehradun',
+            'admin_name': 'Dr. R.C. Sharma',
+            'admin_email': 'director@doonvalley.edu.in',
+            'admin_phone': '+91 98101 99999',
+            'primary_emergency_phone': '+91 98101 00112',
+            'secondary_emergency_phone': '+91 98101 00113',
+            'warden_escalation_phone': '+91 98101 00114',
+            'display_school_caller_id': 'on',
+            'show_guardian_whitelist_numbers': 'on',
+            'notify_sms_guardians': 'on',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+
+        self.school.refresh_from_db()
+        self.assertEqual(self.school.primary_emergency_phone, '+91 98101 00112')
+        self.assertEqual(self.school.secondary_emergency_phone, '+91 98101 00113')
+        self.assertEqual(self.school.warden_escalation_phone, '+91 98101 00114')
+        self.assertTrue(self.school.display_school_caller_id)
+        self.assertTrue(self.school.show_guardian_whitelist_numbers)
+        self.assertTrue(self.school.notify_sms_guardians)

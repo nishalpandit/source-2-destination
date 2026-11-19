@@ -52,8 +52,10 @@
 
               <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label><input type="text" name="className" class="s2d-input" data-bind-field="className" value="{{ student.class_name }}" required></div>
               <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label><input type="text" name="section" class="s2d-input" data-bind-field="section" value="{{ student.section }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Roll Number</label><input type="text" name="roll_number" class="s2d-input" value="{{ student.roll_number }}"></div>
-
+              <div class="col-md-3 s2d-field"><label class="s2d-label">Roll Number</label><input type="text" name="roll_number" class="s2d-input" value="{{ student.roll_number }}"></div>
+              <div class="col-md-3 s2d-field"><label class="s2d-label">Date of Birth</label><input type="date" name="date_of_birth" class="s2d-input" value="{{ student.date_of_birth|date:'Y-m-d' }}"></div>
+              <div class="col-md-3 s2d-field"><label class="s2d-label">4-Digit Kiosk PIN</label><input type="text" name="pin" class="s2d-input mono-code" maxlength="6" value="{{ student.pin|default:'1234' }}"></div>
+              <div class="col-md-3 s2d-field"><label class="s2d-label">Prepaid Balance (₹)</label><input type="number" name="wallet_balance" class="s2d-input" value="{{ student.wallet_balance|default:'50.00' }}" step="10"></div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Wing &amp; Room <span class="req-star">*</span></label><input type="text" name="hostelWing" class="s2d-input" data-bind-field="hostelWing" value="{{ student.hostel_wing }}" required></div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name <span class="req-star">*</span></label><input type="text" name="guardianName" class="s2d-input" value="{{ student.guardian_name }}" required></div>
 

@@ -77,6 +77,48 @@
             </form>
           </div>
         </div>
+
+        <!-- Edit Class Modal -->
+        <div class="s2d-modal-backdrop" id="edit-class-modal">
+          <div class="s2d-modal-dialog">
+            <div class="s2d-modal-header">
+              <h3 class="s2d-card-title">Edit Academic Class</h3>
+              <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button>
+            </div>
+            <form method="POST" action="list.html" data-s2d-form data-success-title="Academic Class Updated" data-success-desc="Class profile successfully modified.">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="edit">
+              <input type="hidden" id="edit_class_code" name="class_code">
+              <input type="hidden" id="edit_original_name" name="original_name">
+              <div class="s2d-modal-body">
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_class_name">Class / Grade Name <span class="req-star">*</span></label>
+                  <input type="text" id="edit_class_name" name="className" class="s2d-input" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_supervisor">Grade Coordinator / Supervisor <span class="req-star">*</span></label>
+                  <input type="text" id="edit_supervisor" name="supervisor" class="s2d-input" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_daily_cap">Default Daily Call Cap (Mins) <span class="req-star">*</span></label>
+                  <input type="number" id="edit_daily_cap" name="defaultDailyMinutes" min="5" max="60" class="s2d-input" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_sched_group">Calling Schedule Policy</label>
+                  <select id="edit_sched_group" name="schedule_group" class="s2d-select">
+                    <option value="Standard Hostel Window">Standard Hostel Window</option>
+                    <option value="Junior Evening Window">Junior Evening Window</option>
+                    <option value="Senior Study-Safe Window">Senior Study-Safe Window</option>
+                  </select>
+                </div>
+              </div>
+              <div class="s2d-modal-footer">
+                <button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Update Class</span></button>
+              </div>
+            </form>
+          </div>
+        </div>
     
       </main>
     </div>

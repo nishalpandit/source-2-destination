@@ -72,7 +72,8 @@
                   </select>
                 </div>
                 <div class="col-md-3 s2d-field"><label class="s2d-label">Roll Number</label><input type="text" name="roll_number" class="s2d-input" placeholder="e.g. 1042"></div>
-                <div class="col-md-12 s2d-field"><label class="s2d-label">Hostel Wing &amp; Dorm Room</label><input type="text" name="hostelWing" class="s2d-input" placeholder="e.g. Tagore Bhavan · Room 204"></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Date of Birth</label><input type="date" name="date_of_birth" class="s2d-input"></div>
+                <div class="col-md-9 s2d-field"><label class="s2d-label">Hostel Wing &amp; Dorm Room</label><input type="text" name="hostelWing" class="s2d-input" placeholder="e.g. Tagore Bhavan · Room 204"></div>
               </div>
             </div>
             <div class="s2d-form-section">
@@ -87,9 +88,11 @@
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>3 · Account Status, Validity &amp; Device</h3><p>Link initial calling validity and primary hostel booth device.</p></div>
               <div class="row g-3">
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label><select name="status" class="s2d-select" required><option value="Active">Active</option><option value="Inactive">Inactive (Hold)</option></select></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Calling Validity Expiry <span class="req-star">*</span></label><input type="date" name="validity_expiry" class="s2d-input" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Booth Assignment</label>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label><select name="status" class="s2d-select" required><option value="Active">Active</option><option value="Inactive">Inactive (Hold)</option></select></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Calling Validity Expiry <span class="req-star">*</span></label><input type="date" name="validity_expiry" class="s2d-input" required></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">4-Digit Student Kiosk PIN <span class="req-star">*</span></label><input type="text" name="pin" class="s2d-input mono-code" maxlength="6" value="1234" required><span class="field-hint">Used for login on booth tablet.</span></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Initial Prepaid Credit (₹)</label><input type="number" name="wallet_balance" class="s2d-input" value="50.00" step="10"></div>
+                <div class="col-md-12 s2d-field"><label class="s2d-label">Hostel Booth Assignment</label>
                   <select name="device_id" class="s2d-select">
                     <option value="">Select booth (optional)...</option>
                     {% for d in devices %}

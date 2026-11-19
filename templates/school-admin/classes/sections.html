@@ -83,6 +83,43 @@
             </form>
           </div>
         </div>
+
+        <!-- Edit Section Modal -->
+        <div class="s2d-modal-backdrop" id="edit-section-modal">
+          <div class="s2d-modal-dialog">
+            <div class="s2d-modal-header">
+              <h3 class="s2d-card-title">Edit Class Section</h3>
+              <button type="button" class="btn-s2d btn-s2d-ghost btn-icon-s2d" data-modal-close><i data-lucide="x"></i></button>
+            </div>
+            <form method="POST" action="sections.html" data-s2d-form data-success-title="Section Updated" data-success-desc="Section mapping successfully modified.">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="edit">
+              <input type="hidden" id="edit_sec_code" name="section_code">
+              <div class="s2d-modal-body">
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_sec_label">Section Label <span class="req-star">*</span></label>
+                  <input type="text" id="edit_sec_label" name="sectionName" class="s2d-input" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_sec_wing">Hostel Wing Mapping <span class="req-star">*</span></label>
+                  <input type="text" id="edit_sec_wing" name="roomWing" class="s2d-input" required>
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_sec_advisor">Section Advisor</label>
+                  <input type="text" id="edit_sec_advisor" name="advisor" class="s2d-input">
+                </div>
+                <div class="s2d-field">
+                  <label class="s2d-label" for="edit_sec_booth">Primary Calling Booth</label>
+                  <input type="text" id="edit_sec_booth" name="assignedBooth" class="s2d-input">
+                </div>
+              </div>
+              <div class="s2d-modal-footer">
+                <button type="button" class="btn-s2d btn-s2d-secondary" data-modal-close>Cancel</button>
+                <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Update Section</span></button>
+              </div>
+            </form>
+          </div>
+        </div>
     
       </main>
     </div>

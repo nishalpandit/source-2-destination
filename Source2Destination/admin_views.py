@@ -160,6 +160,12 @@ def school_add(request):
             allowed_calling_days=request.POST.get('allowed_calling_days', 'All 7 Days'),
             emergency_calling_allowed=bool(request.POST.get('emergency_calling_allowed')),
             kiosk_group_tag=request.POST.get('kiosk_group_tag', 'AE-HOSTEL-BOOTH'),
+            primary_emergency_phone=request.POST.get('primary_emergency_phone', '+91 98765 43210'),
+            secondary_emergency_phone=request.POST.get('secondary_emergency_phone', '+91 98765 43211'),
+            warden_escalation_phone=request.POST.get('warden_escalation_phone', '+91 98765 43212'),
+            display_school_caller_id=bool(request.POST.get('display_school_caller_id')),
+            show_guardian_whitelist_numbers=bool(request.POST.get('show_guardian_whitelist_numbers')),
+            notify_sms_guardians=bool(request.POST.get('notify_sms_guardians')),
             status=status,
             subscription_status="Active"
         )
@@ -237,7 +243,21 @@ def school_edit(request, school_id=None):
             school.allowed_calling_days = request.POST['allowed_calling_days']
         if request.POST.get('kiosk_group_tag'):
             school.kiosk_group_tag = request.POST['kiosk_group_tag']
-        school.emergency_calling_allowed = request.POST.get('emergency_calling_allowed') == 'on'
+        school.emergency_calling_allowed = request.POST.get('emergency_calling_allowed') == 'on' or request.POST.get('emergency_calling_allowed') is True
+
+        # Section 4: Caller ID & Emergency Overrides
+        if request.POST.get('primary_emergency_phone'):
+            school.primary_emergency_phone = request.POST['primary_emergency_phone'].strip()
+        if request.POST.get('secondary_emergency_phone'):
+            school.secondary_emergency_phone = request.POST['secondary_emergency_phone'].strip()
+        if request.POST.get('warden_escalation_phone'):
+            school.warden_escalation_phone = request.POST['warden_escalation_phone'].strip()
+        if 'display_school_caller_id' in request.POST:
+            school.display_school_caller_id = request.POST.get('display_school_caller_id') in ['on', 'true', True]
+        if 'show_guardian_whitelist_numbers' in request.POST:
+            school.show_guardian_whitelist_numbers = request.POST.get('show_guardian_whitelist_numbers') in ['on', 'true', True]
+        if 'notify_sms_guardians' in request.POST:
+            school.notify_sms_guardians = request.POST.get('notify_sms_guardians') in ['on', 'true', True]
 
         if 'status' in request.POST:
             school.status = request.POST.get('status')

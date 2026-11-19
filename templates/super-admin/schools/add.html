@@ -214,6 +214,46 @@
                       <span>Enable 24/7 Emergency Outbound Calling Bypass</span>
                     </label>
                   </div>
+                </div>
+              </div>
+
+              <!-- 4. Caller ID Policies & Emergency Overrides -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Caller ID, Emergency Overrides &amp; Alerts</h3>
+                  <p>Configure automated outbound dialer branding, emergency security contacts, and notification channels.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="primary_emergency_phone">Campus Emergency Phone <span class="req-star">*</span></label>
+                    <input type="tel" id="primary_emergency_phone" name="primary_emergency_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98765 43210" value="+91 98765 43210" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_emergency_phone">Campus Infirmary / Medical</label>
+                    <input type="tel" id="secondary_emergency_phone" name="secondary_emergency_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98765 43211" value="+91 98765 43211">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="warden_escalation_phone">Chief Warden Escalation</label>
+                    <input type="tel" id="warden_escalation_phone" name="warden_escalation_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98765 43212" value="+91 98765 43212">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="d-flex align-items-center gap-2 mb-0 pt-2" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                      <input type="checkbox" name="display_school_caller_id" class="s2d-checkbox" checked>
+                      <span>Display School Caller ID</span>
+                    </label>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="d-flex align-items-center gap-2 mb-0 pt-2" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                      <input type="checkbox" name="show_guardian_whitelist_numbers" class="s2d-checkbox">
+                      <span>Show Guardian Numbers on Kiosk</span>
+                    </label>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="d-flex align-items-center gap-2 mb-0 pt-2" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                      <input type="checkbox" name="notify_sms_guardians" class="s2d-checkbox" checked>
+                      <span>Send SMS Alerts to Guardians</span>
+                    </label>
+                  </div>
                   <div class="col-12">
                     <div class="s2d-switch-row">
                       <div>

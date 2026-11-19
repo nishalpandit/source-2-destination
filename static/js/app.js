@@ -507,6 +507,22 @@
           rowActions: (r) => [
             { label: 'View Sections', icon: 'layout-list', href: `${href('school-admin/classes/sections.html')}?class=${encodeURIComponent(r.className || r.id)}` },
             {
+              label: 'Edit Class', icon: 'pencil',
+              onClick: (row) => {
+                const modal = document.getElementById('edit-class-modal');
+                if (modal) {
+                  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+                  setVal('edit_class_code', row.id || row.code || '');
+                  setVal('edit_original_name', row.className || '');
+                  setVal('edit_class_name', row.className || '');
+                  setVal('edit_supervisor', row.supervisor || '');
+                  setVal('edit_daily_cap', row.defaultDailyMinutes || 15);
+                  setVal('edit_sched_group', row.scheduleGroup || 'Standard Hostel Window');
+                  modal.classList.add('active');
+                }
+              }
+            },
+            {
               label: r.status === 'Active' ? 'Archive Class' : 'Activate Class', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active',
               onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived')
             }
@@ -531,6 +547,21 @@
             { key: 'status', label: 'Status', render: (r) => badge(r.status) }
           ],
           rowActions: (r) => [
+            {
+              label: 'Edit Section', icon: 'pencil',
+              onClick: (row) => {
+                const modal = document.getElementById('edit-section-modal');
+                if (modal) {
+                  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+                  setVal('edit_sec_code', row.id || row.code || '');
+                  setVal('edit_sec_label', row.sectionName || '');
+                  setVal('edit_sec_wing', row.roomWing || '');
+                  setVal('edit_sec_advisor', row.advisor || '');
+                  setVal('edit_sec_booth', row.assignedBooth || '');
+                  modal.classList.add('active');
+                }
+              }
+            },
             { label: r.status === 'Active' ? 'Archive Section' : 'Activate Section', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived') }
           ]
         };
