@@ -35,20 +35,23 @@
           </div>
           <div class="d-flex align-items-center gap-2"><a href="create.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Create Custom Role</span></a></div>
         </div>
-        <div class="s2d-card mb-4">
-          <div class="s2d-card-header"><h3 class="s2d-card-title">Interactive Permission Matrix (School Principal Role Preview)</h3><button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" data-demo-action="Permission Matrix Saved"><i data-lucide="save"></i><span>Save Matrix</span></button></div>
-          <div class="s2d-table-wrap">
-            <table class="s2d-table">
-              <thead><tr><th>Module Domain</th><th>View</th><th>Create</th><th>Edit</th><th>Delete / Suspend</th><th>Approve</th><th>Export</th></tr></thead>
-              <tbody>
-                <tr><td class="cell-primary">Student Management</td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td></tr>
-                <tr><td class="cell-primary">Guardian Phone Whitelist</td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td></tr>
-                <tr><td class="cell-primary">Calling Schedules &amp; Duration</td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox" checked></td><td><input type="checkbox" class="s2d-checkbox"></td><td><input type="checkbox" class="s2d-checkbox"></td><td><input type="checkbox" class="s2d-checkbox" checked></td></tr>
-                <tr><td class="cell-primary">Franchise Commissions</td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td></tr>
-              </tbody>
-            </table>
+        <form method="POST" action="list.html">
+          {% csrf_token %}
+          <div class="s2d-card mb-4">
+            <div class="s2d-card-header"><h3 class="s2d-card-title">Interactive Permission Matrix (School Principal Role Preview)</h3><button type="submit" class="btn-s2d btn-s2d-primary btn-sm-s2d"><i data-lucide="save"></i><span>Save Matrix</span></button></div>
+            <div class="s2d-table-wrap">
+              <table class="s2d-table">
+                <thead><tr><th>Module Domain</th><th>View</th><th>Create</th><th>Edit</th><th>Delete / Suspend</th><th>Approve</th><th>Export</th></tr></thead>
+                <tbody>
+                  <tr><td class="cell-primary">Student Management</td><td><input type="checkbox" name="perm_student_view" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_student_create" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_student_edit" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_student_delete" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_student_approve" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_student_export" class="s2d-checkbox" checked></td></tr>
+                  <tr><td class="cell-primary">Guardian Phone Whitelist</td><td><input type="checkbox" name="perm_guardian_view" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_guardian_create" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_guardian_edit" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_guardian_delete" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_guardian_approve" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_guardian_export" class="s2d-checkbox" checked></td></tr>
+                  <tr><td class="cell-primary">Calling Schedules &amp; Duration</td><td><input type="checkbox" name="perm_calling_view" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_calling_create" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_calling_edit" class="s2d-checkbox" checked></td><td><input type="checkbox" name="perm_calling_delete" class="s2d-checkbox"></td><td><input type="checkbox" name="perm_calling_approve" class="s2d-checkbox"></td><td><input type="checkbox" name="perm_calling_export" class="s2d-checkbox" checked></td></tr>
+                  <tr><td class="cell-primary">Franchise Commissions</td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td><td><input type="checkbox" class="s2d-checkbox" disabled></td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </form>
     
       </main>
     </div>

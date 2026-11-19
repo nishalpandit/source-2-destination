@@ -33,7 +33,7 @@
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
             <span class="fw-semibold text-heading" style="font-size:0.92rem;">School-wise Usage, Validity &amp; Recharge Reports</span>
           </div>
-          <div class="d-flex align-items-center gap-2"><button type="button" class="btn-s2d btn-s2d-primary" data-demo-action="Consolidated Report Exported" data-demo-desc="Prepared school-wise analytical report package for download."><i data-lucide="download"></i><span>Export Executive Report</span></button></div>
+          <div class="d-flex align-items-center gap-2"><a href="export.csv" class="btn-s2d btn-s2d-primary"><i data-lucide="download"></i><span>Export Executive Report</span></a></div>
         </div>
         <div class="row g-4 mb-4">
           <div class="col-lg-7"><div class="chart-card"><div class="chart-card-header"><h3 class="chart-card-title">School-wise Calling Usage Comparison</h3></div><div class="chart-card-body"><div class="chart-canvas" data-s2d-chart="sa-school-usage-bar"></div></div></div></div>
@@ -58,6 +58,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ schools_json|safe }}) {
+      window.S2D_DEMO.schools = {{ schools_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

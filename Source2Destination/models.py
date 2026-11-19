@@ -1,6 +1,7 @@
 import uuid
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 
 class Franchise(models.Model):
@@ -655,6 +656,9 @@ class KioskDevice(models.Model):
     mac_address = models.CharField(max_length=64, blank=True, default="")
     imei = models.CharField(max_length=64, blank=True, default="")
     app_version = models.CharField(max_length=32, default="v2.4.12-enterprise")
+    battery_level = models.PositiveIntegerField(default=95, help_text="Percentage battery remaining")
+    signal_strength = models.CharField(max_length=32, default="4G LTE (-78 dBm)")
+    kiosk_mode_locked = models.BooleanField(default=True, help_text="Android Enterprise lock-task mode")
     hostel_block = models.CharField(max_length=128, default="North Wing")
     assigned_wing = models.CharField(max_length=128, blank=True, default="Junior & Senior Boarding")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Online', db_index=True)
@@ -721,4 +725,205 @@ class HostelWarden(models.Model):
 
     def __str__(self):
         return f"{self.code} · {self.name} ({self.hostel_block})"
+
+
+class SchoolAdminProfile(models.Model):
+    """
+    Campus Administrator & Principal Profile.
+    Manages school-level portal access, authentication credentials, and hostel oversight.
+    """
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Pending Onboarding', 'Pending Onboarding'),
+        ('Deactivated', 'Deactivated'),
+    ]
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='school_admin_profile', null=True, blank=True)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='admin_profiles', db_index=True)
+    admin_id = models.CharField(max_length=32, unique=True, db_index=True, help_text="e.g. ADM-1001")
+    name = models.CharField(max_length=128)
+    email = models.EmailField(db_index=True)
+    phone = models.CharField(max_length=32, blank=True, default="")
+    designation = models.CharField(max_length=128, default="Campus Principal / Administrator")
+    mfa_enforced = models.BooleanField(default=True)
+    is_primary = models.BooleanField(default=False)
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default='Active', db_index=True)
+    last_login_ip = models.GenericIPAddressField(null=True, blank=True)
+    last_active = models.DateTimeField(default=timezone.now)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['school', 'status']),
+            models.Index(fields=['admin_id', 'status']),
+        ]
+
+    def __str__(self):
+        return f"{self.admin_id} · {self.name} ({self.school.name})"
+
+
+class CampusSubscription(models.Model):
+    """
+    Institutional SaaS Subscription Contract.
+    Tracks campus tier, device licensing, student quota, and annual recurring billing.
+    """
+    STATUS_CHOICES = [
+        ('Active', 'Active'),
+        ('Expiring Soon', 'Expiring Soon'),
+        ('Expired', 'Expired'),
+        ('Past Due', 'Past Due'),
+    ]
+    TIER_CHOICES = [
+        ('Standard Campus', 'Standard Campus'),
+        ('Enterprise Boarding', 'Enterprise Boarding'),
+        ('Premium Military / Gurukul', 'Premium Military / Gurukul'),
+    ]
+    BILLING_CHOICES = [
+        ('Annual', 'Annual'),
+        ('Semi-Annual', 'Semi-Annual'),
+        ('Quarterly', 'Quarterly'),
+        ('Monthly', 'Monthly'),
+    ]
+
+    subscription_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. SUB-2026-001")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='subscriptions', db_index=True)
+    plan_name = models.CharField(max_length=128, default="Enterprise Residential Tier")
+    tier = models.CharField(max_length=64, choices=TIER_CHOICES, default='Enterprise Boarding')
+    contract_value = models.DecimalField(max_digits=12, decimal_places=2, default=120000.00)
+    billing_cycle = models.CharField(max_length=32, choices=BILLING_CHOICES, default='Annual')
+    student_seats = models.PositiveIntegerField(default=500)
+    device_seats = models.PositiveIntegerField(default=10)
+    start_date = models.DateField(default=timezone.now)
+    expiry_date = models.DateField()
+    auto_renew = models.BooleanField(default=True)
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default='Active', db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-start_date']
+        indexes = [
+            models.Index(fields=['school', 'status']),
+            models.Index(fields=['status', 'expiry_date']),
+        ]
+
+    def __str__(self):
+        return f"{self.subscription_id} · {self.school.name} ({self.tier})"
+
+
+class FinancialTransaction(models.Model):
+    """
+    Consolidated Institutional & Student Financial Ledger.
+    Records all recharges, subscription payments, credit allocations, and settlements.
+    """
+    STATUS_CHOICES = [
+        ('Successful', 'Successful'),
+        ('Pending', 'Pending'),
+        ('Failed', 'Failed'),
+        ('Refunded', 'Refunded'),
+    ]
+    CATEGORY_CHOICES = [
+        ('Student Recharge', 'Student Recharge'),
+        ('Annual Subscription', 'Annual Subscription'),
+        ('Bulk Credit Allocation', 'Bulk Credit Allocation'),
+        ('Subscription Renewal', 'Subscription Renewal'),
+        ('Hardware Deposit', 'Hardware Deposit'),
+    ]
+    PAYMENT_METHOD_CHOICES = [
+        ('Razorpay / UPI', 'Razorpay / UPI'),
+        ('NEFT / RTGS', 'NEFT / RTGS'),
+        ('NetBanking', 'NetBanking'),
+        ('Bursar Desk Ledger', 'Bursar Desk Ledger'),
+        ('Cash Deposit', 'Cash Deposit'),
+    ]
+
+    transaction_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. TXN-98421")
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='financial_transactions', db_index=True)
+    franchise = models.ForeignKey(Franchise, on_delete=models.SET_NULL, null=True, blank=True, related_name='financial_transactions')
+    student = models.ForeignKey('Student', on_delete=models.SET_NULL, null=True, blank=True, related_name='financial_transactions')
+    category = models.CharField(max_length=64, choices=CATEGORY_CHOICES, default='Student Recharge', db_index=True)
+    amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    payment_method = models.CharField(max_length=64, choices=PAYMENT_METHOD_CHOICES, default='Razorpay / UPI')
+    gateway_reference = models.CharField(max_length=128, blank=True, default="")
+    payer_name = models.CharField(max_length=128, blank=True, default="")
+    invoice_pdf_url = models.CharField(max_length=255, blank=True, default="")
+    status = models.CharField(max_length=32, choices=STATUS_CHOICES, default='Successful', db_index=True)
+    created_at = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['school', 'created_at']),
+            models.Index(fields=['category', 'status']),
+            models.Index(fields=['status', 'created_at']),
+        ]
+
+    def __str__(self):
+        return f"{self.transaction_id} · ₹{self.amount} ({self.category} - {self.status})"
+
+
+class SystemAuditLog(models.Model):
+    """
+    Immutable System Audit Trail.
+    Logs every critical administrative action, policy adjustment, and security event.
+    """
+    ACTION_CHOICES = [
+        ('CREATE', 'CREATE'),
+        ('UPDATE', 'UPDATE'),
+        ('DELETE', 'DELETE'),
+        ('POLICY_OVERRIDE', 'POLICY_OVERRIDE'),
+        ('TERMINAL_LOCKDOWN', 'TERMINAL_LOCKDOWN'),
+        ('LOGIN', 'LOGIN'),
+        ('EXPORT', 'EXPORT'),
+    ]
+
+    actor = models.CharField(max_length=128, default="Super Admin")
+    actor_role = models.CharField(max_length=64, default="SUPER_ADMIN")
+    action_type = models.CharField(max_length=64, choices=ACTION_CHOICES, default='UPDATE', db_index=True)
+    target_domain = models.CharField(max_length=64, default="General", db_index=True)
+    target_id = models.CharField(max_length=64, blank=True, default="")
+    description = models.TextField()
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    timestamp = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['action_type', 'timestamp']),
+            models.Index(fields=['target_domain', 'timestamp']),
+        ]
+
+    def __str__(self):
+        return f"[{self.timestamp.strftime('%Y-%m-%d %H:%M')}] {self.actor} - {self.action_type} on {self.target_domain}"
+
+
+class PlatformSetting(models.Model):
+    """
+    Global Platform Telecommunications & Governance Settings.
+    Singleton record storing default parameters, timeouts, and gateway credentials.
+    """
+    singleton_key = models.CharField(max_length=32, default="default", unique=True)
+    platform_title = models.CharField(max_length=128, default="Source2Destination Telecom Control Center")
+    support_email = models.EmailField(default="support@source2destination.com")
+    support_phone = models.CharField(max_length=32, default="+91 (135) 289-4400")
+    emergency_bypass_active = models.BooleanField(default=False)
+    session_timeout_minutes = models.PositiveIntegerField(default=30)
+    maintenance_mode = models.BooleanField(default=False)
+    default_timezone = models.CharField(max_length=64, default="Asia/Kolkata")
+    sms_gateway_provider = models.CharField(max_length=32, default="Twilio / Kaleyra")
+    sms_api_key = models.CharField(max_length=128, blank=True, default="")
+    sms_sender_id = models.CharField(max_length=32, default="S2DEDU")
+    low_balance_threshold_minutes = models.PositiveIntegerField(default=15)
+    parent_sms_alert_enabled = models.BooleanField(default=True)
+    curfew_lockdown_enabled = models.BooleanField(default=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Platform Settings ({self.platform_title})"
+
+    @classmethod
+    def get_settings(cls):
+        obj, _ = cls.objects.get_or_create(singleton_key="default")
+        return obj
+
 

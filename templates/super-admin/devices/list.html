@@ -36,10 +36,10 @@
           <div class="d-flex align-items-center gap-2"><a href="register.html" class="btn-s2d btn-s2d-primary"><i data-lucide="plus"></i><span>Register &amp; Assign Device</span></a></div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Registered Terminals</div><div class="kpi-value mt-2">418</div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Online Heartbeat</div><div class="kpi-value mt-2">406</div><div class="kpi-meta"><span class="kpi-delta up">97.1%</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">AE Kiosk Compliant</div><div class="kpi-value mt-2">412</div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Blocked / Tamper Alert</div><div class="kpi-value mt-2">2</div><div class="kpi-meta"><span class="kpi-delta down">Isolated</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Registered Terminals</div><div class="kpi-value mt-2">{{ total_terminals|default:418 }}</div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Online Heartbeat</div><div class="kpi-value mt-2">{{ online_count|default:406 }}</div><div class="kpi-meta"><span class="kpi-delta up">{{ online_percent|default:97.1 }}%</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">AE Kiosk Compliant</div><div class="kpi-value mt-2">{{ compliant_count|default:412 }}</div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Blocked / Tamper Alert</div><div class="kpi-value mt-2">{{ tamper_blocked_count|default:2 }}</div><div class="kpi-meta"><span class="kpi-delta down">Isolated</span></div></div></div>
         </div>
         <div data-s2d-table="sa-devices-table"></div>
     
@@ -59,6 +59,11 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ devices_json|safe }}) {
+      window.S2D_DEMO.devices = {{ devices_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

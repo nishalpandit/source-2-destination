@@ -40,6 +40,42 @@ urlpatterns = [
     path('super-admin/recharges/create-plan.html', admin_views.recharge_create_plan, name='super_admin_recharge_create_plan'),
     path('super-admin/recharges/history.html', admin_views.recharge_history, name='super_admin_recharge_history'),
 
+    # Super Admin Fleet: School Administrators (Phase 1)
+    path('super-admin/school-admins/', admin_views.school_admins_list, name='super_admin_school_admins_list'),
+    path('super-admin/school-admins/list.html', admin_views.school_admins_list, name='super_admin_school_admins_list_html'),
+    path('super-admin/school-admins/add.html', admin_views.school_admin_add, name='super_admin_school_admin_add'),
+    path('super-admin/school-admins/edit.html', admin_views.school_admin_edit, name='super_admin_school_admin_edit'),
+    path('super-admin/school-admins/details.html', admin_views.school_admin_details, name='super_admin_school_admin_details'),
+
+    # Super Admin Hardware: Android Enterprise Kiosks (Phase 2)
+    path('super-admin/devices/', admin_views.devices_list, name='super_admin_devices_list'),
+    path('super-admin/devices/list.html', admin_views.devices_list, name='super_admin_devices_list_html'),
+    path('super-admin/devices/register.html', admin_views.device_register, name='super_admin_device_register'),
+    path('super-admin/devices/details.html', admin_views.device_details, name='super_admin_device_details'),
+
+    # Super Admin Commercial: Subscriptions & Payments (Phase 3)
+    path('super-admin/subscriptions/', admin_views.subscriptions_overview, name='super_admin_subscriptions_overview'),
+    path('super-admin/subscriptions/overview.html', admin_views.subscriptions_overview, name='super_admin_subscriptions_overview_html'),
+    path('super-admin/subscriptions/create.html', admin_views.subscription_create, name='super_admin_subscription_create'),
+    path('super-admin/payments/', admin_views.payments_overview, name='super_admin_payments_overview'),
+    path('super-admin/payments/overview.html', admin_views.payments_overview, name='super_admin_payments_overview_html'),
+    path('super-admin/payments/details.html', admin_views.payment_details, name='super_admin_payment_details'),
+
+    # Super Admin Intelligence: Call Telemetry & Reports (Phase 4)
+    path('super-admin/call-history/', admin_views.call_history, name='super_admin_call_history'),
+    path('super-admin/call-history/index.html', admin_views.call_history, name='super_admin_call_history_html'),
+    path('super-admin/reports/', admin_views.reports_overview, name='super_admin_reports_overview'),
+    path('super-admin/reports/index.html', admin_views.reports_overview, name='super_admin_reports_overview_html'),
+    path('super-admin/reports/export.csv', admin_views.export_reports_csv, name='super_admin_reports_export_csv'),
+
+    # Super Admin Governance: RBAC & Platform Settings (Phase 5)
+    path('super-admin/roles-permissions/', admin_views.roles_permissions_list, name='super_admin_roles_permissions_list'),
+    path('super-admin/roles-permissions/list.html', admin_views.roles_permissions_list, name='super_admin_roles_permissions_list_html'),
+    path('super-admin/roles-permissions/create.html', admin_views.role_create, name='super_admin_role_create'),
+    path('super-admin/settings/general.html', admin_views.settings_general, name='super_admin_settings_general'),
+    path('super-admin/settings/notifications.html', admin_views.settings_notifications, name='super_admin_settings_notifications'),
+    path('super-admin/settings/audit-logs.html', admin_views.settings_audit_logs, name='super_admin_settings_audit_logs'),
+
     # Super Admin Dashboards & Subpages
     path('super-admin/', admin_views.dashboard, name='super_admin_dashboard'),
     path('super-admin/dashboard.html', admin_views.dashboard, name='super_admin_dashboard_html'),

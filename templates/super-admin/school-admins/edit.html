@@ -36,21 +36,36 @@
           <div class="d-flex align-items-center gap-2"><a href="details.html?id=ADM-201" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="Administrator Updated (Demo)">
+          <form method="POST" data-s2d-form data-warn-unsaved="true">
+            {% csrf_token %}
+            <input type="hidden" name="id" value="{{ profile.admin_id|default:'ADM-201' }}">
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Profile &amp; Contact</h3><p>Verified identity details.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="Dr. Arthur Pendelton" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Designation <span class="req-star">*</span></label><input type="text" name="designation" class="s2d-input" data-bind-field="designation" value="Principal & Primary Admin" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="admin@oakridge-academy.edu" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="+1 (555) 210-9001" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ profile.name|default:'Dr. Arthur Pendelton' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Designation <span class="req-star">*</span></label><input type="text" name="designation" class="s2d-input" data-bind-field="designation" value="{{ profile.designation|default:'Principal & Primary Admin' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="{{ profile.email|default:'admin@oakridge-academy.edu' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ profile.phone|default:'+1 (555) 210-9001' }}" required></div>
               </div>
             </div>
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Campus &amp; Status</h3><p>Control active workspace access.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label><select name="school" class="s2d-select" data-bind-field="school"><option value="Oakridge Residential Academy">Oakridge Residential Academy</option><option value="Westfield Collegiate Hostel">Westfield Collegiate Hostel</option><option value="St. Jude Boarding Institute">St. Jude Boarding Institute</option></select></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Administrative Status <span class="req-star">*</span></label><select name="status" class="s2d-select" data-bind-field="status"><option value="Active">Active</option><option value="Inactive">Inactive</option></select></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label>
+                  <select name="school" class="s2d-select" data-bind-field="school">
+                    {% for s in schools %}
+                    <option value="{{ s.name }}" {% if profile and profile.school.id == s.id %}selected{% endif %}>{{ s.name }}</option>
+                    {% empty %}
+                    <option value="Oakridge Residential Academy">Oakridge Residential Academy</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Administrative Status <span class="req-star">*</span></label>
+                  <select name="status" class="s2d-select" data-bind-field="status">
+                    <option value="Active" {% if not profile or profile.status == 'Active' %}selected{% endif %}>Active</option>
+                    <option value="Inactive" {% if profile and profile.status != 'Active' %}selected{% endif %}>Inactive</option>
+                  </select>
+                </div>
               </div>
             </div>
             <div class="form-actions-bar">
@@ -76,6 +91,14 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ profile_json|safe }}) {
+      const p = {{ profile_json|safe }};
+      window.S2D_DEMO.schoolAdmins = window.S2D_DEMO.schoolAdmins || [];
+      const idx = window.S2D_DEMO.schoolAdmins.findIndex(a => a.id === p.id);
+      if (idx >= 0) { window.S2D_DEMO.schoolAdmins[idx] = p; } else { window.S2D_DEMO.schoolAdmins.unshift(p); }
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

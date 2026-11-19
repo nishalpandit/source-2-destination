@@ -36,7 +36,8 @@
           <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to List</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="list.html" data-success-title="School Administrator Provisioned (Demo)">
+          <form method="POST" action="add.html" data-s2d-form data-warn-unsaved="true">
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Administrator Identity</h3><p>Official campus credentials used for login and audit attribution.</p></div>
               <div class="row g-3">
@@ -52,10 +53,11 @@
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Assigned School <span class="req-star">*</span></label>
                   <select name="school_id" class="s2d-select" required>
                     <option value="">Select school...</option>
+                    {% for s in schools %}
+                    <option value="{{ s.code }}">{{ s.code }} · {{ s.name }}</option>
+                    {% empty %}
                     <option value="SCH-1001">SCH-1001 · Oakridge Residential Academy</option>
-                    <option value="SCH-1002">SCH-1002 · Westfield Collegiate Hostel</option>
-                    <option value="SCH-1003">SCH-1003 · St. Jude Boarding Institute</option>
-                    <option value="SCH-1004">SCH-1004 · Greenwood International Prep</option>
+                    {% endfor %}
                   </select>
                 </div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Administrative Role Preset <span class="req-star">*</span></label>

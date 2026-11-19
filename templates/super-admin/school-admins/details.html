@@ -59,9 +59,13 @@
                 <table class="s2d-table">
                   <thead><tr><th>Timestamp</th><th>Module</th><th>Action</th><th>Origin IP</th></tr></thead>
                   <tbody>
+                    {% for log in audit_logs %}
+                    <tr><td class="mono-code">{{ log.timestamp|date:"Y-m-d H:i" }}</td><td>{{ log.target_domain }}</td><td>{{ log.description }}</td><td class="mono-code">{{ log.ip_address|default:"127.0.0.1" }}</td></tr>
+                    {% empty %}
                     <tr><td class="mono-code">2026-11-10 08:15</td><td>Guardian Whitelist</td><td>Verified secondary number for STU-4002</td><td class="mono-code">203.0.113.42</td></tr>
                     <tr><td class="mono-code">2026-11-09 17:04</td><td>Calling Schedule</td><td>Updated Sunday hostel window</td><td class="mono-code">203.0.113.42</td></tr>
                     <tr><td class="mono-code">2026-11-08 10:22</td><td>Device Assignment</td><td>Assigned DEV-7703 to East Gables Floor 3</td><td class="mono-code">203.0.113.42</td></tr>
+                    {% endfor %}
                   </tbody>
                 </table>
               </div>
@@ -85,6 +89,14 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ profile_json|safe }}) {
+      const p = {{ profile_json|safe }};
+      window.S2D_DEMO.schoolAdmins = window.S2D_DEMO.schoolAdmins || [];
+      const idx = window.S2D_DEMO.schoolAdmins.findIndex(a => a.id === p.id);
+      if (idx >= 0) { window.S2D_DEMO.schoolAdmins[idx] = p; } else { window.S2D_DEMO.schoolAdmins.unshift(p); }
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

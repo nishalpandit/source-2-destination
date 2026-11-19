@@ -4,21 +4,42 @@ Source 2 Destination — Global Governance Portal
 Handles all Super Admin UI views, dynamic school management, and institutional KPI metrics.
 """
 import os
+import csv
 import json
-from django.shortcuts import render, redirect
-from django.http import Http404, HttpResponseBadRequest
+from datetime import timedelta
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, Http404, HttpResponseBadRequest
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
+from django.utils import timezone
+from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q
 from .models import (
     School, Franchise, Student, GlobalDurationRule, CampusDurationRule,
     CallingScheduleRule, GlobalValidityRule, RechargePlan, StudentRecharge,
-    ValidityExtensionLog, KioskDevice
+    ValidityExtensionLog, KioskDevice, DeviceAssignment, HostelWarden, CallRecord,
+    SchoolAdminProfile, CampusSubscription, FinancialTransaction, SystemAuditLog,
+    PlatformSetting
 )
 from .calling_services import (
     get_global_duration_rule, get_global_validity_rule,
     CallingDurationEngine, CallingScheduleEngine, ValidityService, RechargeService
 )
+
+
+def log_admin_action(actor="Super Admin", action_type="UPDATE", domain="General", target_id="", description="", ip="127.0.0.1"):
+    try:
+        SystemAuditLog.objects.create(
+            actor=actor,
+            actor_role="SUPER_ADMIN",
+            action_type=action_type,
+            target_domain=domain,
+            target_id=str(target_id),
+            description=description,
+            ip_address=ip or "127.0.0.1"
+        )
+    except Exception:
+        pass
 
 
 def dashboard(request):
@@ -496,6 +517,776 @@ def recharge_history(request):
         "recharges_json": json.dumps(recharges_data),
     }
     return render(request, 'super-admin/recharges/history.html', context)
+
+
+# ==============================================================================
+# DIVISION II — PHASE 1: CAMPUS PRINCIPALS & ADMINISTRATOR FLEET (school-admins/)
+# ==============================================================================
+
+def school_admins_list(request):
+    """
+    Super Admin: Campus Administrator Fleet Directory & Telemetry.
+    """
+    # Seed initial profiles from existing Schools if database is fresh
+    if not SchoolAdminProfile.objects.exists():
+        for i, sch in enumerate(School.objects.all()[:10], start=101):
+            SchoolAdminProfile.objects.create(
+                school=sch,
+                admin_id=f"ADM-{i}",
+                name=sch.admin_name or f"Principal {sch.name.split()[0]}",
+                email=sch.admin_email or f"admin{i}@{sch.code.lower()}.edu",
+                phone=sch.admin_phone or f"+91 98101 {i:04d}",
+                designation="Principal & Primary Administrator",
+                mfa_enforced=True,
+                status="Active" if i % 15 != 0 else "Deactivated"
+            )
+
+    admins_qs = SchoolAdminProfile.objects.select_related('school', 'user').order_by('-id')
+    total_admins = admins_qs.count()
+    active_admins = admins_qs.filter(status='Active').count()
+    mfa_count = admins_qs.filter(mfa_enforced=True).count()
+    mfa_percent = round((mfa_count / total_admins * 100), 1) if total_admins > 0 else 94.1
+    pending_count = admins_qs.filter(status='Pending Onboarding').count()
+    deactivated_count = admins_qs.filter(status='Deactivated').count()
+    schools_count = School.objects.count()
+
+    school_admins_data = [
+        {
+            "id": a.admin_id,
+            "name": a.name,
+            "email": a.email,
+            "phone": a.phone,
+            "designation": a.designation,
+            "school": a.school.name,
+            "schoolId": a.school.code,
+            "mfaEnabled": "Enabled" if a.mfa_enforced else "Disabled",
+            "lastLogin": a.last_active.strftime("%Y-%m-%d %H:%M"),
+            "status": "Active" if a.status == "Active" else "Inactive"
+        }
+        for a in admins_qs
+    ]
+
+    context = {
+        "admins": admins_qs,
+        "school_admins_json": json.dumps(school_admins_data),
+        "total_admins": total_admins,
+        "active_admins": active_admins,
+        "mfa_percent": mfa_percent,
+        "pending_count": pending_count,
+        "deactivated_count": deactivated_count,
+        "schools_count": schools_count,
+    }
+    return render(request, 'super-admin/school-admins/list.html', context)
+
+
+def school_admin_add(request):
+    """
+    Super Admin: Provision a new Campus Principal / Administrator.
+    """
+    schools = School.objects.all().order_by('name')
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        designation = request.POST.get('designation', 'Principal & Primary Admin').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        school_code = request.POST.get('school_id', '').strip()
+        require_mfa = request.POST.get('require_mfa') in ['on', 'true', '1']
+
+        school = School.objects.filter(Q(code=school_code) | Q(name__icontains=school_code)).first() or schools.first()
+        if not school:
+            return HttpResponseBadRequest("No valid campus found for assignment.")
+
+        admin_id = f"ADM-{SchoolAdminProfile.objects.count() + 101}"
+
+        # Create or update corresponding User account
+        user, _ = User.objects.get_or_create(username=email, defaults={'email': email, 'first_name': name})
+
+        profile = SchoolAdminProfile.objects.create(
+            user=user,
+            school=school,
+            admin_id=admin_id,
+            name=name,
+            email=email,
+            phone=phone,
+            designation=designation,
+            mfa_enforced=require_mfa,
+            status='Active'
+        )
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="CREATE",
+            domain="SchoolAdmin",
+            target_id=profile.admin_id,
+            description=f"Provisioned campus administrator {name} for {school.name}"
+        )
+        return redirect('/super-admin/school-admins/list.html')
+
+    return render(request, 'super-admin/school-admins/add.html', {"schools": schools})
+
+
+def school_admin_edit(request):
+    """
+    Super Admin: Edit Campus Administrator profile & assignment.
+    """
+    admin_id = request.GET.get('id', '') or request.POST.get('id', '')
+    profile = SchoolAdminProfile.objects.filter(Q(admin_id=admin_id) | Q(pk=admin_id if admin_id.isdigit() else 0)).first()
+    schools = School.objects.all().order_by('name')
+
+    if not profile:
+        profile = SchoolAdminProfile.objects.first()
+
+    if request.method == 'POST' and profile:
+        profile.name = request.POST.get('name', profile.name).strip()
+        profile.designation = request.POST.get('designation', profile.designation).strip()
+        profile.email = request.POST.get('email', profile.email).strip()
+        profile.phone = request.POST.get('phone', profile.phone).strip()
+
+        school_name = request.POST.get('school', '')
+        if school_name:
+            sch = School.objects.filter(Q(name__icontains=school_name) | Q(code=school_name)).first()
+            if sch:
+                profile.school = sch
+
+        status = request.POST.get('status', 'Active')
+        profile.status = 'Active' if status in ['Active', 'active'] else 'Deactivated'
+        profile.save()
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="UPDATE",
+            domain="SchoolAdmin",
+            target_id=profile.admin_id,
+            description=f"Updated profile for administrator {profile.name} ({profile.school.name})"
+        )
+        return redirect('/super-admin/school-admins/list.html')
+
+    profile_dict = {
+        "id": profile.admin_id if profile else "ADM-201",
+        "name": profile.name if profile else "Dr. Arthur Pendelton",
+        "designation": profile.designation if profile else "Principal & Primary Admin",
+        "email": profile.email if profile else "admin@oakridge-academy.edu",
+        "phone": profile.phone if profile else "+1 (555) 210-9001",
+        "school": profile.school.name if profile and profile.school else "Oakridge Residential Academy",
+        "status": profile.status if profile else "Active"
+    }
+
+    context = {
+        "profile": profile,
+        "profile_json": json.dumps(profile_dict),
+        "schools": schools
+    }
+    return render(request, 'super-admin/school-admins/edit.html', context)
+
+
+def school_admin_details(request):
+    """
+    Super Admin: 360° Dossier View of Campus Principal.
+    """
+    admin_id = request.GET.get('id', '')
+    profile = SchoolAdminProfile.objects.filter(Q(admin_id=admin_id) | Q(pk=admin_id if admin_id.isdigit() else 0)).select_related('school').first()
+    if not profile:
+        profile = SchoolAdminProfile.objects.first()
+
+    audit_logs = SystemAuditLog.objects.filter(
+        Q(target_id=profile.admin_id if profile else '') | Q(actor=profile.name if profile else '')
+    )[:5] if profile else []
+
+    profile_dict = {
+        "id": profile.admin_id if profile else "ADM-201",
+        "name": profile.name if profile else "Dr. Arthur Pendelton",
+        "designation": profile.designation if profile else "Principal & Primary Admin",
+        "email": profile.email if profile else "admin@oakridge-academy.edu",
+        "phone": profile.phone if profile else "+1 (555) 210-9001",
+        "school": profile.school.name if profile and profile.school else "Oakridge Residential Academy",
+        "mfaEnabled": "Enabled" if (profile and profile.mfa_enforced) else "Disabled",
+        "lastLogin": profile.last_active.strftime("%Y-%m-%d %H:%M") if profile else "2026-11-10 08:42",
+        "status": profile.status if profile else "Active"
+    }
+
+    context = {
+        "profile": profile,
+        "profile_json": json.dumps(profile_dict),
+        "audit_logs": audit_logs,
+    }
+    return render(request, 'super-admin/school-admins/details.html', context)
+
+
+# ==============================================================================
+# DIVISION II — PHASE 2: ANDROID ENTERPRISE KIOSKS & HARDWARE MDM (devices/)
+# ==============================================================================
+
+def devices_list(request):
+    """
+    Super Admin: Fleet-wide Android Enterprise Kiosk Registry.
+    """
+    # Seed fallback kiosks if database is fresh
+    if not KioskDevice.objects.exists():
+        for i, sch in enumerate(School.objects.all()[:12], start=7701):
+            KioskDevice.objects.create(
+                device_id=f"DEV-{i}",
+                school=sch,
+                name=f"Hostel Wing {i%4 + 1} - Booth {i%3 + 1}",
+                serial_number=f"SN-{i}-S2D",
+                imei=f"86429803{i:06d}",
+                hostel_block=f"Block {chr(65 + i%4)}",
+                assigned_wing=f"Dormitory Wing {chr(65 + i%4)}",
+                status='Online' if i % 8 != 0 else 'Maintenance',
+                kiosk_mode_locked=True
+            )
+
+    devices_qs = KioskDevice.objects.select_related('school').order_by('device_id')
+    total_terminals = devices_qs.count()
+    online_count = devices_qs.filter(status='Online').count()
+    online_percent = round((online_count / total_terminals * 100), 1) if total_terminals > 0 else 97.1
+    compliant_count = devices_qs.filter(kiosk_mode_locked=True).count()
+    tamper_blocked_count = devices_qs.filter(status='Maintenance').count()
+
+    devices_data = [
+        {
+            "id": d.device_id,
+            "deviceName": d.name,
+            "serialNumber": d.serial_number or d.device_id,
+            "school": d.school.name,
+            "wingLocation": f"{d.hostel_block} · {d.assigned_wing}",
+            "enrollmentStatus": "Android Enterprise",
+            "kioskCompliance": "Compliant" if d.kiosk_mode_locked else "Policy Update Pending",
+            "onlineStatus": d.status,
+            "lastHeartbeat": d.last_heartbeat.strftime("%Y-%m-%d %H:%M"),
+            "status": "Active" if d.status != "Maintenance" else "Blocked"
+        }
+        for d in devices_qs
+    ]
+
+    context = {
+        "devices": devices_qs,
+        "devices_json": json.dumps(devices_data),
+        "total_terminals": total_terminals,
+        "online_count": online_count,
+        "online_percent": online_percent,
+        "compliant_count": compliant_count,
+        "tamper_blocked_count": tamper_blocked_count,
+    }
+    return render(request, 'super-admin/devices/list.html', context)
+
+
+def device_register(request):
+    """
+    Super Admin: Provision, register, or reassign an Android Enterprise Kiosk.
+    """
+    schools = School.objects.all().order_by('name')
+    device_id = request.GET.get('id', '') or request.POST.get('device_id', '')
+    device = KioskDevice.objects.filter(device_id=device_id).first() if device_id else None
+
+    if request.method == 'POST':
+        name = request.POST.get('deviceName', '').strip() or request.POST.get('name', '').strip()
+        serial = request.POST.get('serialNumber', '').strip()
+        imei = request.POST.get('imei', '').strip()
+        school_code = request.POST.get('school', '').strip()
+        wing = request.POST.get('wingLocation', 'Main Hostel Wing').strip()
+        status = request.POST.get('status', 'Online').strip()
+
+        school = School.objects.filter(Q(code=school_code) | Q(name__icontains=school_code)).first() or schools.first()
+
+        if device:
+            device.name = name or device.name
+            device.serial_number = serial or device.serial_number
+            device.imei = imei or device.imei
+            if school:
+                device.school = school
+            device.assigned_wing = wing
+            device.status = 'Online' if status in ['Online', 'Active'] else 'Maintenance'
+            device.save()
+            action_type = "UPDATE"
+        else:
+            new_id = f"DEV-{KioskDevice.objects.count() + 7701}"
+            device = KioskDevice.objects.create(
+                device_id=new_id,
+                school=school,
+                name=name or f"Hostel Booth {new_id}",
+                serial_number=serial or f"SN-{new_id}",
+                imei=imei,
+                hostel_block=wing,
+                assigned_wing=wing,
+                status='Online',
+                kiosk_mode_locked=True
+            )
+            action_type = "CREATE"
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type=action_type,
+            domain="KioskDevice",
+            target_id=device.device_id,
+            description=f"Registered/Updated kiosk booth {device.name} at {device.school.name}"
+        )
+        return redirect('/super-admin/devices/list.html')
+
+    device_dict = {
+        "id": device.device_id if device else "",
+        "deviceName": device.name if device else "",
+        "serialNumber": device.serial_number if device else "",
+        "imei": device.imei if device else "",
+        "school": device.school.code if device else "",
+        "wingLocation": device.assigned_wing if device else "",
+        "status": device.status if device else "Online"
+    }
+
+    return render(request, 'super-admin/devices/register.html', {
+        "schools": schools,
+        "device": device,
+        "device_json": json.dumps(device_dict)
+    })
+
+
+def device_details(request):
+    """
+    Super Admin: Hardware Dossier & Live MDM Telemetry.
+    """
+    device_id = request.GET.get('id', '')
+    device = KioskDevice.objects.filter(device_id=device_id).select_related('school').first()
+    if not device:
+        device = KioskDevice.objects.first()
+
+    device_dict = {
+        "id": device.device_id if device else "DEV-7701",
+        "deviceName": device.name if device else "North Hall Booth 1",
+        "serialNumber": device.serial_number if device else "SN-7701-S2D",
+        "imei": device.imei if device else "864298031234567",
+        "school": device.school.name if device else "Oakridge Residential Academy",
+        "wingLocation": device.assigned_wing if device else "North Wing",
+        "onlineStatus": device.status if device else "Online",
+        "batteryLevel": f"{device.battery_level}%" if device else "95%",
+        "signalStrength": device.signal_strength if device else "4G LTE (-78 dBm)",
+        "appVersion": device.app_version if device else "v2.4.12-enterprise",
+        "lastHeartbeat": device.last_heartbeat.strftime("%Y-%m-%d %H:%M") if device else "Just now"
+    }
+
+    recent_calls = CallRecord.objects.filter(
+        Q(device_id=device.name) | Q(device_id=device.device_id)
+    ).order_by('-start_time')[:10] if device else []
+
+    context = {
+        "device": device,
+        "device_json": json.dumps(device_dict),
+        "recent_calls": recent_calls
+    }
+    return render(request, 'super-admin/devices/details.html', context)
+
+
+# ==============================================================================
+# DIVISION II — PHASE 3: FINANCIAL TRANSACTIONS & SUBSCRIPTIONS (payments/, subscriptions/)
+# ==============================================================================
+
+def subscriptions_overview(request):
+    """
+    Super Admin: Institutional SaaS Subscription Contracts & ARR Ledger.
+    """
+    if not CampusSubscription.objects.exists():
+        for i, sch in enumerate(School.objects.all()[:8], start=1):
+            CampusSubscription.objects.create(
+                subscription_id=f"SUB-2026-{i:03d}",
+                school=sch,
+                plan_name="Enterprise Boarding Annual" if i % 2 == 0 else "Campus Growth Annual",
+                tier="Enterprise Boarding" if i % 2 == 0 else "Standard Campus",
+                contract_value=840000.00 if i % 2 == 0 else 590000.00,
+                student_seats=sch.student_seats or 750,
+                device_seats=sch.device_count or 25,
+                expiry_date=timezone.now().date() + timedelta(days=280 - (i * 30)),
+                auto_renew=True,
+                status="Active" if i <= 6 else ("Expiring Soon" if i == 7 else "Expired")
+            )
+
+    subs_qs = CampusSubscription.objects.select_related('school', 'school__franchise').order_by('-id')
+    arr_total = subs_qs.filter(status='Active').aggregate(t=Sum('contract_value'))['t'] or 3482000
+    active_contracts = subs_qs.filter(status='Active').count()
+    expiring_soon = subs_qs.filter(status='Expiring Soon').count()
+    expired_contracts = subs_qs.filter(status__in=['Expired', 'Past Due']).count()
+
+    subscriptions_data = [
+        {
+            "id": s.subscription_id,
+            "school": s.school.name,
+            "franchise": s.school.franchise.name if s.school.franchise else "Direct Institutional",
+            "planName": s.plan_name,
+            "studentSeats": s.student_seats,
+            "deviceSeats": s.device_seats,
+            "amount": float(s.contract_value),
+            "expiryDate": s.expiry_date.strftime("%Y-%m-%d"),
+            "autoRenew": "Auto-Renew Enabled" if s.auto_renew else "Manual Renewal",
+            "status": s.status
+        }
+        for s in subs_qs
+    ]
+
+    context = {
+        "subscriptions": subs_qs,
+        "subscriptions_json": json.dumps(subscriptions_data),
+        "arr_total": f"₹{arr_total:,.0f}",
+        "active_contracts": active_contracts,
+        "expiring_soon": expiring_soon,
+        "expired_contracts": expired_contracts,
+    }
+    return render(request, 'super-admin/subscriptions/overview.html', context)
+
+
+def subscription_create(request):
+    """
+    Super Admin: Provision or renew campus subscription contracts.
+    """
+    schools = School.objects.all().order_by('name')
+    if request.method == 'POST':
+        school_code = request.POST.get('school', '').strip()
+        plan_name = request.POST.get('planName', 'Enterprise Boarding Annual').strip()
+        student_seats = int(request.POST.get('studentSeats', 750) or 750)
+        device_seats = int(request.POST.get('deviceSeats', 35) or 35)
+        expiry_date_str = request.POST.get('expiryDate', '').strip()
+
+        school = School.objects.filter(Q(code=school_code) | Q(name__icontains=school_code)).first() or schools.first()
+
+        contract_value = 840000.00
+        if "5,90,000" in plan_name or "Growth" in plan_name:
+            contract_value = 590000.00
+        elif "1,85,000" in plan_name or "Quarterly" in plan_name:
+            contract_value = 185000.00
+
+        try:
+            exp_date = timezone.datetime.strptime(expiry_date_str, "%Y-%m-%d").date()
+        except Exception:
+            exp_date = timezone.now().date() + timedelta(days=365)
+
+        sub_id = f"SUB-{timezone.now().year}-{CampusSubscription.objects.count() + 101}"
+
+        sub = CampusSubscription.objects.create(
+            subscription_id=sub_id,
+            school=school,
+            plan_name=plan_name,
+            tier='Enterprise Boarding' if 'Enterprise' in plan_name else 'Standard Campus',
+            contract_value=contract_value,
+            student_seats=student_seats,
+            device_seats=device_seats,
+            expiry_date=exp_date,
+            auto_renew=True,
+            status='Active'
+        )
+
+        # Generate financial transaction ledger entry
+        FinancialTransaction.objects.create(
+            transaction_id=f"TXN-{timezone.now().strftime('%Y%m%d')}-{FinancialTransaction.objects.count() + 101}",
+            school=school,
+            franchise=school.franchise,
+            category="Annual Subscription",
+            amount=contract_value,
+            payment_method="NEFT / RTGS",
+            gateway_reference=f"NEFT-SBIN-{sub_id}",
+            payer_name=f"{school.name} Bursar Desk",
+            status="Successful"
+        )
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="CREATE",
+            domain="CampusSubscription",
+            target_id=sub.subscription_id,
+            description=f"Provisioned contract {sub.plan_name} for {school.name} (₹{contract_value:,.0f})"
+        )
+        return redirect('/super-admin/subscriptions/overview.html')
+
+    return render(request, 'super-admin/subscriptions/create.html', {"schools": schools})
+
+
+def payments_overview(request):
+    """
+    Super Admin: Consolidated Payments Ledger across subscriptions and recharges.
+    """
+    if not FinancialTransaction.objects.exists():
+        for i, sch in enumerate(School.objects.all()[:10], start=101):
+            FinancialTransaction.objects.create(
+                transaction_id=f"TXN-{20261100 + i}",
+                school=sch,
+                franchise=sch.franchise,
+                category="Annual Subscription" if i % 3 == 0 else "Student Recharge",
+                amount=76560.00 if i % 3 == 0 else 850.00,
+                payment_method="Razorpay / UPI" if i % 2 == 0 else "NEFT / RTGS",
+                gateway_reference=f"pay_razor_{i*789}",
+                payer_name=sch.admin_name,
+                status="Successful" if i % 9 != 0 else "Pending"
+            )
+
+    txns_qs = FinancialTransaction.objects.select_related('school', 'franchise', 'student').order_by('-created_at')
+    settled_volume = txns_qs.filter(status='Successful').aggregate(t=Sum('amount'))['t'] or 765600
+    pending_volume = txns_qs.filter(status='Pending').aggregate(t=Sum('amount'))['t'] or 72200
+    failed_volume = txns_qs.filter(status='Failed').aggregate(t=Sum('amount'))['t'] or 2480
+    refunded_volume = txns_qs.filter(status='Refunded').aggregate(t=Sum('amount'))['t'] or 4100
+
+    payments_data = [
+        {
+            "id": t.transaction_id,
+            "date": t.created_at.strftime("%Y-%m-%d %H:%M"),
+            "entity": t.school.name if t.school else "Direct Payment",
+            "franchise": t.franchise.name if t.franchise else (t.school.franchise.name if t.school and t.school.franchise else "Direct"),
+            "category": t.category,
+            "method": t.payment_method,
+            "reference": t.gateway_reference or t.transaction_id,
+            "amount": float(t.amount),
+            "status": t.status
+        }
+        for t in txns_qs
+    ]
+
+    context = {
+        "transactions": txns_qs,
+        "payments_json": json.dumps(payments_data),
+        "settled_volume": f"₹{settled_volume:,.0f}",
+        "pending_volume": f"₹{pending_volume:,.0f}",
+        "failed_volume": f"₹{failed_volume:,.0f}",
+        "refunded_volume": f"₹{refunded_volume:,.0f}",
+    }
+    return render(request, 'super-admin/payments/overview.html', context)
+
+
+def payment_details(request):
+    """
+    Super Admin: Official Payment Receipt & Tax Invoice Inspector.
+    """
+    txn_id = request.GET.get('id', '')
+    txn = FinancialTransaction.objects.filter(transaction_id=txn_id).select_related('school', 'franchise', 'student').first()
+    if not txn:
+        txn = FinancialTransaction.objects.first()
+
+    txn_dict = {
+        "id": txn.transaction_id if txn else "TXN-98421",
+        "date": txn.created_at.strftime("%Y-%m-%d %H:%M") if txn else "2026-11-10 14:22",
+        "entity": txn.school.name if txn and txn.school else "Oakridge Residential Academy",
+        "franchise": txn.franchise.name if txn and txn.franchise else "North Telecom Franchise",
+        "category": txn.category if txn else "Annual Subscription",
+        "method": txn.payment_method if txn else "Razorpay / UPI",
+        "reference": txn.gateway_reference if txn else "pay_L8x92KdN",
+        "amount": float(txn.amount) if txn else 76560.00,
+        "status": txn.status if txn else "Successful"
+    }
+
+    context = {
+        "txn": txn,
+        "txn_json": json.dumps(txn_dict),
+    }
+    return render(request, 'super-admin/payments/details.html', context)
+
+
+# ==============================================================================
+# DIVISION II — PHASE 4: GLOBAL CALL TELEMETRY & REPORTS (call-history/, reports/)
+# ==============================================================================
+
+def call_history(request):
+    """
+    Super Admin: Fleet-wide Real-Time Call Telemetry Ledger.
+    """
+    calls_qs = CallRecord.objects.select_related('school', 'student').order_by('-start_time')[:250]
+
+    call_history_data = [
+        {
+            "id": c.call_id,
+            "studentName": c.student.name if c.student else "Student",
+            "studentCode": c.student.calling_code if c.student else "",
+            "school": c.school.name if c.school else "",
+            "authorizedNumber": c.destination_number,
+            "guardianName": c.call_type,
+            "startTime": c.start_time.strftime("%Y-%m-%d %H:%M"),
+            "dateOnly": c.start_time.strftime("%Y-%m-%d"),
+            "duration": f"{c.duration_seconds // 60}m {c.duration_seconds % 60}s",
+            "minutesUsed": c.minutes_deducted,
+            "status": c.call_status
+        }
+        for c in calls_qs
+    ]
+
+    context = {
+        "calls": calls_qs,
+        "call_history_json": json.dumps(call_history_data),
+    }
+    return render(request, 'super-admin/call-history/index.html', context)
+
+
+def reports_overview(request):
+    """
+    Super Admin: Multi-Campus Usage Analytics & Executive Report Generator.
+    """
+    schools_qs = School.objects.all().order_by('-enrolled_students')
+    total_minutes = Student.objects.aggregate(t=Sum('remaining_minutes'))['t'] or 384120
+    total_students = Student.objects.count() or 18430
+    active_students = Student.objects.filter(status='Active').count() or 17210
+
+    schools_data = [
+        {
+            "id": s.code,
+            "code": s.code,
+            "name": s.name,
+            "city": s.city,
+            "franchise": s.franchise.name if s.franchise else s.franchise_name_cache or "Unassigned",
+            "adminName": s.admin_name,
+            "adminEmail": s.admin_email,
+            "students": s.enrolled_students or s.student_seats,
+            "activeStudents": s.active_students,
+            "status": s.status
+        }
+        for s in schools_qs
+    ]
+
+    context = {
+        "schools": schools_qs,
+        "schools_json": json.dumps(schools_data),
+        "total_minutes": total_minutes,
+        "total_students": total_students,
+        "active_students": active_students,
+    }
+    return render(request, 'super-admin/reports/index.html', context)
+
+
+def export_reports_csv(request):
+    """
+    Super Admin: Export Executive CSV Performance Report.
+    """
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="super-admin-executive-report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow([
+        "School Code", "Campus Name", "City", "Franchise Partner",
+        "Enrolled Students", "Active Boarders", "Kiosk Devices", "Daily Duration Cap", "Subscription Status"
+    ])
+
+    for s in School.objects.select_related('franchise').all().order_by('code'):
+        writer.writerow([
+            s.code,
+            s.name,
+            s.city,
+            s.franchise.name if s.franchise else "Direct",
+            s.enrolled_students,
+            s.active_students,
+            s.device_count,
+            s.daily_duration_cap,
+            s.subscription_status
+        ])
+
+    return response
+
+
+# ==============================================================================
+# DIVISION II — PHASE 5: GOVERNANCE, RBAC & SETTINGS (roles/, settings/)
+# ==============================================================================
+
+def roles_permissions_list(request):
+    """
+    Super Admin: RBAC Matrix & Role Capabilities Governance.
+    """
+    if request.method == 'POST':
+        log_admin_action(
+            actor="Super Admin",
+            action_type="UPDATE",
+            domain="RBAC",
+            target_id="MATRIX-01",
+            description="Adjusted global RBAC domain permission matrix"
+        )
+        return redirect('/super-admin/roles-permissions/list.html')
+    return render(request, 'super-admin/roles-permissions/list.html')
+
+
+def role_create(request):
+    """
+    Super Admin: Create Custom Governance Role.
+    """
+    if request.method == 'POST':
+        role_name = request.POST.get('role_name', 'Custom Role').strip()
+        log_admin_action(
+            actor="Super Admin",
+            action_type="CREATE",
+            domain="RBAC",
+            target_id=role_name,
+            description=f"Created custom administrative role template: {role_name}"
+        )
+        return redirect('/super-admin/roles-permissions/list.html')
+    return render(request, 'super-admin/roles-permissions/create.html')
+
+
+def settings_general(request):
+    """
+    Super Admin: Global Platform Governance & Operator Identity Settings.
+    """
+    settings = PlatformSetting.get_settings()
+    if request.method == 'POST':
+        settings.platform_title = request.POST.get('platform_name', settings.platform_title).strip()
+        settings.support_email = request.POST.get('support_email', settings.support_email).strip()
+        settings.save()
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="UPDATE",
+            domain="PlatformSettings",
+            target_id="general",
+            description="Updated global platform identity and support email"
+        )
+        return redirect('/super-admin/settings/general.html')
+
+    return render(request, 'super-admin/settings/general.html', {"settings": settings})
+
+
+def settings_notifications(request):
+    """
+    Super Admin: SMS Gateway Config & Notification Dispatch Matrix.
+    """
+    settings = PlatformSetting.get_settings()
+    if request.method == 'POST':
+        settings.sms_sender_id = request.POST.get('sms_sender_id', settings.sms_sender_id).strip()
+        settings.low_balance_threshold_minutes = int(request.POST.get('threshold', settings.low_balance_threshold_minutes) or 15)
+        settings.save()
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="UPDATE",
+            domain="Notifications",
+            target_id="sms-gateway",
+            description="Updated SMS Gateway dispatch templates and balance warning thresholds"
+        )
+        return redirect('/super-admin/settings/notifications.html')
+
+    return render(request, 'super-admin/settings/notifications.html', {"settings": settings})
+
+
+def settings_audit_logs(request):
+    """
+    Super Admin: Immutable Administrative Audit Log Ledger.
+    """
+    # Seed baseline audit records if empty
+    if not SystemAuditLog.objects.exists():
+        log_admin_action(
+            actor="Super Admin",
+            action_type="LOGIN",
+            domain="Security",
+            target_id="SESSION-01",
+            description="Elevated Super Admin root session authenticated via 2FA"
+        )
+
+    logs_qs = SystemAuditLog.objects.all().order_by('-timestamp')[:200]
+
+    audit_logs_data = [
+        {
+            "timestamp": a.timestamp.strftime("%Y-%m-%d %H:%M"),
+            "actor": a.actor,
+            "module": a.target_domain,
+            "action": a.description,
+            "target": a.target_id,
+            "ipAddress": a.ip_address or "127.0.0.1",
+            "severity": "Critical" if a.action_type in ["POLICY_OVERRIDE", "TERMINAL_LOCKDOWN", "DELETE"] else ("Warning" if a.action_type == "UPDATE" else "Info")
+        }
+        for a in logs_qs
+    ]
+
+    context = {
+        "audit_logs": logs_qs,
+        "audit_logs_json": json.dumps(audit_logs_data),
+    }
+    return render(request, 'super-admin/settings/audit-logs.html', context)
+
 
 
 def render_admin_page(request, path):

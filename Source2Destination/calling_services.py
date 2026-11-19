@@ -8,6 +8,8 @@ Provides precision engines for:
 4. Recharge Plans, Credit Ledger & Top-ups
 5. Call Authorization Engine (whitelisting, schedules, duration, validity)
 """
+import math
+import uuid
 from datetime import datetime, time, timedelta
 from django.utils import timezone
 from django.db import transaction
@@ -15,7 +17,8 @@ from django.db.models import Sum, Q
 from .models import (
     School, Student, Guardian, GlobalDurationRule, CampusDurationRule,
     CallingScheduleRule, StudentScheduleException, GlobalValidityRule,
-    RechargePlan, StudentRecharge, ValidityExtensionLog
+    RechargePlan, StudentRecharge, ValidityExtensionLog,
+    CallRecord, PlatformSetting, SystemAuditLog
 )
 
 
@@ -344,4 +347,178 @@ class CallAuthorizationEngine:
 
         max_seconds = effective_minutes * 60
         return True, max_seconds, f"Authorized: Call granted for up to {effective_minutes} minutes ({window_type})."
+
+
+class CallSessionManager:
+    """
+    State machine and lifecycle coordinator for active calling sessions.
+    Handles token-based initiation, real-time minute metering, atomic balance deductions,
+    and call record ledger generation.
+    """
+    @classmethod
+    def initiate_session(cls, student_code_or_obj, dialed_number, device_id="Kiosk Booth"):
+        """
+        Validates calling permissions via CallAuthorizationEngine and provisions a secure session token.
+        """
+        # Resolve Student
+        if isinstance(student_code_or_obj, Student):
+            student = student_code_or_obj
+        else:
+            student = Student.objects.filter(
+                Q(code=student_code_or_obj) | Q(calling_code=student_code_or_obj)
+            ).select_related('school').first()
+
+        if not student:
+            return {
+                "authorized": False,
+                "reason": "Student authentication failed: Invalid calling code.",
+                "session_token": None,
+                "max_allowed_seconds": 0
+            }
+
+        # Check global platform emergency bypass or curfew lockdown
+        platform_settings = PlatformSetting.get_settings()
+        if platform_settings.maintenance_mode:
+            return {
+                "authorized": False,
+                "reason": "Campus telecom gateway is currently in scheduled maintenance mode.",
+                "session_token": None,
+                "max_allowed_seconds": 0
+            }
+
+        authorized, max_seconds, reason = CallAuthorizationEngine.authorize_call(student, dialed_number)
+        if not authorized:
+            return {
+                "authorized": False,
+                "reason": reason,
+                "session_token": None,
+                "max_allowed_seconds": 0
+            }
+
+        dur_limits = CallingDurationEngine.resolve_limits(student)
+        session_token = f"SESS-{uuid.uuid4().hex[:12].upper()}"
+
+        # Resolve guardian recipient name
+        recipient_name = "Parent / Guardian"
+        clean_dialed = "".join(filter(str.isdigit, str(dialed_number)))
+        if student.primary_phone and clean_dialed.endswith("".join(filter(str.isdigit, student.primary_phone))[-10:]):
+            recipient_name = student.guardian_name or "Primary Guardian"
+        elif student.secondary_phone and clean_dialed.endswith("".join(filter(str.isdigit, student.secondary_phone))[-10:]):
+            recipient_name = "Secondary Guardian"
+        else:
+            for g in student.guardian_contacts.filter(status='Active'):
+                if g.father_phone and clean_dialed.endswith("".join(filter(str.isdigit, g.father_phone))[-10:]):
+                    recipient_name = f"Father ({g.father_name})" if g.father_name else "Father"
+                    break
+                if g.mother_phone and clean_dialed.endswith("".join(filter(str.isdigit, g.mother_phone))[-10:]):
+                    recipient_name = f"Mother ({g.mother_name})" if g.mother_name else "Mother"
+                    break
+
+        return {
+            "authorized": True,
+            "session_token": session_token,
+            "student_id": student.id,
+            "student_code": student.code,
+            "student_name": student.name,
+            "school_id": student.school.id if student.school else None,
+            "school_name": student.school.name if student.school else "",
+            "recipient_name": recipient_name,
+            "dialed_number": dialed_number,
+            "device_id": device_id,
+            "max_allowed_seconds": max_seconds,
+            "low_balance_warn_sec": dur_limits.get("low_balance_warn_sec", 60),
+            "remaining_minutes": student.remaining_minutes,
+            "reason": reason,
+        }
+
+    @classmethod
+    def terminate_session(cls, student_code_or_obj, dialed_number, duration_seconds,
+                          termination_reason="Completed", device_id="Kiosk Booth",
+                          audio_recording_url=""):
+        """
+        Atomically wraps up a call session:
+        - Calculates ceil(duration_seconds / 60)
+        - Deducts voice minutes from student's balance
+        - Records persistent CallRecord entry
+        - Evaluates low-balance notification alert
+        """
+        if isinstance(student_code_or_obj, Student):
+            student = student_code_or_obj
+        else:
+            student = Student.objects.filter(
+                Q(code=student_code_or_obj) | Q(calling_code=student_code_or_obj)
+            ).select_related('school').first()
+
+        if not student:
+            return {"success": False, "error": "Student not found"}
+
+        minutes_to_deduct = math.ceil(duration_seconds / 60) if duration_seconds > 0 else 0
+
+        with transaction.atomic():
+            # Refresh student with lock
+            stu = Student.objects.select_for_update().get(pk=student.pk)
+            previous_balance = stu.remaining_minutes
+            stu.remaining_minutes = max(0, stu.remaining_minutes - minutes_to_deduct)
+            stu.save(update_fields=['remaining_minutes'])
+
+            # Determine recipient name
+            recipient_name = "Parent / Guardian"
+            clean_dialed = "".join(filter(str.isdigit, str(dialed_number)))
+            if stu.primary_phone and clean_dialed.endswith("".join(filter(str.isdigit, stu.primary_phone))[-10:]):
+                recipient_name = stu.guardian_name or "Primary Guardian"
+            elif stu.secondary_phone and clean_dialed.endswith("".join(filter(str.isdigit, stu.secondary_phone))[-10:]):
+                recipient_name = "Secondary Guardian"
+            else:
+                for g in stu.guardian_contacts.filter(status='Active'):
+                    if g.father_phone and clean_dialed.endswith("".join(filter(str.isdigit, g.father_phone))[-10:]):
+                        recipient_name = f"Father ({g.father_name})" if g.father_name else "Father"
+                        break
+                    if g.mother_phone and clean_dialed.endswith("".join(filter(str.isdigit, g.mother_phone))[-10:]):
+                        recipient_name = f"Mother ({g.mother_name})" if g.mother_name else "Mother"
+                        break
+
+            # Map call_type
+            call_type = 'Guardian'
+            if 'Father' in recipient_name or stu.guardian_relation == 'Father':
+                call_type = 'Father'
+            elif 'Mother' in recipient_name or stu.guardian_relation == 'Mother':
+                call_type = 'Mother'
+            elif 'Emergency' in recipient_name:
+                call_type = 'Emergency'
+
+            # Create immutable CallRecord
+            call_id = f"CAL-{timezone.now().strftime('%Y%m%d%H%M%S')}-{uuid.uuid4().hex[:4].upper()}"
+            record = CallRecord.objects.create(
+                call_id=call_id,
+                school=stu.school,
+                student=stu,
+                destination_number=dialed_number,
+                call_type=call_type,
+                device_id=device_id,
+                start_time=timezone.now() - timedelta(seconds=duration_seconds),
+                end_time=timezone.now(),
+                duration_seconds=duration_seconds,
+                minutes_deducted=minutes_to_deduct,
+                call_status=termination_reason,
+                audio_recording_url=audio_recording_url
+            )
+
+            # Check low balance threshold
+            platform_settings = PlatformSetting.get_settings()
+            threshold = platform_settings.low_balance_threshold_minutes
+            low_balance_triggered = (stu.remaining_minutes <= threshold)
+
+        return {
+            "success": True,
+            "call_id": record.call_id,
+            "student_id": stu.id,
+            "student_code": stu.code,
+            "minutes_deducted": minutes_to_deduct,
+            "previous_balance": previous_balance,
+            "remaining_minutes": stu.remaining_minutes,
+            "duration_seconds": duration_seconds,
+            "call_status": termination_reason,
+            "low_balance_alert": low_balance_triggered
+        }
+
 

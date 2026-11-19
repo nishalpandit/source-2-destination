@@ -36,19 +36,20 @@
           
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-success-title="System Settings Updated (Demo)">
+          <form method="POST" action="general.html" data-s2d-form>
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Platform Identity</h3><p>Global organization settings displayed on invoices and notifications.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Platform Name <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Source 2 Destination" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Support Helpdesk Email <span class="req-star">*</span></label><input type="email" class="s2d-input" value="support@source2destination.io" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Platform Name <span class="req-star">*</span></label><input type="text" name="platform_name" class="s2d-input" value="{{ settings.platform_title|default:'Source 2 Destination' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Support Helpdesk Email <span class="req-star">*</span></label><input type="email" name="support_email" class="s2d-input" value="{{ settings.support_email|default:'support@source2destination.io' }}" required></div>
               </div>
             </div>
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Super Admin Profile</h3><p>Active operator identity.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Eleanor Vance" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" class="s2d-input" value="e.vance@source2destination.io" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="admin_name" class="s2d-input" value="Eleanor Vance" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="admin_email" class="s2d-input" value="e.vance@source2destination.io" required></div>
               </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Settings</span></button></div></div>

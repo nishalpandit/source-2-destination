@@ -36,7 +36,8 @@
           <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Back to Roles</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-redirect="list.html" data-success-title="Custom Role Saved (Demo)">
+          <form method="POST" action="create.html" data-s2d-form data-redirect="list.html">
+            {% csrf_token %}
             <div class="row g-3 mb-4">
               <div class="col-md-6 s2d-field"><label class="s2d-label">Role Name <span class="req-star">*</span></label><input type="text" name="role_name" class="s2d-input" placeholder="Regional Compliance Auditor" required></div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Organizational Scope <span class="req-star">*</span></label><select name="scope" class="s2d-select"><option>Global Platform</option><option>Franchise Territory</option><option>Single School Campus</option></select></div>

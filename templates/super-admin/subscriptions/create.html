@@ -36,12 +36,28 @@
           <div class="d-flex align-items-center gap-2"><a href="overview.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Subscriptions</span></a></div>
         </div>
         <div class="s2d-card"><div class="s2d-card-body">
-          <form data-s2d-form data-warn-unsaved="true" data-redirect="overview.html" data-success-title="Subscription Contract Saved (Demo)">
+          <form method="POST" action="create.html" data-s2d-form data-warn-unsaved="true">
+            {% csrf_token %}
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Contract Assignment</h3><p>Bind a campus tenant to a commercial licensing tier.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">School Tenant <span class="req-star">*</span></label><select name="school" class="s2d-select" required><option value="SCH-1001">Oakridge Residential Academy</option><option value="SCH-1003">St. Jude Boarding Institute</option><option value="SCH-1006">Maplewood Residential High</option></select></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Subscription Plan Tier <span class="req-star">*</span></label><select name="planName" class="s2d-select" required><option value="Enterprise Boarding Annual">Enterprise Boarding Annual (₹8,40,000)</option><option value="Campus Growth Annual">Campus Growth Annual (₹5,90,000)</option><option value="Standard Hostel Quarterly">Standard Hostel Quarterly (₹1,85,000)</option></select></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">School Tenant <span class="req-star">*</span></label>
+                  <select name="school" class="s2d-select" required>
+                    <option value="">Select school tenant...</option>
+                    {% for s in schools %}
+                    <option value="{{ s.code }}">{{ s.code }} · {{ s.name }}</option>
+                    {% empty %}
+                    <option value="SCH-1001">SCH-1001 · Oakridge Residential Academy</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Subscription Plan Tier <span class="req-star">*</span></label>
+                  <select name="planName" class="s2d-select" required>
+                    <option value="Enterprise Boarding Annual">Enterprise Boarding Annual (₹8,40,000)</option>
+                    <option value="Campus Growth Annual">Campus Growth Annual (₹5,90,000)</option>
+                    <option value="Standard Hostel Quarterly">Standard Hostel Quarterly (₹1,85,000)</option>
+                  </select>
+                </div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Student Seat Limit <span class="req-star">*</span></label><input type="number" name="studentSeats" class="s2d-input" value="750" min="50" required></div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Enrolled Kiosk Limit <span class="req-star">*</span></label><input type="number" name="deviceSeats" class="s2d-input" value="35" min="1" required></div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Contract End Date <span class="req-star">*</span></label><input type="date" name="expiryDate" class="s2d-input" value="2027-08-15" required></div>

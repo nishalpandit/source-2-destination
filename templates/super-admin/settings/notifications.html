@@ -39,9 +39,10 @@
           <div class="col-lg-6">
             <div class="s2d-card h-100"><div class="s2d-card-header"><h3 class="s2d-card-title">Edit Template: Student Validity Expiry Warning</h3></div>
               <div class="s2d-card-body">
-                <form data-s2d-form data-success-title="Notification Template Saved (Demo)">
-                  <div class="s2d-field"><label class="s2d-label">Subject Line <span class="req-star">*</span></label><input type="text" class="s2d-input" value="Action Required: Calling Account for {{student_name}} Expires in {{days_left}} Days" required></div>
-                  <div class="s2d-field"><label class="s2d-label">Message Body <span class="req-star">*</span></label><textarea class="s2d-textarea" required>Dear {{guardian_name}}, the hostel calling validity for {{student_name}} ({{student_code}}) at {{school_name}} expires on {{expiry_date}}. Please complete a term recharge to avoid interruption.</textarea></div>
+                <form method="POST" action="notifications.html" data-s2d-form>
+                  {% csrf_token %}
+                  <div class="s2d-field"><label class="s2d-label">Subject Line <span class="req-star">*</span></label><input type="text" name="subject" class="s2d-input" value="Action Required: Calling Account for {{student_name}} Expires in {{days_left}} Days" required></div>
+                  <div class="s2d-field"><label class="s2d-label">Message Body <span class="req-star">*</span></label><textarea name="body" class="s2d-textarea" required>Dear {{guardian_name}}, the hostel calling validity for {{student_name}} ({{student_code}}) at {{school_name}} expires on {{expiry_date}}. Please complete a term recharge to avoid interruption.</textarea></div>
                   <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Update Template</span></button>
                 </form>
               </div>

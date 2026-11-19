@@ -76,6 +76,14 @@
   <script src="{% static 'js/forms.js' %}"></script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
+  <script>
+    if (window.S2D_DEMO && {{ device_json|safe }}) {
+      const d = {{ device_json|safe }};
+      window.S2D_DEMO.devices = window.S2D_DEMO.devices || [];
+      const idx = window.S2D_DEMO.devices.findIndex(dev => dev.id === d.id);
+      if (idx >= 0) { window.S2D_DEMO.devices[idx] = d; } else { window.S2D_DEMO.devices.unshift(d); }
+    }
+  </script>
   <script src="{% static 'js/app.js' %}"></script>
 </body>
 </html>

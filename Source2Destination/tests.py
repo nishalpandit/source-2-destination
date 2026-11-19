@@ -827,3 +827,315 @@ class FranchisePortalTests(TestCase):
         self.assertEqual(self.school.daily_duration_cap, 25)
         self.assertEqual(self.school.kiosk_group_tag, 'AE-BOOTH-DORM-NORTH')
         self.assertTrue(self.school.emergency_calling_allowed)
+
+
+class CallingEngineSessionTests(TestCase):
+    """
+    Division I automated verification:
+    Validates CallSessionManager, CallAuthorizationEngine, and Core Enterprise Models.
+    """
+    def setUp(self):
+        self.school = School.objects.create(
+            code='SCH-TEST-01',
+            name='Test Residential Academy',
+            city='Dehradun',
+            admin_name='Admin Test',
+            admin_email='adm@test.edu',
+            daily_duration_cap=20
+        )
+        self.student = Student.objects.create(
+            school=self.school,
+            code='STU-TEST-99',
+            calling_code='8899',
+            name='Aarav Sharma',
+            class_name='Grade 10',
+            section='A',
+            guardian_name='Vikram Sharma',
+            primary_phone='+919876543210',
+            remaining_minutes=45,
+            validity_expiry=timezone.now().date() + timedelta(days=30),
+            status='Active',
+            code_status='Active'
+        )
+        from datetime import time
+        from .models import CallingScheduleRule
+        CallingScheduleRule.objects.create(
+            school=self.school,
+            name='All Day Allowed Test Window',
+            days_of_week='ALL',
+            start_time=time(0, 0),
+            end_time=time(23, 59, 59),
+            policy_type='allowed',
+            is_active=True
+        )
+
+    def test_call_session_initiate_and_terminate(self):
+        from .calling_services import CallSessionManager
+
+        # 1. Initiate session with whitelisted number
+        init_res = CallSessionManager.initiate_session(self.student.calling_code, '+919876543210', 'DEV-BOOTH-1')
+        self.assertTrue(init_res['authorized'])
+        self.assertIsNotNone(init_res['session_token'])
+        self.assertEqual(init_res['student_code'], 'STU-TEST-99')
+        self.assertEqual(init_res['recipient_name'], 'Vikram Sharma')
+
+        # 2. Terminate session after 125 seconds (ceil -> 3 minutes)
+        term_res = CallSessionManager.terminate_session(
+            self.student.calling_code,
+            '+919876543210',
+            duration_seconds=125,
+            termination_reason='Completed',
+            device_id='DEV-BOOTH-1'
+        )
+        self.assertTrue(term_res['success'])
+        self.assertEqual(term_res['minutes_deducted'], 3)
+        self.assertEqual(term_res['previous_balance'], 45)
+        self.assertEqual(term_res['remaining_minutes'], 42)
+
+        # 3. Verify CallRecord exists in database
+        record = CallRecord.objects.get(call_id=term_res['call_id'])
+        self.assertEqual(record.student, self.student)
+        self.assertEqual(record.destination_number, '+919876543210')
+        self.assertEqual(record.minutes_deducted, 3)
+        self.assertEqual(record.call_status, 'Completed')
+
+    def test_call_session_unauthorized_number_rejected(self):
+        from .calling_services import CallSessionManager
+
+        # Initiate session with non-whitelisted number
+        init_res = CallSessionManager.initiate_session(self.student.calling_code, '+919999999999', 'DEV-BOOTH-1')
+        self.assertFalse(init_res['authorized'])
+        self.assertIn('Unauthorized number', init_res['reason'])
+
+    def test_enterprise_models_crud(self):
+        from .models import SchoolAdminProfile, CampusSubscription, FinancialTransaction, SystemAuditLog, PlatformSetting
+
+        # Profile
+        profile = SchoolAdminProfile.objects.create(
+            school=self.school,
+            admin_id='ADM-TEST-1',
+            name='Dr. Test Admin',
+            email='testadmin@test.edu',
+            phone='+919810012345'
+        )
+        self.assertEqual(profile.status, 'Active')
+
+        # Subscription
+        sub = CampusSubscription.objects.create(
+            subscription_id='SUB-TEST-100',
+            school=self.school,
+            tier='Enterprise Boarding',
+            contract_value=150000.00,
+            expiry_date=timezone.now().date() + timedelta(days=365)
+        )
+        self.assertEqual(sub.status, 'Active')
+
+        # Financial Transaction
+        txn = FinancialTransaction.objects.create(
+            transaction_id='TXN-TEST-500',
+            school=self.school,
+            category='Annual Subscription',
+            amount=150000.00,
+            payment_method='NEFT / RTGS',
+            status='Successful'
+        )
+        self.assertEqual(txn.status, 'Successful')
+
+        # System Audit Log
+        audit = SystemAuditLog.objects.create(
+            actor='Super Admin',
+            action_type='CREATE',
+            target_domain='Subscription',
+            target_id=sub.subscription_id,
+            description='Provisioned Enterprise Boarding subscription'
+        )
+        self.assertEqual(audit.action_type, 'CREATE')
+
+        # Platform Settings
+        setting = PlatformSetting.get_settings()
+        self.assertIsNotNone(setting.platform_title)
+
+
+class SuperAdminCitadelBackendTests(TestCase):
+    """
+    Division II automated verification:
+    Validates all 18 Super Admin Citadel endpoints across Phase 1 - Phase 5.
+    """
+    def setUp(self):
+        self.admin_user, _ = User.objects.get_or_create(username='admin', defaults={'email': 'admin@s2d.com', 'is_superuser': True, 'is_staff': True})
+        self.admin_user.is_superuser = True
+        self.admin_user.is_staff = True
+        self.admin_user.save()
+
+        self.client = Client()
+        self.client.force_login(self.admin_user)
+
+        self.school = School.objects.create(
+            code='SCH-CITADEL-01',
+            name='Citadel International Academy',
+            city='Dehradun',
+            admin_name='Dean Vance',
+            admin_email='dean@citadel.edu',
+            admin_phone='+919810011223'
+        )
+
+    def test_phase1_school_admins_workflow(self):
+        # 1. Directory
+        resp = self.client.get('/super-admin/school-admins/')
+        self.assertEqual(resp.status_code, 200)
+
+        # 2. Add
+        add_resp = self.client.post('/super-admin/school-admins/add.html', {
+            'name': 'Dr. Alistair Finch',
+            'designation': 'Campus Principal',
+            'email': 'a.finch@citadel.edu',
+            'phone': '+91 98111 88990',
+            'school_id': self.school.code,
+            'require_mfa': 'on'
+        })
+        self.assertEqual(add_resp.status_code, 302)
+
+        from .models import SchoolAdminProfile
+        profile = SchoolAdminProfile.objects.filter(email='a.finch@citadel.edu').first()
+        self.assertIsNotNone(profile)
+        self.assertEqual(profile.name, 'Dr. Alistair Finch')
+        self.assertEqual(profile.school, self.school)
+        self.assertTrue(profile.mfa_enforced)
+
+        # 3. Edit
+        edit_resp = self.client.post(f'/super-admin/school-admins/edit.html?id={profile.admin_id}', {
+            'id': profile.admin_id,
+            'name': 'Dr. Alistair Finch (Senior Dean)',
+            'designation': 'Senior Dean of Academics',
+            'email': 'a.finch@citadel.edu',
+            'phone': '+91 98111 88990',
+            'school': self.school.name,
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+        profile.refresh_from_db()
+        self.assertEqual(profile.name, 'Dr. Alistair Finch (Senior Dean)')
+
+        # 4. Details
+        det_resp = self.client.get(f'/super-admin/school-admins/details.html?id={profile.admin_id}')
+        self.assertEqual(det_resp.status_code, 200)
+
+    def test_phase2_devices_workflow(self):
+        # 1. Device list
+        resp = self.client.get('/super-admin/devices/')
+        self.assertEqual(resp.status_code, 200)
+
+        # 2. Register device
+        reg_resp = self.client.post('/super-admin/devices/register.html', {
+            'deviceName': 'South Wing Kiosk 01',
+            'serialNumber': 'SN-SOUTH-001',
+            'imei': '864298039988776',
+            'school': self.school.code,
+            'wingLocation': 'South Hostel Wing',
+            'status': 'Online'
+        })
+        self.assertEqual(reg_resp.status_code, 302)
+
+        from .models import KioskDevice
+        dev = KioskDevice.objects.filter(serial_number='SN-SOUTH-001').first()
+        self.assertIsNotNone(dev)
+        self.assertEqual(dev.name, 'South Wing Kiosk 01')
+        self.assertEqual(dev.school, self.school)
+
+        # 3. Details
+        det_resp = self.client.get(f'/super-admin/devices/details.html?id={dev.device_id}')
+        self.assertEqual(det_resp.status_code, 200)
+
+    def test_phase3_subscriptions_and_payments_workflow(self):
+        # 1. Subscriptions overview
+        resp = self.client.get('/super-admin/subscriptions/')
+        self.assertEqual(resp.status_code, 200)
+
+        # 2. Create subscription
+        create_resp = self.client.post('/super-admin/subscriptions/create.html', {
+            'school': self.school.code,
+            'planName': 'Enterprise Boarding Annual (₹8,40,000)',
+            'studentSeats': 600,
+            'deviceSeats': 20,
+            'expiryDate': '2027-12-31'
+        })
+        self.assertEqual(create_resp.status_code, 302)
+
+        from .models import CampusSubscription, FinancialTransaction
+        sub = CampusSubscription.objects.filter(school=self.school).order_by('-id').first()
+        self.assertIsNotNone(sub)
+        self.assertEqual(sub.student_seats, 600)
+
+        # Verify auto-generated transaction
+        txn = FinancialTransaction.objects.filter(school=self.school, category='Annual Subscription').order_by('-id').first()
+        self.assertIsNotNone(txn)
+        self.assertEqual(float(txn.amount), 840000.00)
+
+        # 3. Payments overview & details
+        pay_resp = self.client.get('/super-admin/payments/')
+        self.assertEqual(pay_resp.status_code, 200)
+
+        det_resp = self.client.get(f'/super-admin/payments/details.html?id={txn.transaction_id}')
+        self.assertEqual(det_resp.status_code, 200)
+
+    def test_phase4_call_history_and_reports_workflow(self):
+        # 1. Call history
+        ch_resp = self.client.get('/super-admin/call-history/')
+        self.assertEqual(ch_resp.status_code, 200)
+
+        # 2. Reports overview
+        rep_resp = self.client.get('/super-admin/reports/')
+        self.assertEqual(rep_resp.status_code, 200)
+
+        # 3. CSV export
+        csv_resp = self.client.get('/super-admin/reports/export.csv')
+        self.assertEqual(csv_resp.status_code, 200)
+        self.assertEqual(csv_resp['Content-Type'], 'text/csv')
+        self.assertIn(b'Campus Name', csv_resp.content)
+
+    def test_phase5_governance_and_settings_workflow(self):
+        # 1. Roles & permissions
+        role_resp = self.client.get('/super-admin/roles-permissions/')
+        self.assertEqual(role_resp.status_code, 200)
+
+        role_post = self.client.post('/super-admin/roles-permissions/list.html', {})
+        self.assertEqual(role_post.status_code, 302)
+
+        role_create_post = self.client.post('/super-admin/roles-permissions/create.html', {
+            'role_name': 'Hostel Night In-Charge'
+        })
+        self.assertEqual(role_create_post.status_code, 302)
+
+        # 2. Settings general
+        set_gen_resp = self.client.get('/super-admin/settings/general.html')
+        self.assertEqual(set_gen_resp.status_code, 200)
+
+        set_gen_post = self.client.post('/super-admin/settings/general.html', {
+            'platform_name': 'Source 2 Destination Enterprise Cloud',
+            'support_email': 'support@s2dcloud.io'
+        })
+        self.assertEqual(set_gen_post.status_code, 302)
+
+        from .models import PlatformSetting
+        plat = PlatformSetting.get_settings()
+        self.assertEqual(plat.platform_title, 'Source 2 Destination Enterprise Cloud')
+
+        # 3. Settings notifications
+        set_notif_resp = self.client.get('/super-admin/settings/notifications.html')
+        self.assertEqual(set_notif_resp.status_code, 200)
+
+        set_notif_post = self.client.post('/super-admin/settings/notifications.html', {
+            'sms_sender_id': 'S2DALERT',
+            'threshold': 20
+        })
+        self.assertEqual(set_notif_post.status_code, 302)
+
+        plat.refresh_from_db()
+        self.assertEqual(plat.sms_sender_id, 'S2DALERT')
+        self.assertEqual(plat.low_balance_threshold_minutes, 20)
+
+        # 4. Audit logs
+        audit_resp = self.client.get('/super-admin/settings/audit-logs.html')
+        self.assertEqual(audit_resp.status_code, 200)
+
+
