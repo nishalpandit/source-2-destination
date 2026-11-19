@@ -335,3 +335,115 @@ class SchoolAdminFlowchartTests(TestCase):
         self.assertTrue(self.school.notify_sms_guardians)
         self.assertTrue(self.school.notify_email_recharges)
         self.assertFalse(self.school.notify_push_validity)
+
+    def test_student_add_and_edit_fields(self):
+        # Test enrolling student with validity date and hostel booth
+        enroll_resp = self.client.post('/school-admin/students/add.html', {
+            'name': 'Devansh Singhal',
+            'gender': 'Male',
+            'className': 'Grade 10',
+            'section': 'Section A',
+            'roll_number': '1088',
+            'hostelWing': 'Tagore Bhavan · Rm 102',
+            'guardian_name': 'Alok Singhal (Father)',
+            'primary_phone': '+91 98111 22334',
+            'secondary_phone': '+91 98111 22335',
+            'validity_expiry': '2027-08-31',
+            'device_id': 'DEV-7701',
+            'status': 'Active'
+        })
+        self.assertEqual(enroll_resp.status_code, 302)
+
+        stu = Student.objects.filter(name='Devansh Singhal').first()
+        self.assertIsNotNone(stu)
+        self.assertEqual(str(stu.validity_expiry), '2027-08-31')
+        self.assertEqual(stu.roll_number, '1088')
+        self.assertEqual(stu.gender, 'Male')
+
+        # Check guardian was created with both numbers
+        guardian = stu.guardian_contacts.first()
+        self.assertIsNotNone(guardian)
+        self.assertEqual(guardian.father_phone, '+91 98111 22334')
+        self.assertEqual(guardian.mother_phone, '+91 98111 22335')
+
+        # Check device mapping created
+        assignment = DeviceAssignment.objects.filter(school=self.school, device=self.kiosk).first()
+        self.assertIsNotNone(assignment)
+
+        # Test editing student
+        edit_resp = self.client.post(f'/school-admin/students/edit.html?id={stu.code}', {
+            'name': 'Devansh Singhal Updated',
+            'gender': 'Male',
+            'className': 'Grade 10',
+            'section': 'Section B',
+            'roll_number': '1099',
+            'hostelWing': 'Tagore Bhavan · Rm 204',
+            'guardianName': 'Alok Singhal',
+            'primaryPhone': '+91 98111 99999',
+            'secondaryPhone': '+91 98111 88888',
+            'validityExpiry': '2028-03-31',
+            'remainingMinutes': '180',
+            'dailyLimitMin': '20',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+
+        stu.refresh_from_db()
+        self.assertEqual(stu.name, 'Devansh Singhal Updated')
+        self.assertEqual(stu.roll_number, '1099')
+        self.assertEqual(str(stu.validity_expiry), '2028-03-31')
+        self.assertEqual(stu.primary_phone, '+91 98111 99999')
+        self.assertEqual(stu.remaining_minutes, 180)
+
+        # Verify linked guardian was synchronized
+        guardian.refresh_from_db()
+        self.assertEqual(guardian.father_phone, '+91 98111 99999')
+        self.assertEqual(guardian.name, 'Alok Singhal')
+
+    def test_super_admin_school_edit_comprehensive(self):
+        # Create and log in as super admin
+        admin_user, _ = User.objects.get_or_create(username='admin', defaults={'email': 'admin@s2d.com', 'is_staff': True, 'is_superuser': True})
+        admin_user.set_password('12345')
+        admin_user.is_staff = True
+        admin_user.is_superuser = True
+        admin_user.save()
+
+        admin_client = Client()
+        admin_client.login(username='admin', password='12345')
+
+        edit_resp = admin_client.post(f'/super-admin/schools/edit.html?id={self.school.code}', {
+            'name': 'Doon Valley International School',
+            'campus_type': 'Co-ed Residential Boarding',
+            'affiliation_board': 'CBSE',
+            'website': 'https://doonvalley.edu.in',
+            'city': 'Dehradun',
+            'state': 'Uttarakhand',
+            'postal_code': '248001',
+            'country': 'India',
+            'hostel_blocks_count': '6',
+            'timezone': 'Asia/Kolkata',
+            'address': 'Chakrata Road, Dehradun',
+            'admin_name': 'Dr. R.C. Sharma',
+            'admin_email': 'director@doonvalley.edu.in',
+            'admin_phone': '+91 98101 99999',
+            'subscription_plan': 'Enterprise Boarding Annual',
+            'billing_cycle': 'Annually',
+            'student_seats': '850',
+            'daily_duration_cap': '20',
+            'calling_window_start': '16:30',
+            'calling_window_end': '20:00',
+            'allowed_calling_days': 'All 7 Days',
+            'emergency_calling_allowed': 'on',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+
+        self.school.refresh_from_db()
+        self.assertEqual(self.school.name, 'Doon Valley International School')
+        self.assertEqual(self.school.city, 'Dehradun')
+        self.assertEqual(self.school.state, 'Uttarakhand')
+        self.assertEqual(self.school.hostel_blocks_count, 6)
+        self.assertEqual(self.school.timezone, 'Asia/Kolkata')
+        self.assertEqual(self.school.admin_phone, '+91 98101 99999')
+        self.assertEqual(self.school.daily_duration_cap, 20)
+        self.assertTrue(self.school.emergency_calling_allowed)

@@ -181,13 +181,63 @@ def school_edit(request, school_id=None):
     if not school:
         school = School.objects.first()
 
-    if request.method == "POST":
-        school.name = request.POST.get('name', school.name)
-        school.city = request.POST.get('city', school.city)
-        school.admin_phone = request.POST.get('phone', school.admin_phone)
-        school.admin_name = request.POST.get('admin_name', school.admin_name)
-        school.admin_email = request.POST.get('admin_email', school.admin_email)
+    if request.method == "POST" and school:
+        # Section 1: Institution Identity
+        school.name = request.POST.get('name', school.name).strip()
+        school.campus_type = request.POST.get('campus_type', school.campus_type)
+        school.affiliation_board = request.POST.get('affiliation_board', school.affiliation_board)
+        school.website = request.POST.get('website', school.website).strip()
+        school.city = request.POST.get('city', school.city).strip()
+        school.state = request.POST.get('state', school.state).strip()
+        school.postal_code = request.POST.get('postal_code', school.postal_code).strip()
+        school.country = request.POST.get('country', school.country).strip()
+        if request.POST.get('hostel_blocks_count'):
+            try:
+                school.hostel_blocks_count = int(request.POST['hostel_blocks_count'])
+            except ValueError:
+                pass
+        school.timezone = request.POST.get('timezone', school.timezone)
+        school.address = request.POST.get('address', school.address).strip()
+
+        # Section 2: Franchise & Leadership
+        franchise_id = request.POST.get('franchise_id') or request.POST.get('franchise')
+        if franchise_id:
+            new_franchise = Franchise.objects.filter(
+                Q(code=franchise_id) | Q(name=franchise_id) | Q(id=franchise_id if str(franchise_id).isdigit() else 0)
+            ).first()
+            if new_franchise:
+                school.franchise = new_franchise
+                school.franchise_name_cache = new_franchise.name
+
+        school.admin_name = (request.POST.get('admin_name') or request.POST.get('adminName', school.admin_name)).strip()
+        school.admin_email = (request.POST.get('admin_email') or request.POST.get('adminEmail', school.admin_email)).strip()
+        school.admin_phone = (request.POST.get('admin_phone') or request.POST.get('phone', school.admin_phone)).strip()
+        school.secondary_contact_name = request.POST.get('secondary_contact_name', school.secondary_contact_name).strip()
+        school.secondary_contact_email = request.POST.get('secondary_contact_email', school.secondary_contact_email).strip()
+        school.secondary_contact_phone = request.POST.get('secondary_contact_phone', school.secondary_contact_phone).strip()
+
+        # Section 3: Subscription & Calling Policies
         school.subscription_plan = request.POST.get('subscription_plan', school.subscription_plan)
+        school.billing_cycle = request.POST.get('billing_cycle', school.billing_cycle)
+        if request.POST.get('student_seats'):
+            try:
+                school.student_seats = int(request.POST['student_seats'])
+            except ValueError:
+                pass
+        if request.POST.get('daily_duration_cap'):
+            try:
+                school.daily_duration_cap = int(request.POST['daily_duration_cap'])
+            except ValueError:
+                pass
+        if request.POST.get('calling_window_start'):
+            school.calling_window_start = request.POST['calling_window_start']
+        if request.POST.get('calling_window_end'):
+            school.calling_window_end = request.POST['calling_window_end']
+        if request.POST.get('allowed_calling_days'):
+            school.allowed_calling_days = request.POST['allowed_calling_days']
+        if request.POST.get('kiosk_group_tag'):
+            school.kiosk_group_tag = request.POST['kiosk_group_tag']
+        school.emergency_calling_allowed = request.POST.get('emergency_calling_allowed') == 'on'
 
         if 'status' in request.POST:
             school.status = request.POST.get('status')

@@ -40,9 +40,20 @@
             {% csrf_token %}
             <div class="row g-3">
               <div class="col-md-6 s2d-field"><label class="s2d-label">Guardian Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ guardian.name }}" required></div>
+              <div class="col-md-6 s2d-field">
+                <label class="s2d-label">Relationship <span class="req-star">*</span></label>
+                <select name="relation" class="s2d-select" required>
+                  <option value="Father" {% if guardian.relation == 'Father' %}selected{% endif %}>Father</option>
+                  <option value="Mother" {% if guardian.relation == 'Mother' %}selected{% endif %}>Mother</option>
+                  <option value="Legal Guardian" {% if guardian.relation == 'Legal Guardian' %}selected{% endif %}>Legal Guardian</option>
+                  <option value="Grandparent" {% if guardian.relation == 'Grandparent' %}selected{% endif %}>Grandparent</option>
+                  <option value="Other" {% if guardian.relation == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+              </div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="{{ guardian.email }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Father Authorized Phone <span class="req-star">*</span></label><input type="tel" name="fatherPhone" class="s2d-input" data-bind-field="fatherPhone" data-validate-phone="true" value="{{ guardian.father_phone }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Father Authorized Phone <span class="req-star">*</span></label><input type="tel" name="fatherPhone" class="s2d-input" data-bind-field="fatherPhone" data-validate-phone="true" value="{{ guardian.father_phone }}" required></div>
               <div class="col-md-4 s2d-field"><label class="s2d-label">Mother Authorized Phone</label><input type="tel" name="motherPhone" class="s2d-input" data-bind-field="motherPhone" value="{{ guardian.mother_phone }}"></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Emergency Backup Phone</label><input type="tel" name="emergencyPhone" class="s2d-input" value="{{ guardian.emergency_phone }}"></div>
               <div class="col-md-4 s2d-field"><label class="s2d-label">Authorization Status</label>
                 <select name="status" class="s2d-select" data-bind-field="status">
                   <option value="Active" {% if guardian.status == 'Active' %}selected{% endif %}>Active (Authorized)</option>

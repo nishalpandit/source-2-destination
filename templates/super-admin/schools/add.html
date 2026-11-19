@@ -80,19 +80,19 @@
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="city">City <span class="req-star">*</span></label>
-                    <input type="text" id="city" name="city" class="s2d-input" placeholder="New Haven" required>
+                    <input type="text" id="city" name="city" class="s2d-input" placeholder="e.g. Dehradun" required>
                   </div>
                   <div class="col-md-2 s2d-field">
                     <label class="s2d-label" for="state">State / Province <span class="req-star">*</span></label>
-                    <input type="text" id="state" name="state" class="s2d-input" placeholder="CT" value="CT" required>
+                    <input type="text" id="state" name="state" class="s2d-input" placeholder="e.g. Uttarakhand" value="Uttarakhand" required>
                   </div>
                   <div class="col-md-2 s2d-field">
-                    <label class="s2d-label" for="postal_code">Postal / Zip Code</label>
-                    <input type="text" id="postal_code" name="postal_code" class="s2d-input" placeholder="06511">
+                    <label class="s2d-label" for="postal_code">Postal / PIN Code</label>
+                    <input type="text" id="postal_code" name="postal_code" class="s2d-input" placeholder="248001" value="248001">
                   </div>
                   <div class="col-md-2 s2d-field">
                     <label class="s2d-label" for="country">Country</label>
-                    <input type="text" id="country" name="country" class="s2d-input" value="United States">
+                    <input type="text" id="country" name="country" class="s2d-input" value="India">
                   </div>
                   <div class="col-md-2 s2d-field">
                     <label class="s2d-label" for="hostel_blocks_count">Hostel Blocks</label>
@@ -101,16 +101,15 @@
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label" for="timezone">Campus Timezone <span class="req-star">*</span></label>
                     <select id="timezone" name="timezone" class="s2d-select" required>
+                      <option value="Asia/Kolkata" selected>Asia/Kolkata (IST Standard)</option>
                       <option value="America/New_York">America/New_York (EST/EDT)</option>
                       <option value="America/Chicago">America/Chicago (CST/CDT)</option>
-                      <option value="America/Denver">America/Denver (MST/MDT)</option>
-                      <option value="America/Los_Angeles">America/Los_Angeles (PST/PDT)</option>
                       <option value="UTC">UTC Standard</option>
                     </select>
                   </div>
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label" for="campus_address">Physical Campus Address <span class="req-star">*</span></label>
-                    <input type="text" id="campus_address" name="address" class="s2d-input" placeholder="400 Academic Way, Residential North Campus..." required>
+                    <input type="text" id="campus_address" name="address" class="s2d-input" placeholder="e.g. Mall Road, Cantt Area, Residential North Campus..." required>
                   </div>
                 </div>
               </div>
@@ -132,27 +131,27 @@
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="admin_name">Primary Admin (Principal) Full Name <span class="req-star">*</span></label>
-                    <input type="text" id="admin_name" name="admin_name" class="s2d-input" placeholder="Dr. Jonathan Sterling" required>
+                    <input type="text" id="admin_name" name="admin_name" class="s2d-input" placeholder="e.g. Dr. Ramesh Chandra Sharma" required>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="admin_email">Principal Official Email <span class="req-star">*</span></label>
-                    <input type="email" id="admin_email" name="admin_email" class="s2d-input" placeholder="principal@hawthorneprep.edu" required>
+                    <input type="email" id="admin_email" name="admin_email" class="s2d-input" placeholder="principal@institution.edu.in" required>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="admin_phone">Principal Contact Phone <span class="req-star">*</span></label>
-                    <input type="tel" id="admin_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 290-4100" required>
+                    <input type="tel" id="admin_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23456" required>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="secondary_contact_name">Secondary Admin / Chief Warden</label>
-                    <input type="text" id="secondary_contact_name" name="secondary_contact_name" class="s2d-input" placeholder="Matron Eleanor Vance">
+                    <input type="text" id="secondary_contact_name" name="secondary_contact_name" class="s2d-input" placeholder="e.g. Capt. Arvind Verma">
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="secondary_contact_email">Secondary Admin Email</label>
-                    <input type="email" id="secondary_contact_email" name="secondary_contact_email" class="s2d-input" placeholder="warden@hawthorneprep.edu">
+                    <input type="email" id="secondary_contact_email" name="secondary_contact_email" class="s2d-input" placeholder="warden@institution.edu.in">
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="secondary_contact_phone">Secondary Admin Phone</label>
-                    <input type="tel" id="secondary_contact_phone" name="secondary_contact_phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 290-4109">
+                    <input type="tel" id="secondary_contact_phone" name="secondary_contact_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23457">
                   </div>
                 </div>
               </div>

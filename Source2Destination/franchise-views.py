@@ -184,12 +184,31 @@ def school_edit(request):
     if not school:
         school = School.objects.first()
 
-    if request.method == "POST":
-        school.name = request.POST.get('name', school.name)
-        school.city = request.POST.get('city', school.city)
-        school.admin_name = request.POST.get('admin_name', school.admin_name)
-        school.admin_email = request.POST.get('admin_email', school.admin_email)
-        school.admin_phone = request.POST.get('admin_phone', school.admin_phone)
+    if request.method == "POST" and school:
+        school.name = request.POST.get('name', school.name).strip()
+        school.city = request.POST.get('city', school.city).strip()
+        if request.POST.get('state'):
+            school.state = request.POST.get('state').strip()
+        if request.POST.get('address'):
+            school.address = request.POST.get('address').strip()
+        if request.POST.get('postal_code'):
+            school.postal_code = request.POST.get('postal_code').strip()
+
+        school.admin_name = (request.POST.get('admin_name') or request.POST.get('adminName', school.admin_name)).strip()
+        school.admin_email = (request.POST.get('admin_email') or request.POST.get('adminEmail', school.admin_email)).strip()
+        school.admin_phone = (request.POST.get('admin_phone') or request.POST.get('phone', school.admin_phone)).strip()
+
+        if request.POST.get('secondary_contact_name'):
+            school.secondary_contact_name = request.POST.get('secondary_contact_name').strip()
+        if request.POST.get('secondary_contact_phone'):
+            school.secondary_contact_phone = request.POST.get('secondary_contact_phone').strip()
+
+        if request.POST.get('daily_duration_cap'):
+            try:
+                school.daily_duration_cap = int(request.POST['daily_duration_cap'])
+            except ValueError:
+                pass
+
         school.save()
         return redirect(f"/franchise/schools/details.html?id={school.code}")
 

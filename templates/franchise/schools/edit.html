@@ -41,8 +41,15 @@
             <div class="row g-3">
               <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ school.name }}" required></div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Territory Allocation (Locked)</label><input type="text" class="s2d-input" value="{{ school.franchise.code }} · {{ school.franchise.name }}" readonly></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Campus Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">City <span class="req-star">*</span></label><input type="text" name="city" class="s2d-input" value="{{ school.city }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">State <span class="req-star">*</span></label><input type="text" name="state" class="s2d-input" value="{{ school.state }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Postal / PIN Code</label><input type="text" name="postal_code" class="s2d-input" value="{{ school.postal_code }}"></div>
+              <div class="col-md-12 s2d-field"><label class="s2d-label">Campus Address</label><input type="text" name="address" class="s2d-input" value="{{ school.address }}"></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Primary Admin Name <span class="req-star">*</span></label><input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Principal Email <span class="req-star">*</span></label><input type="email" name="adminEmail" class="s2d-input" value="{{ school.admin_email }}" required></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Campus Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Contact / Chief Warden</label><input type="text" name="secondary_contact_name" class="s2d-input" value="{{ school.secondary_contact_name }}"></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Daily Call Cap (Minutes)</label><input type="number" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="{{ school.daily_duration_cap }}"></div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Details</span></button></div></div>
           </form>

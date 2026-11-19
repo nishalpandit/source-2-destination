@@ -24,75 +24,206 @@
     <div class="app-main">
       <header class="app-topbar" id="app-topbar"></header>
       <main class="app-content">
-        <!-- Sleek Action Toolbar -->
+        <!-- Action Toolbar -->
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-2">
-            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#4f46e5;"></span>
-            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Edit <span data-bind-field="name">{{ school.name }}</span></span>
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#02182D;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Edit School Tenant · <span class="mono-code">{{ school.code }}</span></span>
           </div>
-          <div class="d-flex align-items-center gap-2"><a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a>
-            <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Directory</span></a></div>
+          <div class="d-flex align-items-center gap-2">
+            <a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary"><i data-lucide="eye"></i><span>View Details</span></a>
+            <a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Directory</span></a>
+          </div>
         </div>
 
         <div class="s2d-card">
           <div class="s2d-card-body">
             <form method="POST" action="edit.html?id={{ school.code }}" data-s2d-form data-warn-unsaved="true">
               {% csrf_token %}
+
+              <!-- 1. Institution Identity & Campus Profile -->
               <div class="s2d-form-section">
                 <div class="form-section-meta">
-                  <h3>Institution Profile</h3>
-                  <p>Core identity and campus regional metadata.</p>
+                  <h3>1 · Institution Identity &amp; Campus Profile</h3>
+                  <p>Core boarding school metadata, affiliation boards, hostel blocks, and location details.</p>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-8 s2d-field">
-                    <label class="s2d-label">Official School Name <span class="req-star">*</span></label>
-                    <input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ school.name }}" required>
+                    <label class="s2d-label" for="school_name">Official School / Hostel Name <span class="req-star">*</span></label>
+                    <input type="text" id="school_name" name="name" class="s2d-input" value="{{ school.name }}" required>
                   </div>
                   <div class="col-md-4 s2d-field">
-                    <label class="s2d-label">Tenant ID (Read-Only)</label>
-                    <input type="text" class="s2d-input mono-code" data-bind-field="id" value="{{ school.code }}" readonly>
+                    <label class="s2d-label" for="school_code">Campus Short Code (Immutable)</label>
+                    <input type="text" id="school_code" name="code" class="s2d-input mono-code" value="{{ school.code }}" readonly>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="campus_type">Campus Governance Model <span class="req-star">*</span></label>
+                    <select id="campus_type" name="campus_type" class="s2d-select" required>
+                      <option value="Co-ed Residential Boarding" {% if school.campus_type == 'Co-ed Residential Boarding' %}selected{% endif %}>Co-ed Residential Boarding</option>
+                      <option value="All-Boys Boarding School" {% if school.campus_type == 'All-Boys Boarding School' %}selected{% endif %}>All-Boys Boarding School</option>
+                      <option value="All-Girls Boarding School" {% if school.campus_type == 'All-Girls Boarding School' %}selected{% endif %}>All-Girls Boarding School</option>
+                      <option value="Day-cum-Residential Hostel" {% if school.campus_type == 'Day-cum-Residential Hostel' %}selected{% endif %}>Day-cum-Residential Hostel</option>
+                      <option value="Military / Preparatory Academy" {% if school.campus_type == 'Military / Preparatory Academy' %}selected{% endif %}>Military / Preparatory Academy</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="affiliation_board">Educational Affiliation Board</label>
+                    <select id="affiliation_board" name="affiliation_board" class="s2d-select">
+                      <option value="CBSE" {% if school.affiliation_board == 'CBSE' %}selected{% endif %}>CBSE (Central Board)</option>
+                      <option value="ICSE" {% if school.affiliation_board == 'ICSE' %}selected{% endif %}>ICSE / ISC</option>
+                      <option value="IB World" {% if school.affiliation_board == 'IB World' %}selected{% endif %}>International Baccalaureate (IB)</option>
+                      <option value="Cambridge" {% if school.affiliation_board == 'Cambridge' %}selected{% endif %}>Cambridge International (CIE)</option>
+                      <option value="State Board" {% if school.affiliation_board == 'State Board' %}selected{% endif %}>State Board of Education</option>
+                      <option value="NEASC" {% if school.affiliation_board == 'NEASC' %}selected{% endif %}>NEASC Accredited</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="website">Institutional Website</label>
+                    <input type="url" id="website" name="website" class="s2d-input" value="{{ school.website }}">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="city">City <span class="req-star">*</span></label>
+                    <input type="text" id="city" name="city" class="s2d-input" value="{{ school.city }}" required>
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="state">State / Province <span class="req-star">*</span></label>
+                    <input type="text" id="state" name="state" class="s2d-input" value="{{ school.state }}" required>
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="postal_code">Postal / PIN Code</label>
+                    <input type="text" id="postal_code" name="postal_code" class="s2d-input" value="{{ school.postal_code }}">
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="country">Country</label>
+                    <input type="text" id="country" name="country" class="s2d-input" value="{{ school.country }}">
+                  </div>
+                  <div class="col-md-2 s2d-field">
+                    <label class="s2d-label" for="hostel_blocks_count">Hostel Blocks</label>
+                    <input type="number" id="hostel_blocks_count" name="hostel_blocks_count" class="s2d-input" min="1" max="50" value="{{ school.hostel_blocks_count }}">
                   </div>
                   <div class="col-md-6 s2d-field">
-                    <label class="s2d-label">City &amp; State <span class="req-star">*</span></label>
-                    <input type="text" name="city" class="s2d-input" data-bind-field="city" value="{{ school.city }}" required>
+                    <label class="s2d-label" for="timezone">Campus Timezone <span class="req-star">*</span></label>
+                    <select id="timezone" name="timezone" class="s2d-select" required>
+                      <option value="Asia/Kolkata" {% if school.timezone == 'Asia/Kolkata' %}selected{% endif %}>Asia/Kolkata (IST Standard)</option>
+                      <option value="America/New_York" {% if school.timezone == 'America/New_York' %}selected{% endif %}>America/New_York (EST/EDT)</option>
+                      <option value="America/Chicago" {% if school.timezone == 'America/Chicago' %}selected{% endif %}>America/Chicago (CST/CDT)</option>
+                      <option value="UTC" {% if school.timezone == 'UTC' %}selected{% endif %}>UTC Standard</option>
+                    </select>
                   </div>
                   <div class="col-md-6 s2d-field">
-                    <label class="s2d-label">Campus Phone <span class="req-star">*</span></label>
-                    <input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required>
+                    <label class="s2d-label" for="campus_address">Physical Campus Address <span class="req-star">*</span></label>
+                    <input type="text" id="campus_address" name="address" class="s2d-input" value="{{ school.address }}" required>
                   </div>
                 </div>
               </div>
 
+              <!-- 2. Franchise & Campus Leadership -->
               <div class="s2d-form-section">
                 <div class="form-section-meta">
-                  <h3>Franchise &amp; Governance</h3>
-                  <p>Reassigning a franchise updates future commission attribution without altering historical settlements.</p>
+                  <h3>2 · Franchise &amp; Campus Leadership</h3>
+                  <p>Territory franchise assignment, tenant operational state, and verified leadership contacts.</p>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-6 s2d-field">
-                    <label class="s2d-label">Assigned Franchise <span class="req-star">*</span></label>
-                    <select name="franchise" class="s2d-select" data-bind-field="franchise" required>
+                    <label class="s2d-label" for="franchise_id">Assigned Franchise Partner <span class="req-star">*</span></label>
+                    <select id="franchise_id" name="franchise_id" class="s2d-select" required>
+                      <option value="">Select franchise partner...</option>
                       {% for f in franchises %}
-                      <option value="{{ f.name }}" {% if school.franchise.name == f.name or school.franchise_name_cache == f.name %}selected{% endif %}>{{ f.name }}</option>
-                      {% empty %}
-                      <option value="{{ school.franchise.name|default:school.franchise_name_cache }}">{{ school.franchise.name|default:school.franchise_name_cache }}</option>
+                      <option value="{{ f.code }}" {% if school.franchise.code == f.code or school.franchise_name_cache == f.name %}selected{% endif %}>{{ f.code }} · {{ f.name }} ({{ f.commission_rate }}%)</option>
                       {% endfor %}
                     </select>
                   </div>
                   <div class="col-md-6 s2d-field">
-                    <label class="s2d-label">Operational Status <span class="req-star">*</span></label>
-                    <select name="status" class="s2d-select" data-bind-field="status" required>
+                    <label class="s2d-label" for="status">Operational Status <span class="req-star">*</span></label>
+                    <select id="status" name="status" class="s2d-select" required>
                       <option value="Active" {% if school.status == 'Active' %}selected{% endif %}>Active (Calling Allowed)</option>
-                      <option value="Suspended" {% if school.status == 'Suspended' %}selected{% endif %}>Suspended (Pause Campus Calling)</option>
+                      <option value="Suspended" {% if school.status == 'Suspended' %}selected{% endif %}>Suspended (Calling Blocked)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="admin_name">Primary Admin (Principal) Name <span class="req-star">*</span></label>
+                    <input type="text" id="admin_name" name="admin_name" class="s2d-input" value="{{ school.admin_name }}" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="admin_email">Principal Official Email <span class="req-star">*</span></label>
+                    <input type="email" id="admin_email" name="admin_email" class="s2d-input" value="{{ school.admin_email }}" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="admin_phone">Principal Contact Phone <span class="req-star">*</span></label>
+                    <input type="tel" id="admin_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" value="{{ school.admin_phone }}" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_contact_name">Secondary Admin / Chief Warden</label>
+                    <input type="text" id="secondary_contact_name" name="secondary_contact_name" class="s2d-input" value="{{ school.secondary_contact_name }}">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_contact_email">Secondary Admin Email</label>
+                    <input type="email" id="secondary_contact_email" name="secondary_contact_email" class="s2d-input" value="{{ school.secondary_contact_email }}">
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="secondary_contact_phone">Secondary Admin Phone</label>
+                    <input type="tel" id="secondary_contact_phone" name="secondary_contact_phone" class="s2d-input" data-validate-phone="true" value="{{ school.secondary_contact_phone }}">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Subscription & Calling Policy Defaults -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>3 · Subscription &amp; Calling Policy Defaults</h3>
+                  <p>Seat licensing, subscription plans, per-call limits, allowed time slots, and MDM policy tags.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="sub_plan">Subscription Plan <span class="req-star">*</span></label>
+                    <select id="sub_plan" name="subscription_plan" class="s2d-select" required>
+                      <option value="Enterprise Boarding Annual" {% if school.subscription_plan == 'Enterprise Boarding Annual' %}selected{% endif %}>Enterprise Boarding Annual (₹8,40,000 / yr · 850 seats)</option>
+                      <option value="Campus Growth Annual" {% if school.subscription_plan == 'Campus Growth Annual' %}selected{% endif %}>Campus Growth Annual (₹5,90,000 / yr · 550 seats)</option>
+                      <option value="Standard Hostel Quarterly" {% if school.subscription_plan == 'Standard Hostel Quarterly' %}selected{% endif %}>Standard Hostel Quarterly (₹1,85,000 / qtr · 300 seats)</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="billing_cycle">Billing Cycle</label>
+                    <select id="billing_cycle" name="billing_cycle" class="s2d-select">
+                      <option value="Annually" {% if school.billing_cycle == 'Annually' %}selected{% endif %}>Annually</option>
+                      <option value="Quarterly" {% if school.billing_cycle == 'Quarterly' %}selected{% endif %}>Quarterly</option>
+                      <option value="Monthly" {% if school.billing_cycle == 'Monthly' %}selected{% endif %}>Monthly</option>
+                    </select>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="student_cap">Licensed Student Seats <span class="req-star">*</span></label>
+                    <input type="number" id="student_cap" name="student_seats" class="s2d-input" min="25" max="5000" value="{{ school.student_seats }}" required>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="default_daily_cap">Default Daily Cap (Mins) <span class="req-star">*</span></label>
+                    <input type="number" id="default_daily_cap" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="{{ school.daily_duration_cap }}" required>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="calling_window_start">Calling Window Start</label>
+                    <input type="time" id="calling_window_start" name="calling_window_start" class="s2d-input" value="{{ school.calling_window_start|time:'H:i' }}">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="calling_window_end">Calling Window End</label>
+                    <input type="time" id="calling_window_end" name="calling_window_end" class="s2d-input" value="{{ school.calling_window_end|time:'H:i' }}">
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="allowed_calling_days">Allowed Calling Days</label>
+                    <select id="allowed_calling_days" name="allowed_calling_days" class="s2d-select">
+                      <option value="All 7 Days" {% if school.allowed_calling_days == 'All 7 Days' %}selected{% endif %}>All 7 Days</option>
+                      <option value="Weekdays Only (Mon-Fri)" {% if school.allowed_calling_days == 'Weekdays Only (Mon-Fri)' %}selected{% endif %}>Weekdays Only (Mon-Fri)</option>
+                      <option value="Weekends Only (Sat-Sun)" {% if school.allowed_calling_days == 'Weekends Only (Sat-Sun)' %}selected{% endif %}>Weekends Only (Sat-Sun)</option>
+                      <option value="Mon / Wed / Fri / Sun" {% if school.allowed_calling_days == 'Mon / Wed / Fri / Sun' %}selected{% endif %}>Mon / Wed / Fri / Sun</option>
                     </select>
                   </div>
                   <div class="col-md-6 s2d-field">
-                    <label class="s2d-label">Primary Administrator <span class="req-star">*</span></label>
-                    <input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required>
+                    <label class="s2d-label" for="kiosk_group_tag">Android Enterprise Kiosk Group Tag</label>
+                    <input type="text" id="kiosk_group_tag" name="kiosk_group_tag" class="s2d-input mono-code" value="{{ school.kiosk_group_tag }}">
                   </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label">Administrator Email <span class="req-star">*</span></label>
-                    <input type="email" name="adminEmail" class="s2d-input" data-bind-field="adminEmail" value="{{ school.admin_email }}" required>
+                  <div class="col-md-6 s2d-field d-flex align-items-center pt-3">
+                    <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                      <input type="checkbox" name="emergency_calling_allowed" class="s2d-checkbox" {% if school.emergency_calling_allowed %}checked{% endif %}>
+                      <span>Enable 24/7 Emergency Outbound Calling Bypass</span>
+                    </label>
                   </div>
                 </div>
               </div>
@@ -100,8 +231,8 @@
               <div class="form-actions-bar">
                 <div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>You have unsaved edits</span></div>
                 <div class="d-flex gap-2 ms-auto">
-                  <a href="list.html" class="btn-s2d btn-s2d-secondary">Discard Changes</a>
-                  <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Changes</span></button>
+                  <a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary">Discard Changes</a>
+                  <button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save School Tenant</span></button>
                 </div>
               </div>
             </form>
@@ -114,7 +245,6 @@
   <script src="{% static 'vendor/lucide.min.js' %}"></script>
   <script src="{% static 'vendor/gsap.min.js' %}"></script>
   <script src="{% static 'js/api-config.js' %}"></script>
-  <script src="{% static 'js/demo-data.js' %}"></script>
   <script src="{% static 'js/notifications.js' %}"></script>
   <script src="{% static 'js/modals.js' %}"></script>
   <script src="{% static 'js/navigation.js' %}"></script>

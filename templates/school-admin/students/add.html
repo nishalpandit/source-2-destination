@@ -41,10 +41,18 @@
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>1 · Student &amp; Academic Placement</h3><p>Student Code is issued strictly by the Django backend upon enrollment.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Full legal name" required><span class="field-hint">As per school admission register.</span></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Student Calling Code (Backend Issued)</label><input type="text" name="student_code" class="s2d-input mono-code" value="Auto-generated on save" readonly></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">School (Locked)</label><input type="text" class="s2d-input" value="{{ school.name|default:'Assigned Campus' }}" readonly></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label>
+                <div class="col-md-5 s2d-field"><label class="s2d-label">Student Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Full legal name" required><span class="field-hint">As per school admission register.</span></div>
+                <div class="col-md-3 s2d-field">
+                  <label class="s2d-label">Gender <span class="req-star">*</span></label>
+                  <select name="gender" class="s2d-select" required>
+                    <option value="Male" selected>Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Student Calling Code (Backend Issued)</label><input type="text" name="student_code" class="s2d-input mono-code" value="Auto-generated on save" readonly></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">School (Locked)</label><input type="text" class="s2d-input" value="{{ school.name|default:'Assigned Campus' }}" readonly></div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Class <span class="req-star">*</span></label>
                   <select name="className" class="s2d-select" required>
                     {% for c in classes %}
                     <option value="{{ c.name }}">{{ c.name }}</option>
@@ -53,7 +61,7 @@
                     {% endfor %}
                   </select>
                 </div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Section <span class="req-star">*</span></label>
                   <select name="section" class="s2d-select" required>
                     {% for s in sections %}
                     <option value="{{ s.name }}">{{ s.name }} ({{ s.academic_class.name }})</option>
@@ -63,6 +71,8 @@
                     {% endfor %}
                   </select>
                 </div>
+                <div class="col-md-3 s2d-field"><label class="s2d-label">Roll Number</label><input type="text" name="roll_number" class="s2d-input" placeholder="e.g. 1042"></div>
+                <div class="col-md-12 s2d-field"><label class="s2d-label">Hostel Wing &amp; Dorm Room</label><input type="text" name="hostelWing" class="s2d-input" placeholder="e.g. Tagore Bhavan · Room 204"></div>
               </div>
             </div>
             <div class="s2d-form-section">
@@ -79,7 +89,16 @@
               <div class="row g-3">
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Account Status <span class="req-star">*</span></label><select name="status" class="s2d-select" required><option value="Active">Active</option><option value="Inactive">Inactive (Hold)</option></select></div>
                 <div class="col-md-4 s2d-field"><label class="s2d-label">Calling Validity Expiry <span class="req-star">*</span></label><input type="date" name="validity_expiry" class="s2d-input" required></div>
-                <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Booth Assignment <span class="req-star">*</span></label><select name="device_id" class="s2d-select" required><option value="DEV-7701">DEV-7701 · Primary Hostel Booth</option><option value="DEV-7702">DEV-7702 · Secondary Booth</option></select></div>
+                <div class="col-md-4 s2d-field"><label class="s2d-label">Hostel Booth Assignment</label>
+                  <select name="device_id" class="s2d-select">
+                    <option value="">Select booth (optional)...</option>
+                    {% for d in devices %}
+                    <option value="{{ d.device_id }}">{{ d.device_id }} · {{ d.name }} ({{ d.hostel_block }})</option>
+                    {% empty %}
+                    <option value="">No booths registered on campus</option>
+                    {% endfor %}
+                  </select>
+                </div>
               </div>
             </div>
             <div class="form-actions-bar"><div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved changes</span></div><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Create Student Account</span></button></div></div>

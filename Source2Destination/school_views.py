@@ -235,6 +235,10 @@ def student_add(request):
         code = request.POST.get('code') or f"STU-{Student.objects.count() + 4001}"
         calling_code = request.POST.get('studentCode') or f"S2D-{school.code[:3] if school else 'SCH'}-{Student.objects.count() + 8801}"
 
+        validity_expiry = request.POST.get('validity_expiry') or request.POST.get('validityExpiry')
+        if not validity_expiry:
+            validity_expiry = timezone.now().date() + timedelta(days=365)
+
         stu = Student.objects.create(
             code=code,
             calling_code=calling_code,
@@ -243,8 +247,8 @@ def student_add(request):
             school=school,
             class_name=request.POST.get('className') or request.POST.get('class_name', 'Grade 10'),
             section=request.POST.get('section', 'Section A'),
-            roll_number=request.POST.get('roll_number', ''),
-            hostel_wing=request.POST.get('hostelWing') or request.POST.get('hostel_wing', ''),
+            roll_number=request.POST.get('roll_number') or request.POST.get('rollNumber', ''),
+            hostel_wing=request.POST.get('hostelWing') or request.POST.get('hostel_wing', 'North Wing'),
             guardian_name=request.POST.get('guardianName') or request.POST.get('guardian_name', 'Authorized Guardian'),
             guardian_relation=request.POST.get('guardianRelation') or request.POST.get('guardian_relation', 'Father'),
             primary_phone=request.POST.get('primaryPhone') or request.POST.get('primary_phone', ''),
@@ -252,6 +256,7 @@ def student_add(request):
             remaining_minutes=int(request.POST.get('remainingMinutes') or 120),
             daily_limit_min=int(request.POST.get('dailyLimitMin') or (school.daily_duration_cap if school else 15)),
             wallet_balance=float(request.POST.get('wallet_balance') or 50.00),
+            validity_expiry=validity_expiry,
             status=request.POST.get('status', 'Active')
         )
 
@@ -268,15 +273,32 @@ def student_add(request):
             verification="KYC Verified (School Admission File)",
             status='Active'
         )
+
+        # Link selected booth if specified
+        device_id = request.POST.get('device_id')
+        if device_id and school:
+            device = KioskDevice.objects.filter(device_id=device_id, school=school).first()
+            if device:
+                DeviceAssignment.objects.create(
+                    school=school,
+                    device=device,
+                    hostel_wing=stu.hostel_wing or device.hostel_block,
+                    academic_class=stu.class_name,
+                    assigned_by=request.user.get_full_name() if getattr(request, 'user', None) and request.user.is_authenticated and request.user.get_full_name() else "School Admin",
+                    status='Active'
+                )
+
         return redirect('/school-admin/students/list.html')
 
     classes = AcademicClass.objects.filter(school=school).order_by('name') if school else AcademicClass.objects.none()
     sections = ClassSection.objects.filter(school=school).select_related('academic_class').order_by('name') if school else ClassSection.objects.none()
+    devices = KioskDevice.objects.filter(school=school).order_by('name') if school else KioskDevice.objects.none()
 
     context = {
         "school": school,
         "classes": classes,
         "sections": sections,
+        "devices": devices,
     }
     return render(request, 'school-admin/students/add.html', context)
 
@@ -351,17 +373,40 @@ def student_edit(request):
         stu = Student.objects.first()
 
     if request.method == "POST" and stu:
-        stu.name = request.POST.get('name', stu.name)
-        stu.class_name = request.POST.get('className', stu.class_name)
-        stu.section = request.POST.get('section', stu.section)
-        stu.hostel_wing = request.POST.get('hostelWing', stu.hostel_wing)
-        stu.guardian_name = request.POST.get('guardianName', stu.guardian_name)
-        stu.primary_phone = request.POST.get('primaryPhone', stu.primary_phone)
+        stu.name = request.POST.get('name', stu.name).strip()
+        stu.gender = request.POST.get('gender', stu.gender)
+        stu.class_name = (request.POST.get('className') or request.POST.get('class_name', stu.class_name)).strip()
+        stu.section = (request.POST.get('section', stu.section)).strip()
+        stu.roll_number = (request.POST.get('roll_number') or request.POST.get('rollNumber', stu.roll_number)).strip()
+        stu.hostel_wing = (request.POST.get('hostelWing') or request.POST.get('hostel_wing', stu.hostel_wing)).strip()
+        stu.guardian_name = (request.POST.get('guardianName') or request.POST.get('guardian_name', stu.guardian_name)).strip()
+        stu.primary_phone = (request.POST.get('primaryPhone') or request.POST.get('primary_phone', stu.primary_phone)).strip()
+        if request.POST.get('secondaryPhone') or request.POST.get('secondary_phone'):
+            stu.secondary_phone = (request.POST.get('secondaryPhone') or request.POST.get('secondary_phone')).strip()
+
+        expiry_val = request.POST.get('validityExpiry') or request.POST.get('validity_expiry')
+        if expiry_val:
+            stu.validity_expiry = expiry_val
+
         if 'remainingMinutes' in request.POST:
             stu.remaining_minutes = int(request.POST['remainingMinutes'])
+        if 'dailyLimitMin' in request.POST:
+            stu.daily_limit_min = int(request.POST['dailyLimitMin'])
         if 'status' in request.POST:
             stu.status = request.POST['status']
         stu.save()
+
+        # Keep linked Guardian contact numbers and name in sync
+        guardian = stu.guardian_contacts.first()
+        if guardian:
+            guardian.name = stu.guardian_name
+            guardian.father_phone = stu.primary_phone
+            if stu.secondary_phone:
+                guardian.mother_phone = stu.secondary_phone
+            active_nums = [p for p in [guardian.father_phone, guardian.mother_phone, guardian.emergency_phone] if p and p != 'N/A']
+            guardian.whitelist_status = f"Authorized ({len(active_nums)} Number{'s' if len(active_nums) != 1 else ''})"
+            guardian.save()
+
         return redirect(f"/school-admin/students/details.html?id={stu.code}")
 
     context = {
@@ -763,16 +808,31 @@ def guardian_edit(request):
         guardian = Guardian.objects.first()
 
     if request.method == "POST" and guardian:
-        guardian.name = request.POST.get('name', guardian.name)
-        guardian.email = request.POST.get('email', guardian.email)
-        guardian.father_phone = request.POST.get('fatherPhone', guardian.father_phone)
-        guardian.mother_phone = request.POST.get('motherPhone', guardian.mother_phone)
+        guardian.name = request.POST.get('name', guardian.name).strip()
+        guardian.email = request.POST.get('email', guardian.email).strip()
+        if 'relation' in request.POST:
+            guardian.relation = request.POST.get('relation')
+        guardian.father_phone = (request.POST.get('fatherPhone') or request.POST.get('father_phone', guardian.father_phone)).strip()
+        guardian.mother_phone = (request.POST.get('motherPhone') or request.POST.get('mother_phone', guardian.mother_phone)).strip()
+        if request.POST.get('emergencyPhone') or request.POST.get('emergency_phone'):
+            guardian.emergency_phone = (request.POST.get('emergencyPhone') or request.POST.get('emergency_phone')).strip()
         if 'status' in request.POST:
             guardian.status = request.POST.get('status')
 
         active_numbers = [p for p in [guardian.father_phone, guardian.mother_phone, guardian.emergency_phone] if p and p != 'N/A']
         guardian.whitelist_status = f"Authorized ({len(active_numbers)} Number{'s' if len(active_numbers) != 1 else ''})"
         guardian.save()
+
+        # Update student primary_phone and guardian_name as well
+        if guardian.student:
+            if guardian.father_phone:
+                guardian.student.primary_phone = guardian.father_phone
+            if guardian.name:
+                guardian.student.guardian_name = guardian.name
+            if guardian.mother_phone:
+                guardian.student.secondary_phone = guardian.mother_phone
+            guardian.student.save(update_fields=['primary_phone', 'guardian_name', 'secondary_phone'])
+
         return redirect(f"/school-admin/guardians/details.html?id={guardian.code}")
 
     context = {
@@ -1342,11 +1402,16 @@ def hostel_warden_edit(request):
         warden = HostelWarden.objects.first()
 
     if request.method == "POST" and warden:
-        warden.name = request.POST.get('name', warden.name)
-        warden.phone = request.POST.get('phone', warden.phone)
-        warden.email = request.POST.get('email', warden.email)
-        warden.hostel_block = request.POST.get('hostel_block', warden.hostel_block)
-        warden.shift_timings = request.POST.get('shift_timings', warden.shift_timings)
+        warden.name = request.POST.get('name', warden.name).strip()
+        warden.phone = request.POST.get('phone', warden.phone).strip()
+        warden.email = request.POST.get('email', warden.email).strip()
+        warden.hostel_block = request.POST.get('hostel_block', warden.hostel_block).strip()
+        warden.shift_timings = request.POST.get('shift_timings', warden.shift_timings).strip()
+        if request.POST.get('booths_monitored'):
+            try:
+                warden.booths_monitored = int(request.POST['booths_monitored'])
+            except ValueError:
+                pass
         warden.status = request.POST.get('status', warden.status)
         warden.save()
         return redirect('/school-admin/hostel-wardens/list.html')
