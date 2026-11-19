@@ -5,6 +5,7 @@ from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.models import User
+from .middleware import is_user_authorized_for_path
 
 
 def get_role_dashboard_url(user):
@@ -19,7 +20,7 @@ def get_role_dashboard_url(user):
         return '/super-admin/dashboard.html'
     elif username == 'franchise':
         return '/franchise/dashboard.html'
-    elif username == 'school':
+    elif username == 'school' or hasattr(user, 'school_admin_profile'):
         return '/school-admin/dashboard.html'
     return '/school-admin/dashboard.html'
 
@@ -31,12 +32,17 @@ def login_view(request):
     2. Franchise Admin (user: franchise, pass: 12345) -> /franchise/dashboard.html
     3. School Admin (user: school, pass: 12345) -> /school-admin/dashboard.html
     """
-    # If user is already authenticated on GET, redirect to their role dashboard
+    # If user is already authenticated on GET, verify their authorization for next_url
     if request.user.is_authenticated and request.method == 'GET':
         next_url = request.GET.get('next')
         if next_url and next_url.startswith('/') and not next_url.startswith('//') and next_url != '/':
-            return redirect(next_url)
-        return redirect(get_role_dashboard_url(request.user))
+            if is_user_authorized_for_path(request.user, next_url):
+                return redirect(next_url)
+            else:
+                # Active session does not match requested portal — log out and force login
+                auth_logout(request)
+        else:
+            return redirect(get_role_dashboard_url(request.user))
 
     error = None
     login_val = ''
@@ -67,7 +73,10 @@ def login_view(request):
 
             next_url = request.POST.get('next') or request.GET.get('next')
             if next_url and next_url.startswith('/') and not next_url.startswith('//') and next_url != '/':
-                dest_url = next_url
+                if is_user_authorized_for_path(user, next_url):
+                    dest_url = next_url
+                else:
+                    dest_url = get_role_dashboard_url(user)
             else:
                 dest_url = get_role_dashboard_url(user)
 
@@ -120,6 +129,16 @@ def render_template_page(request, path):
 
     if clean_path.startswith('..') or clean_path.startswith('/'):
         raise Http404("Invalid template path")
+
+    # Strict portal isolation check:
+    for portal_prefix in ('super-admin', 'franchise', 'school-admin'):
+        if clean_path.startswith(portal_prefix):
+            full_path = f"/{clean_path}"
+            if not request.user.is_authenticated:
+                return redirect(f"/?next={full_path}")
+            if not is_user_authorized_for_path(request.user, full_path):
+                auth_logout(request)
+                return redirect(f"/?next={full_path}")
 
     candidates = []
     if clean_path.endswith('.html'):

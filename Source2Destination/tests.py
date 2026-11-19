@@ -1139,3 +1139,78 @@ class SuperAdminCitadelBackendTests(TestCase):
         self.assertEqual(audit_resp.status_code, 200)
 
 
+class StrictPortalIsolationTests(TestCase):
+    """Verify that every dashboard can only be accessed by its own ID & password, and changing URLs is blocked."""
+
+    def setUp(self):
+        self.super_user, _ = User.objects.get_or_create(username='admin', defaults={'is_superuser': True, 'is_staff': True})
+        self.super_user.set_password('12345')
+        self.super_user.is_superuser = True
+        self.super_user.is_staff = True
+        self.super_user.save()
+
+        self.franchise_user, _ = User.objects.get_or_create(username='franchise')
+        self.franchise_user.set_password('12345')
+        self.franchise_user.is_superuser = False
+        self.franchise_user.save()
+
+        self.school_user, _ = User.objects.get_or_create(username='school')
+        self.school_user.set_password('12345')
+        self.school_user.is_superuser = False
+        self.school_user.save()
+
+    def test_unauthenticated_access_blocked_to_all_dashboards(self):
+        for path in ('/super-admin/dashboard.html', '/franchise/dashboard.html', '/school-admin/dashboard.html'):
+            resp = self.client.get(path)
+            self.assertEqual(resp.status_code, 302)
+            self.assertIn(f"/?next={path}", resp.get('Location'))
+
+    def test_school_user_cannot_access_super_or_franchise_by_changing_url(self):
+        self.client.login(username='school', password='12345')
+        # Allowed in school-admin
+        self.assertEqual(self.client.get('/school-admin/dashboard.html').status_code, 200)
+
+        # Blocked from super-admin; session logged out and redirected to login
+        resp_super = self.client.get('/super-admin/dashboard.html')
+        self.assertEqual(resp_super.status_code, 302)
+        self.assertIn('/?next=/super-admin/dashboard.html', resp_super.get('Location'))
+
+        # Blocked from franchise
+        self.client.login(username='school', password='12345')
+        resp_fran = self.client.get('/franchise/dashboard.html')
+        self.assertEqual(resp_fran.status_code, 302)
+        self.assertIn('/?next=/franchise/dashboard.html', resp_fran.get('Location'))
+
+    def test_franchise_user_cannot_access_super_or_school_by_changing_url(self):
+        self.client.login(username='franchise', password='12345')
+        # Allowed in franchise
+        self.assertEqual(self.client.get('/franchise/dashboard.html').status_code, 200)
+
+        # Blocked from super-admin
+        resp_super = self.client.get('/super-admin/dashboard.html')
+        self.assertEqual(resp_super.status_code, 302)
+        self.assertIn('/?next=/super-admin/dashboard.html', resp_super.get('Location'))
+
+        # Blocked from school-admin
+        self.client.login(username='franchise', password='12345')
+        resp_sch = self.client.get('/school-admin/dashboard.html')
+        self.assertEqual(resp_sch.status_code, 302)
+        self.assertIn('/?next=/school-admin/dashboard.html', resp_sch.get('Location'))
+
+    def test_super_admin_cannot_access_franchise_or_school_by_changing_url(self):
+        self.client.login(username='admin', password='12345')
+        # Allowed in super-admin
+        self.assertEqual(self.client.get('/super-admin/dashboard.html').status_code, 200)
+
+        # Blocked from franchise by URL change; requires franchise login
+        resp_fran = self.client.get('/franchise/dashboard.html')
+        self.assertEqual(resp_fran.status_code, 302)
+        self.assertIn('/?next=/franchise/dashboard.html', resp_fran.get('Location'))
+
+        # Blocked from school-admin by URL change; requires school login
+        self.client.login(username='admin', password='12345')
+        resp_sch = self.client.get('/school-admin/dashboard.html')
+        self.assertEqual(resp_sch.status_code, 302)
+        self.assertIn('/?next=/school-admin/dashboard.html', resp_sch.get('Location'))
+
+

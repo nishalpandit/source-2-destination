@@ -156,35 +156,6 @@
         </div>
 
         <div class="topbar-right">
-          <!-- Role Environment Switcher for Seamless Demo Inspection -->
-          <div style="position:relative;" class="s2d-dropdown-host">
-            <button type="button" class="btn-s2d btn-s2d-secondary btn-sm-s2d" data-dropdown-toggle title="Switch Role Portal (Demo Preview)">
-              <i data-lucide="layers-3" style="width:15px;height:15px;color:var(--s2d-primary);"></i>
-              <span class="d-none d-md-inline">${navCfg.roleLabel}</span>
-              <i data-lucide="chevron-down" style="width:14px;height:14px;"></i>
-            </button>
-            <div class="s2d-dropdown-menu" style="min-width:235px;">
-              <div style="padding:6px 10px;font-size:0.69rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--s2d-text-muted);">Switch Portal Environment</div>
-              <a href="${resolveHref('super-admin/dashboard.html')}" class="s2d-dropdown-item">
-                <i data-lucide="shield" style="width:15px;height:15px;color:#4F46E5;"></i>
-                <span>Super Admin Portal</span>
-              </a>
-              <a href="${resolveHref('franchise/dashboard.html')}" class="s2d-dropdown-item">
-                <i data-lucide="network" style="width:15px;height:15px;color:#0D9488;"></i>
-                <span>Franchise Partner Portal</span>
-              </a>
-              <a href="${resolveHref('school-admin/dashboard.html')}" class="s2d-dropdown-item">
-                <i data-lucide="school" style="width:15px;height:15px;color:#0284C7;"></i>
-                <span>School Admin Portal</span>
-              </a>
-              <div class="s2d-dropdown-divider"></div>
-              <a href="${resolveHref('index.html')}" class="s2d-dropdown-item">
-                <i data-lucide="compass" style="width:15px;height:15px;"></i>
-                <span>Platform Launcher Hub</span>
-              </a>
-            </div>
-          </div>
-
           <!-- Notification Bell -->
           <div style="position:relative;" class="s2d-dropdown-host">
             <button type="button" class="topbar-icon-btn" data-dropdown-toggle aria-label="Notifications">
