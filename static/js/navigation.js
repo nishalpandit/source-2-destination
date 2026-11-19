@@ -98,13 +98,6 @@
           label: 'Governance & System',
           items: [
             {
-              id: 'sa-roles', label: 'Roles & Permissions', icon: 'shield-check',
-              children: [
-                { label: 'Roles & Permission Matrix', href: 'super-admin/roles-permissions/list.html' },
-                { label: 'Create / Edit Role', href: 'super-admin/roles-permissions/create.html' }
-              ]
-            },
-            {
               id: 'sa-settings', label: 'Settings & Audit', icon: 'settings',
               children: [
                 { label: 'General & Admin Settings', href: 'super-admin/settings/general.html' },

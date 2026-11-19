@@ -1172,41 +1172,8 @@ def export_reports_csv(request):
 
 
 # ==============================================================================
-# DIVISION II — PHASE 5: GOVERNANCE, RBAC & SETTINGS (roles/, settings/)
+# DIVISION II — PHASE 5: GOVERNANCE & SETTINGS (settings/)
 # ==============================================================================
-
-def roles_permissions_list(request):
-    """
-    Super Admin: RBAC Matrix & Role Capabilities Governance.
-    """
-    if request.method == 'POST':
-        log_admin_action(
-            actor="Super Admin",
-            action_type="UPDATE",
-            domain="RBAC",
-            target_id="MATRIX-01",
-            description="Adjusted global RBAC domain permission matrix"
-        )
-        return redirect('/super-admin/roles-permissions/list.html')
-    return render(request, 'super-admin/roles-permissions/list.html')
-
-
-def role_create(request):
-    """
-    Super Admin: Create Custom Governance Role.
-    """
-    if request.method == 'POST':
-        role_name = request.POST.get('role_name', 'Custom Role').strip()
-        log_admin_action(
-            actor="Super Admin",
-            action_type="CREATE",
-            domain="RBAC",
-            target_id=role_name,
-            description=f"Created custom administrative role template: {role_name}"
-        )
-        return redirect('/super-admin/roles-permissions/list.html')
-    return render(request, 'super-admin/roles-permissions/create.html')
-
 
 def settings_general(request):
     """

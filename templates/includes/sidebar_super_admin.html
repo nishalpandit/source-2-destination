@@ -173,19 +173,6 @@
   <div class="sidebar-group">
     <div class="sidebar-group-label">Governance &amp; System</div>
 
-    <div class="nav-item-box {% if '/super-admin/roles-permissions/' in request.path %}open{% endif %}">
-      <button type="button" class="sidebar-parent-btn {% if '/super-admin/roles-permissions/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/super-admin/roles-permissions/' in request.path %}true{% else %}false{% endif %}">
-        <span class="sidebar-link-icon"><i data-lucide="shield-check"></i></span>
-        <span class="sidebar-link-label">Roles &amp; Permissions</span>
-        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
-      </button>
-      <div class="sidebar-tooltip">Roles &amp; Permissions</div>
-      <div class="sidebar-submenu">
-        <a href="/super-admin/roles-permissions/list.html" class="sidebar-sublink {% if request.path == '/super-admin/roles-permissions/list.html' %}active{% endif %}">Roles &amp; Permission Matrix</a>
-        <a href="/super-admin/roles-permissions/create.html" class="sidebar-sublink {% if request.path == '/super-admin/roles-permissions/create.html' %}active{% endif %}">Create / Edit Role</a>
-      </div>
-    </div>
-
     <div class="nav-item-box {% if '/super-admin/settings/' in request.path %}open{% endif %}">
       <button type="button" class="sidebar-parent-btn {% if '/super-admin/settings/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/super-admin/settings/' in request.path %}true{% else %}false{% endif %}">
         <span class="sidebar-link-icon"><i data-lucide="settings"></i></span>

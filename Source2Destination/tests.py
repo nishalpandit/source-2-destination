@@ -1094,19 +1094,7 @@ class SuperAdminCitadelBackendTests(TestCase):
         self.assertIn(b'Campus Name', csv_resp.content)
 
     def test_phase5_governance_and_settings_workflow(self):
-        # 1. Roles & permissions
-        role_resp = self.client.get('/super-admin/roles-permissions/')
-        self.assertEqual(role_resp.status_code, 200)
-
-        role_post = self.client.post('/super-admin/roles-permissions/list.html', {})
-        self.assertEqual(role_post.status_code, 302)
-
-        role_create_post = self.client.post('/super-admin/roles-permissions/create.html', {
-            'role_name': 'Hostel Night In-Charge'
-        })
-        self.assertEqual(role_create_post.status_code, 302)
-
-        # 2. Settings general
+        # 1. Settings general
         set_gen_resp = self.client.get('/super-admin/settings/general.html')
         self.assertEqual(set_gen_resp.status_code, 200)
 

@@ -68,10 +68,7 @@ urlpatterns = [
     path('super-admin/reports/index.html', admin_views.reports_overview, name='super_admin_reports_overview_html'),
     path('super-admin/reports/export.csv', admin_views.export_reports_csv, name='super_admin_reports_export_csv'),
 
-    # Super Admin Governance: RBAC & Platform Settings (Phase 5)
-    path('super-admin/roles-permissions/', admin_views.roles_permissions_list, name='super_admin_roles_permissions_list'),
-    path('super-admin/roles-permissions/list.html', admin_views.roles_permissions_list, name='super_admin_roles_permissions_list_html'),
-    path('super-admin/roles-permissions/create.html', admin_views.role_create, name='super_admin_role_create'),
+    # Super Admin Governance: Platform Settings & Audit (Phase 5)
     path('super-admin/settings/general.html', admin_views.settings_general, name='super_admin_settings_general'),
     path('super-admin/settings/notifications.html', admin_views.settings_notifications, name='super_admin_settings_notifications'),
     path('super-admin/settings/audit-logs.html', admin_views.settings_audit_logs, name='super_admin_settings_audit_logs'),

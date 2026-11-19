@@ -42,7 +42,6 @@ school-calling-system/
 │   ├── subscriptions/              # overview, create
 │   ├── payments/                   # overview, details
 │   ├── devices/                    # list, register, details (Android Enterprise MDM readiness)
-│   ├── roles-permissions/          # list (RBAC matrix), create
 │   └── settings/                   # general, notifications, audit-logs
 ├── franchise/                      # Portal 2: Territory Partner Operations (20 HTML pages)
 │   ├── dashboard.html
