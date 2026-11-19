@@ -33,45 +33,86 @@
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0d9488;"></span>
             <span class="fw-semibold text-heading" style="font-size:0.92rem;">Bulk Student Excel / CSV Import</span>
           </div>
-          
+          <div class="d-flex align-items-center gap-2">
+            <a href="sample.csv" class="btn-s2d btn-s2d-secondary btn-sm-s2d"><i data-lucide="download"></i><span>Download Sample CSV</span></a>
+          </div>
         </div>
-        
+
+        {% if upload_result %}
+        <div class="mb-4">
+          {% if upload_result.success %}
+          <div class="s2d-callout success mb-3">
+            <i data-lucide="check-circle-2"></i>
+            <div>
+              <strong>Batch Import Successful:</strong> Successfully imported {{ upload_result.valid_count }} student(s) into database.
+              {% if upload_result.error_count > 0 %}<br><span class="text-secondary-s2d">{{ upload_result.error_count }} record(s) flagged with issues.</span>{% endif %}
+            </div>
+          </div>
+          {% else %}
+          <div class="s2d-callout danger mb-3">
+            <i data-lucide="alert-triangle"></i>
+            <div>
+              <strong>Import Issues Detected:</strong> {{ upload_result.error|default:"Review row errors below." }}
+            </div>
+          </div>
+          {% endif %}
+
+          {% if upload_result.error_rows %}
+          <div class="s2d-card mb-4">
+            <div class="s2d-card-header"><h3 class="s2d-card-title text-danger">Flagged Row Diagnostics ({{ upload_result.error_count }})</h3></div>
+            <div class="s2d-table-wrap">
+              <table class="s2d-table">
+                <thead><tr><th>Row #</th><th>Student Name</th><th>Reason / Error Diagnostic</th></tr></thead>
+                <tbody>
+                  {% for err in upload_result.error_rows %}
+                  <tr>
+                    <td class="mono-code">{{ err.row }}</td>
+                    <td><strong>{{ err.name }}</strong></td>
+                    <td class="text-danger">{{ err.reason }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
 <div class="row g-4">
   <div class="col-lg-8">
     <div class="s2d-card mb-4">
       <div class="s2d-card-header">
-        <div><h3 class="s2d-card-title">Upload Student Enrollment Spreadsheet (.xlsx / .csv)</h3><p class="s2d-card-subtitle">Client-side schema pre-check followed by authoritative server-side DRF import validation</p></div>
-        <button type="button" class="btn-s2d btn-s2d-secondary btn-sm-s2d" id="download-sample-template"><i data-lucide="download"></i><span>Download Sample CSV</span></button>
+        <div><h3 class="s2d-card-title">Upload Student Enrollment Spreadsheet (.xlsx / .csv)</h3><p class="s2d-card-subtitle">Server-validated student import with duplicate telephone detection</p></div>
+        <a href="sample.csv" class="btn-s2d btn-s2d-secondary btn-sm-s2d" id="download-sample-template"><i data-lucide="download"></i><span>Sample Format</span></a>
       </div>
       <div class="s2d-card-body">
-        <input type="file" id="bulk-file-input" accept=".xlsx,.xls,.csv" style="display:none;">
-        <div class="upload-dropzone" id="bulk-upload-dropzone">
-          <div class="kpi-icon mx-auto mb-3" style="width:48px;height:48px;"><i data-lucide="upload-cloud" style="width:24px;height:24px;"></i></div>
-          <h3 class="h3-s2d mb-1">Drag &amp; drop Excel or CSV file here, or click to browse</h3>
-          <p class="text-secondary-s2d mb-3" style="font-size:0.81rem;">Supports <code>.xlsx</code> and <code>.csv</code> up to 5,000 student rows per batch.</p>
-          <span class="btn-s2d btn-s2d-primary btn-sm-s2d">Select Spreadsheet File</span>
-        </div>
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
-          <span class="text-secondary-s2d" style="font-size:0.78rem;">No spreadsheet handy? Run a live interactive validation preview:</span>
-          <button type="button" class="btn-s2d btn-s2d-soft btn-sm-s2d" id="simulate-sample-validation"><i data-lucide="play"></i><span>Simulate Validation Preview</span></button>
-        </div>
-      </div>
-    </div>
+        <form method="POST" action="index.html" enctype="multipart/form-data" id="franchise-bulk-form">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="s2d-label">Target Assigned Campus <span class="req-star">*</span></label>
+            <select name="school_id" class="s2d-select" required>
+              {% for sch in schools %}
+              <option value="{{ sch.code }}">{{ sch.code }} · {{ sch.name }} ({{ sch.city }})</option>
+              {% empty %}
+              <option value="">No campuses assigned to territory</option>
+              {% endfor %}
+            </select>
+            <span class="field-hint">Records without an explicit 'school_code' column will automatically be assigned to this campus.</span>
+          </div>
 
-    <!-- Validation Preview Section -->
-    <div class="s2d-card" id="bulk-validation-preview" style="display:none;">
-      <div class="s2d-card-header">
-        <div>
-          <h3 class="s2d-card-title">Validation Preview: <span class="mono-code text-brand" id="uploaded-filename-badge">sample.xlsx</span></h3>
-          <p class="s2d-card-subtitle">3 Valid Records · 1 Duplicate Record Flagged · 1 Format Error</p>
+          <input type="file" name="spreadsheet" id="bulk-file-input" accept=".xlsx,.xls,.csv" style="display:none;" onchange="this.form.submit()">
+          <div class="upload-dropzone" id="bulk-upload-dropzone" onclick="document.getElementById('bulk-file-input').click();">
+            <div class="kpi-icon mx-auto mb-3" style="width:48px;height:48px;"><i data-lucide="upload-cloud" style="width:24px;height:24px;"></i></div>
+            <h3 class="h3-s2d mb-1">Drag &amp; drop Excel or CSV file here, or click to browse</h3>
+            <p class="text-secondary-s2d mb-3" style="font-size:0.81rem;">Supports <code>.xlsx</code> and <code>.csv</code> student rosters.</p>
+            <button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d">Select Spreadsheet File</button>
+          </div>
+        </form>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-3">
+          <span class="text-secondary-s2d" style="font-size:0.78rem;">Need template reference?</span>
+          <a href="sample.csv" class="btn-s2d btn-s2d-soft btn-sm-s2d"><i data-lucide="download"></i><span>Download Blank CSV Template</span></a>
         </div>
-        <button type="button" class="btn-s2d btn-s2d-primary btn-sm-s2d" id="confirm-bulk-import-btn"><i data-lucide="check-circle-2"></i><span>Confirm &amp; Import Valid Rows (3)</span></button>
-      </div>
-      <div class="s2d-table-wrap">
-        <table class="s2d-table">
-          <thead><tr><th>Row</th><th>Student Name</th><th>Class / Sec</th><th>Primary Guardian Phone</th><th>Validation</th><th>Diagnostic Note</th></tr></thead>
-          <tbody id="bulk-preview-tbody"></tbody>
-        </table>
       </div>
     </div>
   </div>
@@ -83,12 +124,13 @@
         <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">student_full_name</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
         <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">class_grade</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
         <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">section</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
-        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">father_authorized_phone</code><span class="s2d-badge s2d-badge-indigo">E.164 Req</span></div>
-        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">mother_authorized_phone</code><span class="s2d-badge s2d-badge-neutral">Optional</span></div>
-        <div class="d-flex justify-content-between py-1"><code class="mono-code">validity_plan_code</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">father_authorized_phone</code><span class="s2d-badge s2d-badge-indigo">Required</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">guardian_name</code><span class="s2d-badge s2d-badge-neutral">Optional</span></div>
+        <div class="d-flex justify-content-between py-1 border-bottom border-s2d"><code class="mono-code">school_code</code><span class="s2d-badge s2d-badge-neutral">Optional</span></div>
+        <div class="d-flex justify-content-between py-1"><code class="mono-code">pin</code><span class="s2d-badge s2d-badge-neutral">Defaults 1234</span></div>
         <div class="s2d-callout indigo mt-2" style="font-size:0.76rem;">
           <i data-lucide="shield-check"></i>
-          <span>Unique Student Calling Codes are assigned server-side after import confirmation.</span>
+          <span>Calling codes and student accounts are automatically provisioned on upload.</span>
         </div>
       </div>
     </div>

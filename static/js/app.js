@@ -423,41 +423,46 @@
         };
       },
 
-      'fr-commissions-table': () => ({
-        data: D.commissions,
-        selectable: false,
-        searchPlaceholder: 'Search school, billing period, or commission ID...',
-        filters: [
-          { key: 'status', label: 'Payout Status', options: ['Successful', 'Pending'] },
-          { key: 'school', label: 'School', options: ['Doon Valley Residential Academy', 'Mayo International Boarding School', 'Scindia Residential Campus'] }
-        ],
-        exportFilename: 'franchise-commission-ledger.csv',
-        columns: [
-          { key: 'id', label: 'Entry ID', render: (r) => `<span class="mono-code cell-primary">${r.id}</span>` },
-          { key: 'period', label: 'Settlement Period' },
-          { key: 'school', label: 'Assigned School', render: (r) => `<span class="cell-primary">${r.school}</span><span class="cell-sub">${r.sourceType}</span>` },
-          { key: 'grossAmount', label: 'Gross Volume', render: (r) => `<span class="mono-code">${fmtMoney(r.grossAmount)}</span>` },
-          { key: 'commissionEarned', label: 'Partner Commission', render: (r) => `<strong class="mono-code text-brand">${fmtMoney(r.commissionEarned)}</strong> <span class="text-secondary-s2d">(${r.rate})</span>` },
-          { key: 'status', label: 'Settlement', render: (r) => `${badge(r.status)}<span class="cell-sub mono-code">Payout: ${r.payoutDate}</span>` }
-        ],
-        rowActions: (r) => [
-          {
-            label: 'Commission Breakdown', icon: 'coins',
-            onClick: (row) => window.S2DModal.openDrawer({
-              eyebrow: 'COMMISSION STATEMENT · ' + row.id,
-              title: `${row.school} (${row.period})`,
-              html: `<div class="kv-grid">
-                <div><div class="kv-item-label">Ledger ID</div><div class="kv-item-value mono-code">${row.id}</div></div>
-                <div><div class="kv-item-label">Settlement Status</div><div class="kv-item-value">${badge(row.status)}</div></div>
-                <div><div class="kv-item-label">Gross Eligible Volume</div><div class="kv-item-value">${fmtMoney(row.grossAmount)}</div></div>
-                <div><div class="kv-item-label">Contracted Tier Rate</div><div class="kv-item-value">${row.rate}</div></div>
-                <div><div class="kv-item-label">Earned Commission</div><div class="kv-item-value text-brand">${fmtMoney(row.commissionEarned)}</div></div>
-                <div><div class="kv-item-label">Scheduled Payout Date</div><div class="kv-item-value mono-code">${row.payoutDate}</div></div>
-              </div>`
-            })
-          }
-        ]
-      }),
+      'fr-commissions-table': () => {
+        const commSchools = D.commissions && D.commissions.length
+          ? Array.from(new Set(D.commissions.map(c => c.school).filter(Boolean)))
+          : ['Doon Valley Residential Academy', 'Mayo International Boarding School', 'Scindia Residential Campus'];
+        return {
+          data: D.commissions,
+          selectable: false,
+          searchPlaceholder: 'Search school, billing period, or commission ID...',
+          filters: [
+            { key: 'status', label: 'Payout Status', options: ['Successful', 'Pending'] },
+            { key: 'school', label: 'School', options: commSchools }
+          ],
+          exportFilename: 'franchise-commission-ledger.csv',
+          columns: [
+            { key: 'id', label: 'Entry ID', render: (r) => `<span class="mono-code cell-primary">${r.id}</span>` },
+            { key: 'period', label: 'Settlement Period' },
+            { key: 'school', label: 'Assigned School', render: (r) => `<span class="cell-primary">${r.school}</span><span class="cell-sub">${r.sourceType}</span>` },
+            { key: 'grossAmount', label: 'Gross Volume', render: (r) => `<span class="mono-code">${fmtMoney(r.grossAmount)}</span>` },
+            { key: 'commissionEarned', label: 'Partner Commission', render: (r) => `<strong class="mono-code text-brand">${fmtMoney(r.commissionEarned)}</strong> <span class="text-secondary-s2d">(${r.rate})</span>` },
+            { key: 'status', label: 'Settlement', render: (r) => `${badge(r.status)}<span class="cell-sub mono-code">Payout: ${r.payoutDate}</span>` }
+          ],
+          rowActions: (r) => [
+            {
+              label: 'Commission Breakdown', icon: 'coins',
+              onClick: (row) => window.S2DModal.openDrawer({
+                eyebrow: 'COMMISSION STATEMENT · ' + row.id,
+                title: `${row.school} (${row.period})`,
+                html: `<div class="kv-grid">
+                  <div><div class="kv-item-label">Ledger ID</div><div class="kv-item-value mono-code">${row.id}</div></div>
+                  <div><div class="kv-item-label">Settlement Status</div><div class="kv-item-value">${badge(row.status)}</div></div>
+                  <div><div class="kv-item-label">Gross Eligible Volume</div><div class="kv-item-value">${fmtMoney(row.grossAmount)}</div></div>
+                  <div><div class="kv-item-label">Contracted Tier Rate</div><div class="kv-item-value">${row.rate}</div></div>
+                  <div><div class="kv-item-label">Earned Commission</div><div class="kv-item-value text-brand">${fmtMoney(row.commissionEarned)}</div></div>
+                  <div><div class="kv-item-label">Scheduled Payout Date</div><div class="kv-item-value mono-code">${row.payoutDate}</div></div>
+                </div>`
+              })
+            }
+          ]
+        };
+      },
 
       /* --- SCHOOL ADMIN TABLES (SCOPED TO OAKRIDGE SCH-1001 OR CURRENT SCHOOL) --- */
       'sch-students-table': () => {

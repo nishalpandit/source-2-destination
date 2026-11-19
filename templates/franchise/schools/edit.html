@@ -49,7 +49,15 @@
               <div class="col-md-4 s2d-field"><label class="s2d-label">Principal Email <span class="req-star">*</span></label><input type="email" name="adminEmail" class="s2d-input" value="{{ school.admin_email }}" required></div>
               <div class="col-md-4 s2d-field"><label class="s2d-label">Campus Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required></div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Contact / Chief Warden</label><input type="text" name="secondary_contact_name" class="s2d-input" value="{{ school.secondary_contact_name }}"></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Daily Call Cap (Minutes)</label><input type="number" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="{{ school.daily_duration_cap }}"></div>
+              <div class="col-md-3 s2d-field"><label class="s2d-label">Student Seats</label><input type="number" name="student_seats" class="s2d-input" value="{{ school.student_seats|default:400 }}"></div>
+              <div class="col-md-3 s2d-field"><label class="s2d-label">Daily Call Cap (Minutes)</label><input type="number" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="{{ school.daily_duration_cap }}"></div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Android Kiosk Group Tag</label><input type="text" name="kiosk_group_tag" class="s2d-input mono-code" value="{{ school.kiosk_group_tag|default:'AE-HOSTEL-BOOTH' }}"></div>
+              <div class="col-md-6 s2d-field d-flex align-items-center pt-3">
+                <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
+                  <input type="checkbox" name="emergency_calling_allowed" class="s2d-checkbox" {% if school.emergency_calling_allowed %}checked{% endif %}>
+                  <span>Enable 24/7 Emergency Outbound Calling Bypass</span>
+                </label>
+              </div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="details.html?id={{ school.code }}" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Details</span></button></div></div>
           </form>

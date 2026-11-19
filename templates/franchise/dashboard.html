@@ -52,7 +52,7 @@
               </div>
               <div class="stat-card-value">₹{{ earned_commission|default:"2,24,805.60" }}</div>
               <div class="stat-card-meta">
-                <span>₹38.4k pending payout</span>
+                <span>₹{{ pending_commission|default:"38,420.00" }} pending payout</span>
               </div>
             </div>
           </div>
@@ -148,6 +148,11 @@
   <script src="{% static 'js/sidebar.js' %}"></script>
   <script src="{% static 'js/tables.js' %}"></script>
   <script src="{% static 'js/forms.js' %}"></script>
+  <script>
+    if ({{ franchise_charts_json|safe }}) {
+      window.S2D_FRANCHISE_CHARTS = {{ franchise_charts_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>

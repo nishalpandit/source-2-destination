@@ -68,6 +68,15 @@
   <script src="{% static 'js/sidebar.js' %}"></script>
   <script src="{% static 'js/tables.js' %}"></script>
   <script src="{% static 'js/forms.js' %}"></script>
+  <script>
+    window.S2D_DEMO = window.S2D_DEMO || {};
+    if ({{ students_json|safe }}) {
+      window.S2D_DEMO.students = {{ students_json|safe }};
+    }
+    if ({{ recharges_json|safe }}) {
+      window.S2D_DEMO.recharges = {{ recharges_json|safe }};
+    }
+  </script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>

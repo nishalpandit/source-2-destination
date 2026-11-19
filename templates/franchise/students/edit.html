@@ -50,8 +50,12 @@
                   <option value="Suspended" {% if student.status == 'Suspended' %}selected{% endif %}>Suspended</option>
                 </select>
               </div>
+              <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Name</label><input type="text" name="guardianName" class="s2d-input" value="{{ student.guardian_name }}"></div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Guardian Phone <span class="req-star">*</span></label><input type="tel" name="primaryPhone" class="s2d-input" data-bind-field="primaryPhone" data-validate-phone="true" value="{{ student.primary_phone }}" required></div>
-              <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Guardian Phone</label><input type="tel" name="secondaryPhone" class="s2d-input" data-bind-field="secondaryPhone" value="{{ student.secondary_phone }}"></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Secondary Guardian Phone</label><input type="tel" name="secondaryPhone" class="s2d-input" data-bind-field="secondaryPhone" value="{{ student.secondary_phone }}"></div>
+              <div class="col-md-4 s2d-field"><label class="s2d-label">Date of Birth</label><input type="date" name="date_of_birth" class="s2d-input" value="{{ student.date_of_birth|date:'Y-m-d'|default:'' }}"></div>
+              <div class="col-md-2 s2d-field"><label class="s2d-label">Kiosk PIN</label><input type="text" name="pin" class="s2d-input mono-code" value="{{ student.pin|default:'1234' }}" maxlength="6"></div>
+              <div class="col-md-2 s2d-field"><label class="s2d-label">Prepaid Balance (₹)</label><input type="number" name="wallet_balance" class="s2d-input" value="{{ student.wallet_balance|default:'50.00' }}" step="10"></div>
             </div>
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="details.html?id={{ student.code }}" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Update Student</span></button></div></div>
           </form>

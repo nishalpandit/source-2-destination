@@ -2,7 +2,10 @@ from datetime import timedelta
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .models import School, Student, Guardian, HostelWarden, KioskDevice, DeviceAssignment, CallRecord, AcademicClass, ClassSection
+from .models import (
+    School, Student, Guardian, HostelWarden, KioskDevice, DeviceAssignment,
+    CallRecord, AcademicClass, ClassSection, Franchise, StudentRecharge, RechargePlan
+)
 
 
 class SchoolAdminFlowchartTests(TestCase):
@@ -595,3 +598,232 @@ class SchoolAdminFlowchartTests(TestCase):
         self.assertTrue(self.school.display_school_caller_id)
         self.assertTrue(self.school.show_guardian_whitelist_numbers)
         self.assertTrue(self.school.notify_sms_guardians)
+
+
+class FranchisePortalTests(TestCase):
+    """
+    Automated integration test suite verifying Franchise Partner Portal
+    functionality, dynamic database binding, commissions ledger,
+    transactions, regional call telemetry, bulk upload, reports, and settings.
+    """
+
+    def setUp(self):
+        self.user, _ = User.objects.get_or_create(username='franchise', defaults={'email': 'partner@northedunet.in'})
+        self.user.set_password('12345')
+        self.user.save()
+
+        self.franchise, _ = Franchise.objects.get_or_create(
+            code='FRN-101',
+            defaults={
+                'name': 'North India EduNet Partners',
+                'partner_contact': 'Vikramaditya Singhania',
+                'email': 'v.singhania@northedunet.in',
+                'phone': '+91 98101 44550',
+                'commission_rate': 18.00,
+                'territory': 'Northern Region',
+                'status': 'Active'
+            }
+        )
+
+        self.school, _ = School.objects.get_or_create(
+            code='SCH-1001',
+            defaults={
+                'name': 'Doon Valley Residential Academy',
+                'city': 'Dehradun',
+                'state': 'Uttarakhand',
+                'franchise': self.franchise,
+                'admin_name': 'Dr. Sharma',
+                'admin_email': 'admin@doonvalley.edu.in',
+                'admin_phone': '+91 98101 23456',
+                'student_seats': 400,
+                'enrolled_students': 350,
+                'active_students': 340,
+                'daily_duration_cap': 15,
+                'status': 'Active'
+            }
+        )
+        if self.school.franchise != self.franchise:
+            self.school.franchise = self.franchise
+            self.school.save(update_fields=['franchise'])
+
+        self.student, _ = Student.objects.get_or_create(
+            code='STU-4001',
+            defaults={
+                'calling_code': 'S2D-SCH-8801',
+                'name': 'Aarav Sharma',
+                'gender': 'Male',
+                'school': self.school,
+                'class_name': 'Grade 10',
+                'section': 'Section A',
+                'guardian_name': 'Rajesh Sharma',
+                'primary_phone': '+919810123456',
+                'pin': '1234',
+                'wallet_balance': 50.00,
+                'remaining_minutes': 120,
+                'daily_limit_min': 15,
+                'status': 'Active'
+            }
+        )
+
+        self.recharge = StudentRecharge.objects.create(
+            recharge_id='RCG-TEST-001',
+            student=self.student,
+            school=self.school,
+            plan_name_cache='Term Calling Pack',
+            amount=1000.00,
+            minutes_added=150,
+            validity_days_added=30,
+            payment_mode='Campus Bursar Desk',
+            voucher_ref='VCH-99881',
+            status='Successful'
+        )
+
+        self.call = CallRecord.objects.create(
+            call_id='CAL-TEST-001',
+            school=self.school,
+            student=self.student,
+            destination_number='+919810123456',
+            call_type='Father',
+            duration_seconds=180,
+            minutes_deducted=3,
+            call_status='Completed'
+        )
+
+        self.client = Client()
+        self.client.login(username='franchise', password='12345')
+
+    def test_franchise_dashboard(self):
+        resp = self.client.get('/franchise/dashboard.html')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'North India EduNet Partners')
+        self.assertContains(resp, 'window.S2D_FRANCHISE_CHARTS')
+
+    def test_franchise_commissions_ledger(self):
+        resp = self.client.get('/franchise/commissions/index.html')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Revenue &amp; Commission Management')
+        self.assertContains(resp, 'window.S2D_DEMO.commissions')
+        self.assertContains(resp, 'window.S2D_FRANCHISE_CHARTS')
+
+    def test_franchise_transactions_history(self):
+        resp = self.client.get('/franchise/transactions/index.html')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Franchise Payment &amp; Transaction History')
+        self.assertContains(resp, 'window.S2D_DEMO.transactions')
+
+    def test_franchise_call_history(self):
+        resp = self.client.get('/franchise/call-history/index.html')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'Assigned-School Call History')
+        self.assertContains(resp, 'window.S2D_DEMO.callHistory')
+
+    def test_franchise_bulk_upload_flow(self):
+        page_resp = self.client.get('/franchise/bulk-upload/')
+        self.assertEqual(page_resp.status_code, 200)
+
+        sample_resp = self.client.get('/franchise/bulk-upload/sample.csv')
+        self.assertEqual(sample_resp.status_code, 200)
+        self.assertIn(b'student_full_name', sample_resp.content)
+
+        # Upload a test CSV
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        csv_content = (
+            "student_full_name,class_grade,section,father_authorized_phone,guardian_name,gender,pin,school_code\n"
+            "Ananya Sen,Grade 10,Section B,+919811122334,Priya Sen,Female,4321,SCH-1001\n"
+        ).encode('utf-8')
+        upload_file = SimpleUploadedFile("students.csv", csv_content, content_type="text/csv")
+
+        post_resp = self.client.post('/franchise/bulk-upload/index.html', {
+            'school_id': self.school.code,
+            'spreadsheet': upload_file
+        })
+        self.assertEqual(post_resp.status_code, 200)
+        self.assertTrue(Student.objects.filter(name='Ananya Sen', school=self.school).exists())
+
+    def test_franchise_reports_and_export(self):
+        resp = self.client.get('/franchise/reports/index.html')
+        self.assertEqual(resp.status_code, 200)
+        self.assertContains(resp, 'window.S2D_DEMO.schools')
+
+        csv_resp = self.client.get('/franchise/reports/export.csv')
+        self.assertEqual(csv_resp.status_code, 200)
+        self.assertIn(b'School Code', csv_resp.content)
+        self.assertIn(b'Doon Valley Residential Academy', csv_resp.content)
+
+    def test_franchise_settings_update(self):
+        get_resp = self.client.get('/franchise/settings/index.html')
+        self.assertEqual(get_resp.status_code, 200)
+
+        post_resp = self.client.post('/franchise/settings/index.html', {
+            'name': 'North India EduNet Holdings',
+            'partner_contact': 'V. Singhania',
+            'email': 'director@northedunet.in',
+            'phone': '+91 98101 99999',
+            'territory': 'Northern & North-Eastern Region'
+        })
+        self.assertEqual(post_resp.status_code, 200)
+
+        self.franchise.refresh_from_db()
+        self.assertEqual(self.franchise.name, 'North India EduNet Holdings')
+        self.assertEqual(self.franchise.partner_contact, 'V. Singhania')
+        self.assertEqual(self.franchise.email, 'director@northedunet.in')
+
+    def test_franchise_student_pin_dob_wallet_crud(self):
+        # Create student with PIN and DOB
+        add_resp = self.client.post('/franchise/students/add.html', {
+            'school': self.school.code,
+            'name': 'Kavya Mehra',
+            'className': 'Grade 11',
+            'section': 'Section B',
+            'guardianName': 'Suresh Mehra',
+            'primaryPhone': '+919876543210',
+            'pin': '7788',
+            'date_of_birth': '2008-06-15',
+            'wallet_balance': '150.00'
+        })
+        self.assertEqual(add_resp.status_code, 302)
+
+        stu = Student.objects.filter(name='Kavya Mehra').first()
+        self.assertIsNotNone(stu)
+        self.assertEqual(stu.pin, '7788')
+        self.assertEqual(str(stu.date_of_birth), '2008-06-15')
+        self.assertEqual(float(stu.wallet_balance), 150.00)
+
+        # Edit student
+        edit_resp = self.client.post(f'/franchise/students/edit.html?id={stu.code}', {
+            'name': 'Kavya Mehra (Honors)',
+            'className': 'Grade 11',
+            'section': 'Section A',
+            'primaryPhone': '+919876543210',
+            'pin': '9900',
+            'date_of_birth': '2008-06-16',
+            'wallet_balance': '200.00',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+
+        stu.refresh_from_db()
+        self.assertEqual(stu.name, 'Kavya Mehra (Honors)')
+        self.assertEqual(stu.pin, '9900')
+        self.assertEqual(str(stu.date_of_birth), '2008-06-16')
+        self.assertEqual(float(stu.wallet_balance), 200.00)
+
+    def test_franchise_school_emergency_settings(self):
+        edit_resp = self.client.post(f'/franchise/schools/edit.html?id={self.school.code}', {
+            'name': 'Doon Valley Residential Academy (Main Campus)',
+            'city': 'Dehradun',
+            'state': 'Uttarakhand',
+            'adminName': 'Dr. Sharma',
+            'adminEmail': 'admin@doonvalley.edu.in',
+            'phone': '+91 98101 23456',
+            'daily_duration_cap': 25,
+            'kiosk_group_tag': 'AE-BOOTH-DORM-NORTH',
+            'emergency_calling_allowed': 'on'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+
+        self.school.refresh_from_db()
+        self.assertEqual(self.school.name, 'Doon Valley Residential Academy (Main Campus)')
+        self.assertEqual(self.school.daily_duration_cap, 25)
+        self.assertEqual(self.school.kiosk_group_tag, 'AE-BOOTH-DORM-NORTH')
+        self.assertTrue(self.school.emergency_calling_allowed)

@@ -161,10 +161,10 @@
 
 <div class="sidebar-footer">
   <div class="sidebar-user-card">
-    <div class="sidebar-user-avatar">{% if request.user.is_authenticated and request.user.first_name %}{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1"|default:"" }}{% else %}VS{% endif %}</div>
+    <div class="sidebar-user-avatar">{% if request.user.is_authenticated and request.user.first_name %}{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1"|default:"" }}{% elif franchise.partner_contact %}{{ franchise.partner_contact|slice:":2"|upper }}{% else %}FP{% endif %}</div>
     <div class="sidebar-user-meta">
-      <div class="sidebar-user-name">{% if request.user.is_authenticated and request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}Vikramaditya Singhania{% endif %}</div>
-      <div class="sidebar-user-email">{% if request.user.is_authenticated and request.user.email %}{{ request.user.email }}{% else %}v.singhania@northedunet.in{% endif %}</div>
+      <div class="sidebar-user-name">{% if request.user.is_authenticated and request.user.get_full_name %}{{ request.user.get_full_name }}{% elif franchise.partner_contact %}{{ franchise.partner_contact }}{% else %}{{ franchise.name|default:"Franchise Partner" }}{% endif %}</div>
+      <div class="sidebar-user-email">{% if request.user.is_authenticated and request.user.email %}{{ request.user.email }}{% elif franchise.email %}{{ franchise.email }}{% else %}partner@s2d.network{% endif %}</div>
     </div>
     <a href="/logout/" class="sidebar-logout-btn" title="Sign out">
       <i data-lucide="log-out" style="width:16px;height:16px;"></i>

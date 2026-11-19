@@ -302,10 +302,11 @@
     /* ==================== FRANCHISE CHARTS ==================== */
     'fr-revenue-chart': {
       build: (range, viewType) => {
+        const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.revenue) || null;
         const type = viewType || 'bar';
-        const cats = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-        const gross = [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450];
-        const comm = [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501];
+        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+        const gross = dyn && dyn.gross && dyn.gross.length ? dyn.gross : [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450];
+        const comm = dyn && dyn.commission && dyn.commission.length ? dyn.commission : [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501];
 
         if (type === 'area') {
           return Object.assign(baseChartOptions('area', 275), {
@@ -350,87 +351,113 @@
     },
 
     'fr-commission-bar': {
-      build: () => Object.assign(baseChartOptions('bar', 265), {
-        colors: [PALETTE.teal, PALETTE.amber],
-        plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
-        series: [
-          { name: 'Settled Commission', data: [22100, 23900, 25800, 27400, 29100, 32580] },
-          { name: 'Pending Settlement', data: [0, 0, 0, 0, 1800, 34200] }
-        ],
-        xaxis: { categories: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
-        tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
-      })
+      build: () => {
+        const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.commissionBar) || null;
+        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+        const settled = dyn && dyn.settled && dyn.settled.length ? dyn.settled : [22100, 23900, 25800, 27400, 29100, 32580];
+        const pending = dyn && dyn.pending && dyn.pending.length ? dyn.pending : [0, 0, 0, 0, 1800, 34200];
+        return Object.assign(baseChartOptions('bar', 265), {
+          colors: [PALETTE.teal, PALETTE.amber],
+          plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
+          series: [
+            { name: 'Settled Commission', data: settled },
+            { name: 'Pending Settlement', data: pending }
+          ],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } },
+          tooltip: { y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
+        });
+      }
     },
 
     'fr-school-students-bar': {
-      build: () => Object.assign(baseChartOptions('bar', 275), {
-        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
-        plotOptions: {
-          bar: {
-            borderRadius: 6,
-            horizontal: true,
-            barHeight: '56%',
-            distributed: true
-          }
-        },
-        series: [{
-          name: 'Enrolled Boarders',
-          data: [790, 684, 512, 430, 345]
-        }],
-        xaxis: {
-          categories: ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'],
-          axisBorder: { show: false },
-          axisTicks: { show: false },
-          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
-        },
-        legend: { show: false },
-        tooltip: { y: { formatter: (v) => v + ' Students' } }
-      })
+      build: () => {
+        const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.schoolStudents) || null;
+        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'];
+        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [790, 684, 512, 430, 345];
+        return Object.assign(baseChartOptions('bar', 275), {
+          colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              horizontal: true,
+              barHeight: '56%',
+              distributed: true
+            }
+          },
+          series: [{
+            name: 'Enrolled Boarders',
+            data: data
+          }],
+          xaxis: {
+            categories: cats,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+          },
+          legend: { show: false },
+          tooltip: { y: { formatter: (v) => v + ' Students' } }
+        });
+      }
     },
 
     'fr-school-students-donut': {
       // Modern bar chart replacing oval donut
-      build: () => Object.assign(baseChartOptions('bar', 275), {
-        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
-        plotOptions: {
-          bar: {
-            borderRadius: 6,
-            horizontal: true,
-            barHeight: '56%',
-            distributed: true
-          }
-        },
-        series: [{
-          name: 'Enrolled Boarders',
-          data: [790, 684, 512, 430, 345]
-        }],
-        xaxis: {
-          categories: ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'],
-          axisBorder: { show: false },
-          axisTicks: { show: false },
-          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
-        },
-        legend: { show: false },
-        tooltip: { y: { formatter: (v) => v + ' Students' } }
-      })
+      build: () => {
+        const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.schoolStudents) || null;
+        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'];
+        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [790, 684, 512, 430, 345];
+        return Object.assign(baseChartOptions('bar', 275), {
+          colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              horizontal: true,
+              barHeight: '56%',
+              distributed: true
+            }
+          },
+          series: [{
+            name: 'Enrolled Boarders',
+            data: data
+          }],
+          xaxis: {
+            categories: cats,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+          },
+          legend: { show: false },
+          tooltip: { y: { formatter: (v) => v + ' Students' } }
+        });
+      }
     },
 
     'fr-calling-usage-line': {
-      build: () => Object.assign(baseChartOptions('bar', 255), {
-        colors: [PALETTE.indigo],
-        plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
-        series: [{ name: 'Territory Calling Minutes', data: [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940] }],
-        xaxis: { categories: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
-      })
+      build: () => {
+        const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.callingUsage) || null;
+        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'];
+        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940];
+        return Object.assign(baseChartOptions('bar', 255), {
+          colors: [PALETTE.indigo],
+          plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
+          series: [{ name: 'Territory Calling Minutes', data: data }],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
+        });
+      }
     },
 
     'fr-recharge-trend': {
-      build: () => Object.assign(baseChartOptions('bar', 255), {
-        colors: [PALETTE.emerald],
-        plotOptions: { bar: { borderRadius: 5, columnWidth: '46%' } },
-        series: [{ name: 'Completed Recharges', data: [142, 158, 165, 189, 204, 218, 246] }],
-        xaxis: { categories: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
-      })
+      build: () => {
+        const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.rechargesTrend) || null;
+        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
+        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [142, 158, 165, 189, 204, 218, 246];
+        return Object.assign(baseChartOptions('bar', 255), {
+          colors: [PALETTE.emerald],
+          plotOptions: { bar: { borderRadius: 5, columnWidth: '46%' } },
+          series: [{ name: 'Completed Recharges', data: data }],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+        });
+      }
     },
 
     /* ==================== SCHOOL ADMIN CHARTS ==================== */
