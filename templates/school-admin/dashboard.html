@@ -124,11 +124,12 @@
               <div class="chart-card-header">
                 <div>
                   <h2 class="chart-card-title">Daily Calls</h2>
-                  <p class="chart-card-subtitle">Completed vs blocked calls over the last 7 days</p>
+                  <p class="chart-card-subtitle" id="sch-daily-calls-subtitle">Completed vs blocked calls over the last 30 days</p>
                 </div>
                 <div class="chart-range-group">
-                  <button type="button" class="chart-range-btn active" data-chart-target="sch-daily-calls" data-view="bar" title="Column View">Bars</button>
-                  <button type="button" class="chart-range-btn" data-chart-target="sch-daily-calls" data-view="area" title="Trend View">Trend</button>
+                  <button type="button" class="chart-range-btn active" data-chart-target="sch-daily-calls" data-range="30D" title="Last 30 Days">30 Days</button>
+                  <button type="button" class="chart-range-btn" data-chart-target="sch-daily-calls" data-range="6M" title="Last 6 Months">6 Months</button>
+                  <button type="button" class="chart-range-btn" data-chart-target="sch-daily-calls" data-range="12M" title="Last 12 Months">12 Months</button>
                 </div>
               </div>
               <div class="chart-card-body">

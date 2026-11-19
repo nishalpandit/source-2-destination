@@ -3,7 +3,7 @@ import io
 import csv
 import random
 import json
-from datetime import timedelta
+from datetime import date, timedelta
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.template.loader import get_template
@@ -104,24 +104,99 @@ def dashboard(request):
     wardens_on_duty_count = HostelWarden.objects.filter(school=school, status='On Duty').count() if school else 0
     recent_wardens = HostelWarden.objects.filter(school=school).order_by('status', 'name')[:4] if school else []
 
-    # Live Chart 1: Last 7 Days Calling Traffic & Window Compliance
-    daily_labels = []
-    daily_completed = []
-    daily_restricted = []
-    for offset in range(6, -1, -1):
+    # Live Chart 1: Multi-Range Calling Traffic (30 Days, 6 Months, 12 Months)
+    year_ago = today - timedelta(days=366)
+    calls_year = list(
+        CallRecord.objects.filter(school=school, start_time__date__gte=year_ago)
+        .values('start_time', 'call_status')
+    ) if school else []
+
+    restricted_statuses = {'Restricted Schedule', 'Unauthorized Number', 'Insufficient Credits'}
+
+    # 1. 30 Days (Daily)
+    day_map_completed = {}
+    day_map_restricted = {}
+    for r in calls_year:
+        st = r['start_time']
+        d = st.date() if hasattr(st, 'date') else st
+        if r['call_status'] == 'Completed':
+            day_map_completed[d] = day_map_completed.get(d, 0) + 1
+        elif r['call_status'] in restricted_statuses:
+            day_map_restricted[d] = day_map_restricted.get(d, 0) + 1
+
+    labels_30d = []
+    completed_30d = []
+    restricted_30d = []
+    for offset in range(29, -1, -1):
         day = today - timedelta(days=offset)
-        day_qs = CallRecord.objects.filter(school=school, start_time__date=day) if school else CallRecord.objects.none()
-        daily_labels.append('Today' if offset == 0 else day.strftime('%a'))
-        daily_completed.append(day_qs.filter(call_status='Completed').count())
-        daily_restricted.append(
-            day_qs.filter(call_status__in=['Restricted Schedule', 'Unauthorized Number', 'Insufficient Credits']).count()
-        )
+        labels_30d.append('Today' if offset == 0 else day.strftime('%b %d'))
+        completed_30d.append(day_map_completed.get(day, 0))
+        restricted_30d.append(day_map_restricted.get(day, 0))
+
+    # 2. 6 Months (Monthly)
+    labels_6m = []
+    completed_6m = []
+    restricted_6m = []
+    for m_offset in range(5, -1, -1):
+        tot = today.year * 12 + today.month - 1 - m_offset
+        yr = tot // 12
+        mo = (tot % 12) + 1
+        labels_6m.append(date(yr, mo, 1).strftime('%b'))
+        c_count = 0
+        r_count = 0
+        for r in calls_year:
+            st = r['start_time']
+            if st.year == yr and st.month == mo:
+                if r['call_status'] == 'Completed':
+                    c_count += 1
+                elif r['call_status'] in restricted_statuses:
+                    r_count += 1
+        completed_6m.append(c_count)
+        restricted_6m.append(r_count)
+
+    # 3. 12 Months (Monthly)
+    labels_12m = []
+    completed_12m = []
+    restricted_12m = []
+    for m_offset in range(11, -1, -1):
+        tot = today.year * 12 + today.month - 1 - m_offset
+        yr = tot // 12
+        mo = (tot % 12) + 1
+        labels_12m.append(date(yr, mo, 1).strftime('%b'))
+        c_count = 0
+        r_count = 0
+        for r in calls_year:
+            st = r['start_time']
+            if st.year == yr and st.month == mo:
+                if r['call_status'] == 'Completed':
+                    c_count += 1
+                elif r['call_status'] in restricted_statuses:
+                    r_count += 1
+        completed_12m.append(c_count)
+        restricted_12m.append(r_count)
 
     daily_calls_chart = {
-        "labels": daily_labels,
-        "completed": daily_completed,
-        "restricted": daily_restricted,
-        "hasData": any(daily_completed) or any(daily_restricted),
+        "ranges": {
+            "30D": {
+                "labels": labels_30d,
+                "completed": completed_30d,
+                "restricted": restricted_30d,
+            },
+            "6M": {
+                "labels": labels_6m,
+                "completed": completed_6m,
+                "restricted": restricted_6m,
+            },
+            "12M": {
+                "labels": labels_12m,
+                "completed": completed_12m,
+                "restricted": restricted_12m,
+            }
+        },
+        "labels": labels_30d,
+        "completed": completed_30d,
+        "restricted": restricted_30d,
+        "hasData": bool(calls_year),
     }
 
     # Live Chart 2: 30-Day Class-wise Voice Usage Breakdown
