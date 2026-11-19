@@ -1020,6 +1020,51 @@ class SuperAdminCitadelBackendTests(TestCase):
         det_resp = self.client.get(f'/super-admin/school-admins/details.html?id={profile.admin_id}')
         self.assertEqual(det_resp.status_code, 200)
 
+    def test_phase1b_franchise_partners_workflow(self):
+        # 1. Partner Directory
+        resp = self.client.get('/super-admin/franchises/')
+        self.assertEqual(resp.status_code, 200)
+
+        # 2. Onboard Franchise Partner
+        add_resp = self.client.post('/super-admin/franchises/add.html', {
+            'name': 'Eastern Horizon Edunet',
+            'code': 'FRN-EAST-01',
+            'partner_contact': 'Subhashish Banerjee',
+            'email': 's.banerjee@easternedunet.in',
+            'phone': '+91 98301 99887',
+            'territory': 'Eastern Region (West Bengal & Odisha)',
+            'commission_rate': '17.50',
+            'status': 'Active'
+        })
+        self.assertEqual(add_resp.status_code, 302)
+
+        from .models import Franchise
+        frn = Franchise.objects.filter(code='FRN-EAST-01').first()
+        self.assertIsNotNone(frn)
+        self.assertEqual(frn.name, 'Eastern Horizon Edunet')
+        self.assertEqual(frn.partner_contact, 'Subhashish Banerjee')
+        self.assertEqual(float(frn.commission_rate), 17.50)
+
+        # 3. Edit Franchise
+        edit_resp = self.client.post(f'/super-admin/franchises/edit.html?id={frn.code}', {
+            'id': frn.code,
+            'name': 'Eastern Horizon Edunet Pvt Ltd',
+            'partner_contact': 'Subhashish Banerjee (MD)',
+            'email': 's.banerjee@easternedunet.in',
+            'phone': '+91 98301 99887',
+            'territory': 'Eastern Region & North East Corridor',
+            'commission_rate': '18.00',
+            'status': 'Active'
+        })
+        self.assertEqual(edit_resp.status_code, 302)
+        frn.refresh_from_db()
+        self.assertEqual(frn.name, 'Eastern Horizon Edunet Pvt Ltd')
+        self.assertEqual(float(frn.commission_rate), 18.00)
+
+        # 4. Details 360 inspection
+        det_resp = self.client.get(f'/super-admin/franchises/details.html?id={frn.code}')
+        self.assertEqual(det_resp.status_code, 200)
+
     def test_phase2_devices_workflow(self):
         # 1. Device list
         resp = self.client.get('/super-admin/devices/')

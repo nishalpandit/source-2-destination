@@ -520,6 +520,179 @@ def recharge_history(request):
 
 
 # ==============================================================================
+# DIVISION II — PHASE 1B: FRANCHISE PARTNERS & TERRITORY FLEET (franchises/)
+# ==============================================================================
+
+def franchises_list(request):
+    """
+    Super Admin: Fleet-wide Regional Franchise Partners Directory & Overview.
+    """
+    franchises_qs = Franchise.objects.all().order_by('name')
+    total_franchises = franchises_qs.count()
+    active_franchises = franchises_qs.filter(status='Active').count()
+    total_schools = School.objects.filter(franchise__isnull=False).count()
+
+    franchises_data = []
+    for f in franchises_qs:
+        assigned_schools_count = f.schools.count()
+        enrolled_students_count = Student.objects.filter(school__franchise=f).count()
+        franchises_data.append({
+            "id": f.code,
+            "pk": f.id,
+            "name": f.name,
+            "code": f.code,
+            "partnerContact": f.partner_contact,
+            "email": f.email,
+            "phone": f.phone,
+            "territory": f.territory,
+            "commissionRate": float(f.commission_rate),
+            "assignedSchools": assigned_schools_count,
+            "enrolledStudents": enrolled_students_count,
+            "status": f.status,
+            "createdDate": f.created_at.strftime("%Y-%m-%d") if f.created_at else "2026-01-01"
+        })
+
+    context = {
+        "franchises": franchises_qs,
+        "franchises_json": json.dumps(franchises_data),
+        "total_franchises": total_franchises,
+        "active_franchises": active_franchises,
+        "total_schools": total_schools,
+    }
+    return render(request, 'super-admin/franchises/list.html', context)
+
+
+def franchise_add(request):
+    """
+    Super Admin: Onboard a new Regional Franchise Partner & Territory License.
+    """
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        code = request.POST.get('code', '').strip().upper()
+        partner_contact = request.POST.get('partner_contact', '').strip()
+        email = request.POST.get('email', '').strip()
+        phone = request.POST.get('phone', '').strip()
+        territory = request.POST.get('territory', '').strip()
+        commission_rate = request.POST.get('commission_rate', '15.00').strip()
+        status = request.POST.get('status', 'Active')
+
+        if not code:
+            code = f"FRN-{Franchise.objects.count() + 101}"
+
+        franchise = Franchise.objects.create(
+            code=code,
+            name=name,
+            partner_contact=partner_contact,
+            email=email,
+            phone=phone,
+            territory=territory,
+            commission_rate=float(commission_rate) if commission_rate else 15.00,
+            status='Active' if status in ['Active', 'active'] else 'Suspended'
+        )
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="CREATE",
+            domain="Franchise",
+            target_id=franchise.code,
+            description=f"Onboarded regional franchise partner: {name} ({code}) covering {territory}"
+        )
+        return redirect('/super-admin/franchises/list.html')
+
+    return render(request, 'super-admin/franchises/add.html')
+
+
+def franchise_edit(request):
+    """
+    Super Admin: Edit Franchise Partner details, territory boundary & commission %.
+    """
+    target_id = request.GET.get('id', '') or request.POST.get('id', '')
+    franchise = Franchise.objects.filter(Q(code=target_id) | Q(pk=target_id if target_id.isdigit() else 0)).first()
+    if not franchise:
+        franchise = Franchise.objects.first()
+
+    if request.method == 'POST' and franchise:
+        franchise.name = request.POST.get('name', franchise.name).strip()
+        franchise.partner_contact = request.POST.get('partner_contact', franchise.partner_contact).strip()
+        franchise.email = request.POST.get('email', franchise.email).strip()
+        franchise.phone = request.POST.get('phone', franchise.phone).strip()
+        franchise.territory = request.POST.get('territory', franchise.territory).strip()
+
+        comm_val = request.POST.get('commission_rate', '')
+        if comm_val:
+            try:
+                franchise.commission_rate = float(comm_val)
+            except ValueError:
+                pass
+
+        status = request.POST.get('status', franchise.status)
+        franchise.status = 'Active' if status in ['Active', 'active'] else 'Suspended'
+        franchise.save()
+
+        log_admin_action(
+            actor="Super Admin",
+            action_type="UPDATE",
+            domain="Franchise",
+            target_id=franchise.code,
+            description=f"Updated franchise profile & commission rate for {franchise.name}"
+        )
+        return redirect('/super-admin/franchises/list.html')
+
+    franchise_dict = {
+        "id": franchise.code if franchise else "FRN-101",
+        "name": franchise.name if franchise else "North India EduNet Partners",
+        "partnerContact": franchise.partner_contact if franchise else "Vikramaditya Singhania",
+        "email": franchise.email if franchise else "v.singhania@northedunet.in",
+        "phone": franchise.phone if franchise else "+91 98101 22334",
+        "territory": franchise.territory if franchise else "North India Boarding Corridor",
+        "commissionRate": float(franchise.commission_rate) if franchise else 18.00,
+        "status": franchise.status if franchise else "Active"
+    }
+
+    context = {
+        "franchise": franchise,
+        "franchise_json": json.dumps(franchise_dict),
+    }
+    return render(request, 'super-admin/franchises/edit.html', context)
+
+
+def franchise_details(request):
+    """
+    Super Admin: Franchise 360° Territory Performance, Schools & Commission Ledger.
+    """
+    target_id = request.GET.get('id', '')
+    franchise = Franchise.objects.filter(Q(code=target_id) | Q(pk=target_id if target_id.isdigit() else 0)).first()
+    if not franchise:
+        franchise = Franchise.objects.first()
+
+    assigned_schools = franchise.schools.all().order_by('name') if franchise else []
+    total_students = Student.objects.filter(school__franchise=franchise).count() if franchise else 0
+    recent_transactions = FinancialTransaction.objects.filter(franchise=franchise).order_by('-created_at')[:20] if franchise else []
+
+    franchise_dict = {
+        "id": franchise.code if franchise else "FRN-101",
+        "name": franchise.name if franchise else "North India EduNet Partners",
+        "partnerContact": franchise.partner_contact if franchise else "Vikramaditya Singhania",
+        "email": franchise.email if franchise else "v.singhania@northedunet.in",
+        "phone": franchise.phone if franchise else "+91 98101 22334",
+        "territory": franchise.territory if franchise else "North India Boarding Corridor",
+        "commissionRate": float(franchise.commission_rate) if franchise else 18.00,
+        "status": franchise.status if franchise else "Active",
+        "schoolsCount": len(assigned_schools),
+        "studentsCount": total_students
+    }
+
+    context = {
+        "franchise": franchise,
+        "franchise_json": json.dumps(franchise_dict),
+        "assigned_schools": assigned_schools,
+        "total_students": total_students,
+        "recent_transactions": recent_transactions,
+    }
+    return render(request, 'super-admin/franchises/details.html', context)
+
+
+# ==============================================================================
 # DIVISION II — PHASE 1: CAMPUS PRINCIPALS & ADMINISTRATOR FLEET (school-admins/)
 # ==============================================================================
 

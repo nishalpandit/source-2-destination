@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Franchise Details — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/tables.css' %}">
+  <link rel="stylesheet" href="{% static 'css/charts.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/franchises/details.html" data-section="Franchise Partners" data-page-title="Franchise Territory Details">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <!-- Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0D9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Territory 360° Inspection &amp; Performance</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <a href="list.html" class="btn-s2d btn-s2d-secondary">
+              <i data-lucide="arrow-left"></i>
+              <span>Back to Directory</span>
+            </a>
+            <a href="edit.html?id={{ franchise.code }}" class="btn-s2d btn-s2d-primary">
+              <i data-lucide="pencil"></i>
+              <span>Edit Franchise</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Hero Identity Banner -->
+        <div class="s2d-card mb-4" style="background: linear-gradient(135deg, rgba(13,148,136,0.06), rgba(79,70,229,0.03));">
+          <div class="s2d-card-body p-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+              <div class="d-flex align-items-center gap-3">
+                <div style="width:52px;height:52px;border-radius:12px;background:#0D9488;color:#FFF;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.25rem;">
+                  {{ franchise.name|slice:":2"|upper }}
+                </div>
+                <div>
+                  <div class="d-flex align-items-center gap-2">
+                    <h2 class="h2-s2d mb-0" style="font-size:1.35rem;">{{ franchise.name }}</h2>
+                    <span class="badge-s2d {% if franchise.status == 'Active' %}badge-s2d-success{% else %}badge-s2d-danger{% endif %}">{{ franchise.status }}</span>
+                  </div>
+                  <div class="text-secondary-s2d mt-1" style="font-size:0.83rem;">
+                    <span class="mono-code" style="font-weight:600;">{{ franchise.code }}</span> &bull; 
+                    <span>{{ franchise.territory }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-4">
+                <div class="text-end">
+                  <div style="font-size:0.75rem;color:var(--s2d-text-muted);text-transform:uppercase;letter-spacing:0.04em;">Contracted Commission</div>
+                  <div class="mono-code" style="font-size:1.3rem;font-weight:700;color:var(--s2d-primary);">{{ franchise.commission_rate }}%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3-Column Meta Overview -->
+        <div class="row g-3 mb-4">
+          <div class="col-md-4">
+            <div class="kpi-card">
+              <div class="kpi-label">Primary Operator Contact</div>
+              <div class="kpi-value mt-2" style="font-size:1.1rem;">{{ franchise.partner_contact }}</div>
+              <div class="kpi-meta"><span class="mono-code">{{ franchise.phone }}</span></div>
+              <div class="text-secondary-s2d mt-1" style="font-size:0.76rem;">{{ franchise.email }}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="kpi-card">
+              <div class="kpi-label">Assigned Campuses</div>
+              <div class="kpi-value mt-2">{{ assigned_schools|length }} Schools</div>
+              <div class="kpi-meta"><span class="kpi-delta up">Active Campuses</span></div>
+              <div class="text-secondary-s2d mt-1" style="font-size:0.76rem;">All active in {{ franchise.territory }}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="kpi-card">
+              <div class="kpi-label">Enrolled Boarders</div>
+              <div class="kpi-value mt-2">{{ total_students }} Students</div>
+              <div class="kpi-meta"><span class="kpi-delta up">Calling Enabled</span></div>
+              <div class="text-secondary-s2d mt-1" style="font-size:0.76rem;">Managed across regional hostels</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assigned Schools Fleet Table -->
+        <div class="s2d-card mb-4">
+          <div class="s2d-card-header d-flex justify-content-between align-items-center">
+            <h3 class="s2d-card-title">Assigned Campuses in Territory</h3>
+            <span class="badge-s2d badge-s2d-secondary">{{ assigned_schools|length }} Campuses</span>
+          </div>
+          <div class="s2d-table-wrapper">
+            <table class="s2d-table">
+              <thead>
+                <tr>
+                  <th>School Code</th>
+                  <th>Campus Name</th>
+                  <th>City / State</th>
+                  <th>Enrolled Students</th>
+                  <th>Calling Booths</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for sch in assigned_schools %}
+                <tr>
+                  <td><span class="mono-code fw-semibold">{{ sch.code }}</span></td>
+                  <td>
+                    <div class="fw-semibold text-heading">{{ sch.name }}</div>
+                    <div class="text-secondary-s2d" style="font-size:0.75rem;">{{ sch.campus_type }}</div>
+                  </td>
+                  <td>{{ sch.city }}, {{ sch.state }}</td>
+                  <td><span class="mono-code">{{ sch.enrolled_students }}</span></td>
+                  <td><span class="badge-s2d badge-s2d-secondary">{{ sch.active_kiosks }} Booths</span></td>
+                  <td><span class="badge-s2d {% if sch.status == 'Active' %}badge-s2d-success{% else %}badge-s2d-danger{% endif %}">{{ sch.status }}</span></td>
+                  <td>
+                    <a href="/super-admin/schools/details.html?id={{ sch.code }}" class="btn-s2d btn-s2d-secondary btn-sm-s2d">Inspect</a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center py-4 text-secondary-s2d">No schools currently assigned to this franchise territory.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent Territory Financial Transactions -->
+        <div class="s2d-card">
+          <div class="s2d-card-header d-flex justify-content-between align-items-center">
+            <h3 class="s2d-card-title">Recent Territory Financial Settlements</h3>
+            <a href="/super-admin/payments/overview.html" class="btn-s2d btn-s2d-secondary btn-sm-s2d">Full Ledger</a>
+          </div>
+          <div class="s2d-table-wrapper">
+            <table class="s2d-table">
+              <thead>
+                <tr>
+                  <th>Transaction ID</th>
+                  <th>Campus</th>
+                  <th>Category</th>
+                  <th>Method</th>
+                  <th>Gross Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for txn in recent_transactions %}
+                <tr>
+                  <td><span class="mono-code fw-semibold">{{ txn.transaction_id }}</span></td>
+                  <td>{{ txn.school.name|default:"General Settlement" }}</td>
+                  <td><span class="badge-s2d badge-s2d-secondary">{{ txn.category }}</span></td>
+                  <td>{{ txn.payment_method }}</td>
+                  <td><span class="mono-code fw-bold">₹{{ txn.amount }}</span></td>
+                  <td><span class="badge-s2d {% if txn.status == 'Successful' %}badge-s2d-success{% else %}badge-s2d-warning{% endif %}">{{ txn.status }}</span></td>
+                  <td><span class="mono-code text-secondary-s2d" style="font-size:0.75rem;">{{ txn.created_at|date:"Y-m-d H:i" }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7" class="text-center py-4 text-secondary-s2d">No recent transactions recorded for this territory.</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script>
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+</html>

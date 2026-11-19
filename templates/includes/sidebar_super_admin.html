@@ -44,6 +44,20 @@
       </div>
     </div>
 
+    <div class="nav-item-box {% if '/super-admin/franchises/' in request.path %}open{% endif %}">
+      <button type="button" class="sidebar-parent-btn {% if '/super-admin/franchises/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/super-admin/franchises/' in request.path %}true{% else %}false{% endif %}">
+        <span class="sidebar-link-icon"><i data-lucide="network"></i></span>
+        <span class="sidebar-link-label">Franchise Partners</span>
+        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
+      </button>
+      <div class="sidebar-tooltip">Franchise Partners</div>
+      <div class="sidebar-submenu">
+        <a href="/super-admin/franchises/list.html" class="sidebar-sublink {% if request.path == '/super-admin/franchises/list.html' %}active{% endif %}">Partner Directory</a>
+        <a href="/super-admin/franchises/add.html" class="sidebar-sublink {% if request.path == '/super-admin/franchises/add.html' %}active{% endif %}">Onboard Franchise</a>
+        <a href="/super-admin/franchises/details.html" class="sidebar-sublink {% if request.path == '/super-admin/franchises/details.html' %}active{% endif %}">Territory Performance</a>
+      </div>
+    </div>
+
     <div class="nav-item-box {% if '/super-admin/school-admins/' in request.path %}open{% endif %}">
       <button type="button" class="sidebar-parent-btn {% if '/super-admin/school-admins/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/super-admin/school-admins/' in request.path %}true{% else %}false{% endif %}">
         <span class="sidebar-link-icon"><i data-lucide="user-cog"></i></span>

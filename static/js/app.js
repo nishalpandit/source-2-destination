@@ -150,6 +150,29 @@
         ]
       }),
 
+      'sa-franchises-table': () => ({
+        data: D.franchises || [],
+        searchPlaceholder: 'Search franchise company, territory, or contact...',
+        filters: [
+          { key: 'status', label: 'Status', options: ['Active', 'Suspended'] }
+        ],
+        exportFilename: 'franchise-partners.csv',
+        columns: [
+          { key: 'name', label: 'Franchise Partner', render: (r) => `<a href="${href('super-admin/franchises/details.html')}?id=${r.id}" class="cell-primary">${r.name}</a><span class="cell-sub mono-code">${r.code || r.id}</span>` },
+          { key: 'partnerContact', label: 'Primary Contact', render: (r) => `${r.partnerContact}<span class="cell-sub">${r.email || ''}</span>` },
+          { key: 'territory', label: 'Assigned Territory', render: (r) => `<span style="font-weight:500;">${r.territory}</span>` },
+          { key: 'assignedSchools', label: 'Campuses', render: (r) => `<span class="badge-s2d badge-s2d-secondary">${r.assignedSchools || 0} Schools</span>` },
+          { key: 'commissionRate', label: 'Commission Rate', render: (r) => `<span class="mono-code" style="font-weight:600;color:var(--s2d-primary);">${r.commissionRate}%</span>` },
+          { key: 'status', label: 'Status', render: (r) => badge(r.status) }
+        ],
+        rowActions: (r) => [
+          { label: 'View Territory 360°', icon: 'eye', href: `${href('super-admin/franchises/details.html')}?id=${r.id}` },
+          { label: 'Edit Partner Record', icon: 'pencil', href: `${href('super-admin/franchises/edit.html')}?id=${r.id}` },
+          { divider: true },
+          { label: r.status === 'Active' ? 'Suspend Franchise' : 'Activate Franchise', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
+        ]
+      }),
+
       'sa-school-admins-table': () => ({
         data: D.schoolAdmins,
         searchPlaceholder: 'Search administrator name, email, or school...',

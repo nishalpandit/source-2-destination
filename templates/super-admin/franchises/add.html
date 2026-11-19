@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onboard Franchise — Super Admin — Source 2 Destination</title>
+  <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}">
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+  <script src="{% static 'vendor/tailwind-config.js' %}"></script>
+  <script src="{% static 'vendor/tailwindcss-cdn.js' %}"></script>
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+  <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+  <link rel="stylesheet" href="{% static 'css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'css/forms.css' %}">
+  <link rel="stylesheet" href="{% static 'css/animations.css' %}">
+  <link rel="stylesheet" href="{% static 'css/responsive.css' %}">
+</head>
+<body data-role="super-admin" data-root="../../" data-route="super-admin/franchises/add.html" data-section="Franchise Partners" data-page-title="Onboard Franchise">
+  <div class="app-shell">
+    <aside class="app-sidebar" id="app-sidebar">
+      {% include 'includes/sidebar_super_admin.html' %}
+    </aside>
+    <div class="app-main">
+      <header class="app-topbar" id="app-topbar"></header>
+      <main class="app-content">
+
+        <!-- Action Toolbar -->
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
+          <div class="d-flex align-items-center gap-2">
+            <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0D9488;"></span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Onboard Regional Franchise Partner</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <a href="list.html" class="btn-s2d btn-s2d-secondary">
+              <i data-lucide="arrow-left"></i>
+              <span>Back to Directory</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="s2d-card">
+          <div class="s2d-card-body">
+            <form method="POST" action="add.html">
+              {% csrf_token %}
+              
+              <!-- Section 1: Partner Identity -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Enterprise Partner Identity</h3>
+                  <p>Corporate name, regional code prefix, and primary franchise operator contact information.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-8 s2d-field">
+                    <label class="s2d-label" for="franchise_name">Company / Partner Name <span class="req-star">*</span></label>
+                    <input type="text" id="franchise_name" name="name" class="s2d-input" placeholder="e.g. Western Scholastic Network Pvt Ltd" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="franchise_code">Franchise Code <span class="req-star">*</span></label>
+                    <input type="text" id="franchise_code" name="code" class="s2d-input mono-code" placeholder="FRN-105" required>
+                    <span class="field-hint">Unique platform partner identifier.</span>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="partner_contact">Primary Contact Person <span class="req-star">*</span></label>
+                    <input type="text" id="partner_contact" name="partner_contact" class="s2d-input" placeholder="e.g. Vikramaditya Singhania" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="partner_email">Business Email Address <span class="req-star">*</span></label>
+                    <input type="email" id="partner_email" name="email" class="s2d-input" placeholder="partner@domain.com" required>
+                  </div>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="partner_phone">Telephone / Mobile <span class="req-star">*</span></label>
+                    <input type="tel" id="partner_phone" name="phone" class="s2d-input mono-code" placeholder="+91 98101 22334" required>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Section 2: Territory & Commercial Terms -->
+              <div class="s2d-form-section">
+                <div class="form-section-meta">
+                  <h3>Territory License &amp; Commercial Terms</h3>
+                  <p>Designate authorized territorial borders, contracted talk-time commission percentage, and account status.</p>
+                </div>
+                <div class="row g-3">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="territory">Authorized Territory Boundaries <span class="req-star">*</span></label>
+                    <input type="text" id="territory" name="territory" class="s2d-input" placeholder="e.g. North India Boarding Corridor (Uttarakhand, HP, Punjab)" required>
+                    <span class="field-hint">Defines the regional cluster of residential schools managed.</span>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="commission_rate">Contracted Commission (%) <span class="req-star">*</span></label>
+                    <input type="number" step="0.01" min="0" max="100" id="commission_rate" name="commission_rate" class="s2d-input mono-code" value="15.00" required>
+                    <span class="field-hint">Percentage earned on student talk-time recharges.</span>
+                  </div>
+                  <div class="col-md-3 s2d-field">
+                    <label class="s2d-label" for="partner_status">Initial Operational Status <span class="req-star">*</span></label>
+                    <select id="partner_status" name="status" class="s2d-select">
+                      <option value="Active" selected>Active / Authorized</option>
+                      <option value="Suspended">Suspended / Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Submit Buttons -->
+              <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top border-s2d">
+                <a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a>
+                <button type="submit" class="btn-s2d btn-s2d-primary">
+                  <i data-lucide="check-circle"></i>
+                  <span>Complete Onboarding</span>
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="{% static 'vendor/lucide.min.js' %}"></script>
+  <script src="{% static 'vendor/gsap.min.js' %}"></script>
+  <script src="{% static 'js/api-config.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+  <script src="{% static 'js/navigation.js' %}"></script>
+  <script src="{% static 'js/sidebar.js' %}"></script>
+  <script src="{% static 'js/forms.js' %}"></script>
+  <script>
+    if (window.lucide) window.lucide.createIcons();
+  </script>
+</body>
+</html>

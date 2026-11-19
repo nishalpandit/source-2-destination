@@ -33,6 +33,14 @@
               ]
             },
             {
+              id: 'sa-franchises', label: 'Franchise Partners', icon: 'network',
+              children: [
+                { label: 'Partner Directory', href: 'super-admin/franchises/list.html' },
+                { label: 'Onboard Franchise', href: 'super-admin/franchises/add.html' },
+                { label: 'Territory Performance', href: 'super-admin/franchises/details.html' }
+              ]
+            },
+            {
               id: 'sa-school-admins', label: 'School Administrators', icon: 'user-cog',
               children: [
                 { label: 'Administrator List', href: 'super-admin/school-admins/list.html' },

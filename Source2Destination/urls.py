@@ -47,6 +47,13 @@ urlpatterns = [
     path('super-admin/school-admins/edit.html', admin_views.school_admin_edit, name='super_admin_school_admin_edit'),
     path('super-admin/school-admins/details.html', admin_views.school_admin_details, name='super_admin_school_admin_details'),
 
+    # Super Admin Fleet: Regional Franchise Partners (Phase 1B)
+    path('super-admin/franchises/', admin_views.franchises_list, name='super_admin_franchises_list'),
+    path('super-admin/franchises/list.html', admin_views.franchises_list, name='super_admin_franchises_list_html'),
+    path('super-admin/franchises/add.html', admin_views.franchise_add, name='super_admin_franchise_add'),
+    path('super-admin/franchises/edit.html', admin_views.franchise_edit, name='super_admin_franchise_edit'),
+    path('super-admin/franchises/details.html', admin_views.franchise_details, name='super_admin_franchise_details'),
+
     # Super Admin Hardware: Android Enterprise Kiosks (Phase 2)
     path('super-admin/devices/', admin_views.devices_list, name='super_admin_devices_list'),
     path('super-admin/devices/list.html', admin_views.devices_list, name='super_admin_devices_list_html'),
