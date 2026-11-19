@@ -9,7 +9,20 @@
   function getUserProfile(role) {
     const ctx = (window.S2D_DEMO && window.S2D_DEMO.currentContext) || {};
     if (role === 'franchise') return ctx.franchise || { fullName: 'Vikramaditya Singhania', initials: 'VS', email: 'v.singhania@northedunet.in', roleLabel: 'Franchise Partner' };
-    if (role === 'school-admin') return ctx.schoolAdmin || { fullName: 'Dr. Ramesh Chandra Sharma', initials: 'RS', email: 'principal@doonvalley.edu.in', roleLabel: 'School Administrator' };
+    if (role === 'school-admin') {
+      const stats = window.S2D_SCHOOL_STATS;
+      if (stats && stats.admin_name) {
+        const parts = stats.admin_name.trim().split(/\s+/);
+        const inits = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase();
+        return {
+          fullName: stats.admin_name,
+          initials: inits,
+          email: stats.admin_email || 'admin@campus.edu',
+          roleLabel: 'School Administrator'
+        };
+      }
+      return ctx.schoolAdmin || { fullName: 'Campus Administrator', initials: 'CA', email: 'admin@campus.edu', roleLabel: 'School Administrator' };
+    }
     return ctx.superAdmin || { fullName: 'Aarav Singhal', initials: 'AS', email: 'aarav.singhal@source2destination.in', roleLabel: 'Super Administrator' };
   }
 

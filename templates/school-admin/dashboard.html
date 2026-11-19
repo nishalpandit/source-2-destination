@@ -172,7 +172,9 @@
       active_students: {{ active_students|default:0 }},
       inactive_students: {{ inactive_students|default:0 }},
       expiring_count: {{ expiring_count|default:0 }},
-      school_name: "{{ school.name|default:'Campus'|escapejs }}"
+      school_name: "{{ school.name|default:'Campus'|escapejs }}",
+      admin_name: "{{ school.admin_name|default:request.user.get_full_name|default:'School Administrator'|escapejs }}",
+      admin_email: "{{ school.admin_email|default:request.user.email|default:'admin@campus.edu'|escapejs }}"
     };
     window.S2D_SCHOOL_CHARTS = {
       dailyCalls: {{ daily_calls_chart_json|default:"null"|safe }},
