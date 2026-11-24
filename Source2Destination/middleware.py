@@ -71,7 +71,9 @@ class RoleAccessMiddleware:
 
     EXEMPT_EXACT = (
         '/',
+        '/index.html',
         '/login/',
+        '/login.html',
         '/logout/',
         '/auth/login.html',
         '/auth/logout/',

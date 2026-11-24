@@ -13,6 +13,7 @@ db.sqlite3
 
 # Static collected
 staticfiles/
+media/
 
 # System / IDE
 .DS_Store

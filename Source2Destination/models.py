@@ -70,11 +70,11 @@ class School(models.Model):
 
     # Location & Physical Campus
     city = models.CharField(max_length=120, db_index=True)
-    state = models.CharField(max_length=120, blank=True, default="CT")
+    state = models.CharField(max_length=120, blank=True, default="Uttarakhand")
     postal_code = models.CharField(max_length=32, blank=True)
-    country = models.CharField(max_length=120, default="United States")
+    country = models.CharField(max_length=120, default="India")
     address = models.TextField(blank=True)
-    timezone = models.CharField(max_length=64, default="America/New_York")
+    timezone = models.CharField(max_length=64, default="Asia/Kolkata")
     hostel_blocks_count = models.PositiveIntegerField(default=4, help_text="Number of active dorm/hostel buildings")
 
     # Franchise relationship
@@ -206,7 +206,7 @@ class Student(models.Model):
     # Calling balance & rules
     remaining_minutes = models.PositiveIntegerField(default=120, help_text="Remaining monthly voice calling minutes")
     daily_limit_min = models.PositiveIntegerField(default=15, help_text="Daily calling duration limit in minutes")
-    wallet_balance = models.DecimalField(max_digits=8, decimal_places=2, default=50.00, help_text="Prepaid credit balance ($)")
+    wallet_balance = models.DecimalField(max_digits=8, decimal_places=2, default=50.00, help_text="Prepaid credit balance (₹)")
     validity_start = models.DateField(default=timezone.now)
     validity_expiry = models.DateField(null=True, blank=True)
 
@@ -520,7 +520,7 @@ class RechargePlan(models.Model):
     """
     code = models.CharField(max_length=32, unique=True, db_index=True, help_text="e.g. RPL-01, RPL-02")
     name = models.CharField(max_length=128, db_index=True, help_text="e.g. Standard Term Calling Pack")
-    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price in USD ($)")
+    price = models.DecimalField(max_digits=10, decimal_places=2, help_text="Price in INR (₹)")
     minutes_allocated = models.PositiveIntegerField(help_text="Voice minutes credited")
     validity_days = models.PositiveIntegerField(help_text="Validity extension in days")
     per_call_cap = models.PositiveIntegerField(default=15, help_text="Per-call cap override in minutes")
@@ -536,7 +536,7 @@ class RechargePlan(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.code} · {self.name} (${self.price} · {self.minutes_allocated}m · {self.validity_days}d)"
+        return f"{self.code} · {self.name} (₹{self.price} · {self.minutes_allocated}m · {self.validity_days}d)"
 
 
 class StudentRecharge(models.Model):
@@ -571,7 +571,7 @@ class StudentRecharge(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.recharge_id} · {self.student.name} · {self.plan_name_cache} (${self.amount})"
+        return f"{self.recharge_id} · {self.student.name} · {self.plan_name_cache} (₹{self.amount})"
 
 
 class ValidityExtensionLog(models.Model):
@@ -648,6 +648,10 @@ class KioskDevice(models.Model):
         ('Offline', 'Offline'),
         ('Maintenance', 'Maintenance'),
     ]
+    ASSIGNMENT_TYPE_CHOICES = [
+        ('Student', 'Dedicated Student Phone'),
+        ('Wing', 'Shared Hostel Booth'),
+    ]
 
     device_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. DEV-BOOTH-01")
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='kiosk_devices', db_index=True)
@@ -661,6 +665,20 @@ class KioskDevice(models.Model):
     kiosk_mode_locked = models.BooleanField(default=True, help_text="Android Enterprise lock-task mode")
     hostel_block = models.CharField(max_length=128, default="North Wing")
     assigned_wing = models.CharField(max_length=128, blank=True, default="Junior & Senior Boarding")
+    assigned_student = models.ForeignKey(
+        'Student',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_devices',
+        help_text="Student for 1-to-1 dedicated device binding"
+    )
+    assignment_type = models.CharField(
+        max_length=20,
+        choices=ASSIGNMENT_TYPE_CHOICES,
+        default='Student',
+        help_text="Dedicated 1-to-1 Student Phone vs Shared Hostel Booth"
+    )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Online', db_index=True)
     last_heartbeat = models.DateTimeField(default=timezone.now)
     registered_at = models.DateTimeField(auto_now_add=True)
@@ -672,16 +690,35 @@ class KioskDevice(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.device_id} · {self.name} ({self.status})"
+        target = f" -> {self.assigned_student.name}" if self.assigned_student else f" ({self.hostel_block})"
+        return f"{self.device_id} · {self.name}{target} [{self.status}]"
+
+    @property
+    def is_available(self):
+        """Check if device is enrolled, online, and not currently assigned to an active student."""
+        if self.status != 'Online':
+            return False
+        if self.assignment_type == 'Student' and self.assigned_student is not None:
+            return False
+        return True
 
 
 class DeviceAssignment(models.Model):
     """
-    Mapping between kiosk device, hostel dorms, and student cohorts.
+    Mapping between kiosk device, individual students, or hostel dorm cohorts.
     Flowchart: Section 3 'Assign Device to Student -> Save Device Mapping'.
     """
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='device_assignments')
     device = models.ForeignKey(KioskDevice, on_delete=models.CASCADE, related_name='assignments')
+    student = models.ForeignKey(
+        'Student',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='device_assignments',
+        help_text="Assigned student for 1-to-1 device binding"
+    )
+    assignment_type = models.CharField(max_length=20, default='Student', choices=[('Student', 'Student'), ('Wing', 'Hostel Wing')])
     academic_class = models.CharField(max_length=128, blank=True, default="All Classes")
     hostel_wing = models.CharField(max_length=128, default="North Wing")
     assigned_by = models.CharField(max_length=128, default="Campus Administrator")
@@ -692,6 +729,8 @@ class DeviceAssignment(models.Model):
         ordering = ['-assigned_date']
 
     def __str__(self):
+        if self.student:
+            return f"{self.device.name} assigned to {self.student.name} ({self.status})"
         return f"{self.device.name} assigned to {self.hostel_wing} ({self.status})"
 
 
