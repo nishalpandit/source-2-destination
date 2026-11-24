@@ -1,10 +1,12 @@
-from datetime import timedelta
+import json
+from datetime import timedelta, time
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.utils import timezone
 from .models import (
     School, Student, Guardian, HostelWarden, KioskDevice, DeviceAssignment,
-    CallRecord, AcademicClass, ClassSection, Franchise, StudentRecharge, RechargePlan
+    CallRecord, AcademicClass, ClassSection, Franchise, StudentRecharge, RechargePlan,
+    CallingScheduleRule
 )
 
 
@@ -1245,5 +1247,316 @@ class StrictPortalIsolationTests(TestCase):
         resp_sch = self.client.get('/school-admin/dashboard.html')
         self.assertEqual(resp_sch.status_code, 302)
         self.assertIn('/?next=/school-admin/dashboard.html', resp_sch.get('Location'))
+
+
+class PlanADeviceBindingWorkflowTests(TestCase):
+    """
+    Test suite for Plan A: 1-to-1 Student Device Hardware Binding,
+    Android Kiosk Enrollment, School Admin Device Assignment, and Login Verification.
+    Directly tests Flowchart Sections 3, 4, and 7.
+    """
+    def setUp(self):
+        self.client = Client()
+        self.school = School.objects.create(
+            code="SCH-BIND-01",
+            name="Doon Valley Academy",
+            city="Dehradun",
+            status="Active"
+        )
+        self.student = Student.objects.create(
+            code="STD-AARAV-01",
+            calling_code="S2D-AARAV-01",
+            name="Aarav Sharma",
+            school=self.school,
+            class_name="Grade 10-A",
+            section="Section A",
+            hostel_wing="Tagore Bhavan · Rm 204",
+            guardian_name="Vikram Sharma",
+            guardian_relation="Father",
+            primary_phone="+91 98111 22233",
+            secondary_phone="+91 98111 44455",
+            remaining_minutes=60,
+            daily_limit_min=15,
+            pin="1234",
+            status="Active",
+            validity_expiry=timezone.now().date() + timedelta(days=30)
+        )
+        self.other_student = Student.objects.create(
+            code="STD-ROHAN-02",
+            calling_code="S2D-ROHAN-02",
+            name="Rohan Varma",
+            school=self.school,
+            class_name="Grade 10-B",
+            pin="5678",
+            status="Active",
+            validity_expiry=timezone.now().date() + timedelta(days=30)
+        )
+        # Use school user for school-admin session
+        self.school_user, _ = User.objects.get_or_create(username='school', defaults={'email': 'school@s2d.com'})
+        self.school_user.set_password('12345')
+        self.school_user.save()
+
+    def test_complete_plan_a_lifecycle(self):
+        # 1. Android App first-time install: enrolls device via REST API
+        enroll_payload = {
+            "device_id": "DEV-SAMSUNG-A15-001",
+            "school_code": self.school.code,
+            "model_name": "Samsung Galaxy A15 Enterprise",
+            "serial_number": "SN-A15-88392",
+            "imei": "864209048123456",
+            "mac_address": "AA:BB:CC:DD:EE:01",
+            "app_version": "v2.5.0-kiosk",
+            "battery_level": 98,
+            "signal_strength": "4G LTE (-72 dBm)"
+        }
+        enroll_resp = self.client.post(
+            '/api/v1/kiosk/device/enroll/',
+            data=json.dumps(enroll_payload),
+            content_type='application/json'
+        )
+        self.assertEqual(enroll_resp.status_code, 201)
+        enroll_data = enroll_resp.json()
+        self.assertEqual(enroll_data['status'], 'success')
+        self.assertEqual(enroll_data['device']['device_id'], 'DEV-SAMSUNG-A15-001')
+
+        device = KioskDevice.objects.get(device_id="DEV-SAMSUNG-A15-001")
+        self.assertEqual(device.school, self.school)
+        self.assertEqual(device.status, 'Online')
+        self.assertIsNone(device.assigned_student)
+        self.assertTrue(device.is_available)
+
+        # 2. Heartbeat ping from kiosk device
+        hb_resp = self.client.post(
+            '/api/v1/kiosk/device/heartbeat/',
+            data=json.dumps({"device_id": "DEV-SAMSUNG-A15-001", "battery_level": 97}),
+            content_type='application/json'
+        )
+        self.assertEqual(hb_resp.status_code, 200)
+        self.assertEqual(hb_resp.json()['status'], 'online')
+
+        # 3. Unauthorized login before assignment should fail (403 DEVICE_NOT_ASSIGNED)
+        pre_assign_auth = self.client.post(
+            '/api/v1/kiosk/student/auth/',
+            data=json.dumps({"device_id": "DEV-SAMSUNG-A15-001", "student_code": self.student.code, "pin": "1234"}),
+            content_type='application/json'
+        )
+        self.assertEqual(pre_assign_auth.status_code, 403)
+        self.assertEqual(pre_assign_auth.json()['error'], 'DEVICE_NOT_ASSIGNED')
+
+        # 4. School Admin logs in and binds device to Student Aarav
+        self.client.login(username='school', password='12345')
+        # Seed session current school
+        session = self.client.session
+        session['school_code'] = self.school.code
+        session.save()
+
+        assign_resp = self.client.post('/school-admin/device-assignments/assign.html', {
+            'device_id': device.device_id,
+            'assignment_mode': 'Student',
+            'student_id': str(self.student.id),
+        })
+        self.assertEqual(assign_resp.status_code, 302)
+        device.refresh_from_db()
+        self.assertEqual(device.assigned_student, self.student)
+        self.assertEqual(device.assignment_type, 'Student')
+        self.assertFalse(device.is_available)
+        self.assertTrue(DeviceAssignment.objects.filter(device=device, student=self.student, status='Active').exists())
+
+        # 5. Security Gate: Another student (Rohan) tries to log in on Aarav's phone
+        # MUST BE REJECTED (403 HARDWARE_MISMATCH)
+        mismatch_auth = self.client.post(
+            '/api/v1/kiosk/student/auth/',
+            data=json.dumps({"device_id": "DEV-SAMSUNG-A15-001", "student_code": self.other_student.code, "pin": "5678"}),
+            content_type='application/json'
+        )
+        self.assertEqual(mismatch_auth.status_code, 403)
+        mismatch_data = mismatch_auth.json()
+        self.assertEqual(mismatch_data['error'], 'HARDWARE_MISMATCH')
+        self.assertIn('Aarav Sharma', mismatch_data['message'])
+
+        # 6. Wrong PIN check for Aarav
+        wrong_pin_auth = self.client.post(
+            '/api/v1/kiosk/student/auth/',
+            data=json.dumps({"device_id": "DEV-SAMSUNG-A15-001", "student_code": self.student.code, "pin": "0000"}),
+            content_type='application/json'
+        )
+        self.assertEqual(wrong_pin_auth.status_code, 401)
+        self.assertEqual(wrong_pin_auth.json()['error'], 'INVALID_PIN')
+
+        # 7. Authorized Student Aarav logs in with correct PIN
+        # MUST SUCCEED (200 OK) with whitelisted contacts
+        success_auth = self.client.post(
+            '/api/v1/kiosk/student/auth/',
+            data=json.dumps({"device_id": "DEV-SAMSUNG-A15-001", "student_code": self.student.code, "pin": "1234"}),
+            content_type='application/json'
+        )
+        self.assertEqual(success_auth.status_code, 200)
+        auth_data = success_auth.json()
+        self.assertEqual(auth_data['status'], 'authenticated')
+        self.assertEqual(auth_data['student']['name'], 'Aarav Sharma')
+        self.assertGreater(len(auth_data['contacts']), 0)
+        self.assertEqual(auth_data['contacts'][0]['phone'], '+91 98111 22233')
+
+        # 8. School Admin unbinds / releases device
+        unbind_resp = self.client.post('/school-admin/device-assignments/unassign/', {
+            'device_id': device.device_id
+        })
+        self.assertEqual(unbind_resp.status_code, 302)
+        device.refresh_from_db()
+        self.assertIsNone(device.assigned_student)
+        self.assertTrue(device.is_available)
+        self.assertEqual(DeviceAssignment.objects.filter(device=device, status='Active').count(), 0)
+
+
+class StudentAppCallingApiWorkflowTests(TestCase):
+    """
+    Validates the end-to-end Student Mobile Application REST API workflow (Flowchart Section 4):
+    1. Student live profile & schedule status
+    2. Whitelisted contacts fetch
+    3. Call Pre-Flight authorization (whitelisted vs rejected number)
+    4. Call termination & minute deduction
+    5. Student calling history ledger retrieval
+    """
+    def setUp(self):
+        self.client = Client()
+        self.school = School.objects.create(
+            name='Doon Valley Residential Academy',
+            code='SCH-1001',
+            campus_type='Co-ed Residential Boarding',
+            status='Active',
+        )
+        self.student = Student.objects.create(
+            code='STU-TEST-99',
+            calling_code='S2D-DV-99',
+            school=self.school,
+            name='Kabir Mehta',
+            class_name='Grade 9',
+            section='A',
+            guardian_name='Vikram Mehta',
+            guardian_relation='Father',
+            primary_phone='+91 98110 99001',
+            secondary_phone='+91 98110 99002',
+            remaining_minutes=60,
+            status='Active',
+            validity_expiry=timezone.now().date() + timedelta(days=90),
+            pin='9999',
+        )
+        self.device = KioskDevice.objects.create(
+            device_id='DEV-KABIR-01',
+            school=self.school,
+            name='Kabir Phone',
+            status='Online',
+            assignment_type='Student',
+            assigned_student=self.student,
+            kiosk_mode_locked=True,
+            last_heartbeat=timezone.now(),
+        )
+        CallingScheduleRule.objects.create(
+            school=self.school,
+            name='All Day Test Window',
+            days_of_week='ALL',
+            start_time=time(0, 0),
+            end_time=time(23, 59),
+            policy_type='allowed',
+            is_active=True,
+        )
+
+    def test_student_app_full_calling_lifecycle(self):
+        # 1. Fetch live profile
+        profile_resp = self.client.get(f'/api/v1/kiosk/student/{self.student.code}/profile/')
+        self.assertEqual(profile_resp.status_code, 200)
+        pdata = profile_resp.json()
+        self.assertEqual(pdata['status'], 'success')
+        self.assertEqual(pdata['student']['remaining_minutes'], 60)
+        self.assertEqual(pdata['student']['validity_status'], 'Active')
+
+        # 2. Fetch whitelisted contacts
+        contacts_resp = self.client.get(f'/api/v1/kiosk/student/{self.student.code}/contacts/')
+        self.assertEqual(contacts_resp.status_code, 200)
+        cdata = contacts_resp.json()
+        self.assertGreaterEqual(len(cdata['contacts']), 2)
+
+        # 3. Call authorize - Unauthorized number rejected
+        reject_auth = self.client.post(
+            '/api/v1/kiosk/call/authorize/',
+            data=json.dumps({
+                'student_code': self.student.code,
+                'dialed_number': '+91 99999 00000',
+                'device_id': self.device.device_id
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(reject_auth.status_code, 403)
+        self.assertFalse(reject_auth.json()['authorized'])
+
+        # 4. Call authorize - Whitelisted father number authorized
+        ok_auth = self.client.post(
+            '/api/v1/kiosk/call/authorize/',
+            data=json.dumps({
+                'student_code': self.student.code,
+                'dialed_number': '+91 98110 99001',
+                'device_id': self.device.device_id
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(ok_auth.status_code, 200)
+        auth_data = ok_auth.json()
+        self.assertTrue(auth_data['authorized'])
+        self.assertIsNotNone(auth_data.get('session_token'))
+        self.assertGreater(auth_data['max_seconds'], 0)
+
+        # 5. Call terminate - 180 seconds (3 minutes) deducted
+        term_resp = self.client.post(
+            '/api/v1/kiosk/call/terminate/',
+            data=json.dumps({
+                'student_code': self.student.code,
+                'dialed_number': '+91 98110 99001',
+                'duration_seconds': 180,
+                'termination_reason': 'Completed',
+                'device_id': self.device.device_id
+            }),
+            content_type='application/json'
+        )
+        self.assertEqual(term_resp.status_code, 200)
+        term_data = term_resp.json()
+        self.assertEqual(term_data['status'], 'success')
+        self.assertEqual(term_data['minutes_deducted'], 3)
+        self.assertEqual(term_data['remaining_minutes'], 57)
+        self.student.refresh_from_db()
+        self.assertEqual(self.student.remaining_minutes, 57)
+
+        # 6. Fetch call history - contains the newly completed call
+        hist_resp = self.client.get(f'/api/v1/kiosk/student/{self.student.code}/history/')
+        self.assertEqual(hist_resp.status_code, 200)
+        hdata = hist_resp.json()
+        self.assertEqual(hdata['status'], 'success')
+        self.assertEqual(hdata['total_calls'], 1)
+        self.assertEqual(hdata['history'][0]['destination_number'], '+91 98110 99001')
+        self.assertEqual(hdata['history'][0]['minutes_deducted'], 3)
+
+    def test_student_validity_api(self):
+        """Verify Student Validity Checkup endpoint returns correct lifecycle dossier."""
+        resp = self.client.get(f'/api/student/{self.student.code}/validity/')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertEqual(data['student_code'], self.student.code)
+        self.assertIn(data['validity_status'], ['Active', 'Expiring', 'Grace Period', 'Expired'])
+        self.assertIn('days_remaining', data)
+        self.assertIn('calling_allowed', data)
+        self.assertIn('remaining_minutes', data)
+        self.assertIn('wallet_balance', data)
+        self.assertIn('recharge_required', data)
+        self.assertIsInstance(data['recharge_plans'], list)
+
+        # Also test alias route
+        alias_resp = self.client.get(f'/api/v1/kiosk/student/{self.student.code}/validity/')
+        self.assertEqual(alias_resp.status_code, 200)
+
+        # Non-existent student returns 404
+        not_found = self.client.get('/api/student/NONEXISTENT-9999/validity/')
+        self.assertEqual(not_found.status_code, 404)
+        self.assertEqual(not_found.json()['error'], 'STUDENT_NOT_FOUND')
+
+
 
 

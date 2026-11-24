@@ -1,0 +1,462 @@
+SOURCE 2 DESTINATION — REST API SPECIFICATION
+Client: Student Mobile Application
+Target Device: Android Enterprise Kiosk Mode
+
+Base URL: http://192.168.1.52:8000 (or http://localhost:8000)
+Tested against active database without data deletion.
+
+
+1. Device Enrollment
+url: http://192.168.1.52:8000/api/device/enroll/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "device_id": "DEV-TEST-ENROLL-99",
+  "model_name": "Google Pixel 8",
+  "school_code": "SCH-1001"
+}
+
+Response (200 OK):
+{
+  "status": "success",
+  "device_id": "DEV-TEST-ENROLL-99",
+  "name": "Google Pixel 8"
+}
+
+
+2. Device Heartbeat
+url: http://192.168.1.52:8000/api/device/heartbeat/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "device_id": "8f3b2a1c0d9e4567"
+}
+
+Response :
+{
+  "status": "online"
+}
+
+
+3. Student Login (Hardware-Locked)
+url: http://192.168.1.52:8000/api/student/auth/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "device_id": "8f3b2a1c0d9e4567",
+  "student_code": "STU-DV-1023"
+}
+
+Response :
+{
+  "status": "authenticated",
+  "student": {
+    "code": "STU-DV-1023",
+    "name": "Shaurya Gill",
+    "remaining_minutes": 125,
+    "validity_expiry": "2027-02-11",
+    "daily_limit_minutes": 12
+  },
+  "max_call_seconds": 1200,
+  "contacts": [
+    {
+      "name": "Harpreet Gill",
+      "phone": "+91 98110 40123",
+      "relation": "Father",
+      "authorized": true
+    },
+    {
+      "name": "Mother",
+      "phone": "+91 98110 50123",
+      "relation": "Mother",
+      "authorized": true
+    }
+  ]
+}
+
+Response (403 Forbidden — Hardware Mismatch):
+{
+  "error": "HARDWARE_MISMATCH",
+  "message": "This device is assigned exclusively to Shaurya Gill (STU-DV-1023). Login rejected."
+}
+
+
+4. Student Real-time Profile
+url: http://192.168.1.52:8000/api/student/STU-DV-1023/profile/
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "status": "success",
+  "student": {
+    "code": "STU-DV-1023",
+    "name": "Shaurya Gill",
+    "remaining_minutes": 125,
+    "validity_status": "Active",
+    "validity_expiry": "2027-02-11",
+    "daily_limit_minutes": 12,
+    "minutes_used_today": 6,
+    "calling_allowed": true
+  }
+}
+
+
+5. Whitelisted Contacts
+url: http://192.168.1.52:8000/api/student/STU-DV-1023/contacts/
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "student_code": "STU-DV-1023",
+  "contacts": [
+    {
+      "name": "Harpreet Gill",
+      "phone": "+91 98110 40123",
+      "relation": "Father"
+    },
+    {
+      "name": "Secondary Contact",
+      "phone": "+91 98110 50123",
+      "relation": "Secondary Guardian"
+    }
+  ]
+}
+
+
+6. Call Pre-Flight Authorization
+url: http://192.168.1.52:8000/api/call/authorize/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "student_code": "STU-DV-1023",
+  "dialed_number": "+91 98110 40123",
+  "device_id": "8f3b2a1c0d9e4567"
+}
+
+Response (200 OK):
+{
+  "authorized": true,
+  "session_token": "SESS-1F249235D17D",
+  "max_seconds": 720,
+  "recipient_name": "Harpreet Gill"
+}
+
+Response (403 Forbidden ):
+{
+  "authorized": false,
+  "reason": "Unauthorized number: Dialing +91 99999 88888 is rejected by parent whitelist policy."
+}
+
+
+7. Call Terminate & Minute Deduction
+url: http://192.168.1.52:8000/api/call/terminate/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "student_code": "STU-DV-1023",
+  "dialed_number": "+91 98110 40123",
+  "duration_seconds": 120,
+  "termination_reason": "Completed",
+  "device_id": "8f3b2a1c0d9e4567"
+}
+
+Response :
+{
+  "status": "success",
+  "call_id": "CAL-20261124073334-CF24",
+  "minutes_deducted": 2,
+  "remaining_minutes": 123
+}
+
+
+8. Student Call History
+url: http://192.168.1.52:8000/api/student/STU-DV-1023/history/
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "status": "success",
+  "student_code": "STU-DV-1023",
+  "total_calls": 7,
+  "history": [
+    {
+      "call_id": "CAL-20261124073334-CF24",
+      "destination_number": "+91 98110 40123",
+      "call_type": "Father",
+      "start_time": "2026-11-24T07:31:34.608229+00:00",
+      "duration_seconds": 120,
+      "minutes_deducted": 2,
+      "status": "Completed"
+    },
+    {
+      "call_id": "CAL-20261120070931-3CEF",
+      "destination_number": "+91 98110 40123",
+      "call_type": "Father",
+      "start_time": "2026-11-20T07:05:31.544232+00:00",
+      "duration_seconds": 240,
+      "minutes_deducted": 4,
+      "status": "Completed"
+    }
+  ]
+}
+
+
+9. Remote Kiosk Configuration & Policy Sync
+url: http://192.168.1.52:8000/api/device/8f3b2a1c0d9e4567/config/
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "device_id": "8f3b2a1c0d9e4567",
+  "name": "Samsung Galaxy A15",
+  "school": "WMS-01",
+  "kiosk_mode_locked": true,
+  "assignment_type": "Student",
+  "assigned_student": "STU-DV-1023",
+  "heartbeat_interval_sec": 60,
+  "max_call_duration_min": 12,
+  "daily_cumulative_limit_min": 12,
+  "calling_schedules": [
+    {
+      "name": "Morning Hostel Window",
+      "policy_type": "allowed",
+      "start_time": "07:00",
+      "end_time": "08:15",
+      "days": "MON,TUE,WED,THU,FRI,SAT,SUN"
+    },
+    {
+      "name": "Academic Quiet Hours",
+      "policy_type": "restricted",
+      "start_time": "08:30",
+      "end_time": "16:30",
+      "days": "MON,TUE,WED,THU,FRI"
+    },
+    {
+      "name": "Evening Calling Window",
+      "policy_type": "allowed",
+      "start_time": "17:00",
+      "end_time": "20:30",
+      "days": "MON,TUE,WED,THU,FRI,SAT,SUN"
+    }
+  ],
+  "emergency_number": "+91 98110 40123"
+}
+
+
+10. Call Audio Recording Upload
+url: http://192.168.1.52:8000/api/call/recordings/upload/
+method: POST
+headers: Content-Type: multipart/form-data
+
+Form Data:
+call_id: CAL-20261124095233-2067
+recording_file: [audio/mp3 binary stream]
+
+Response :
+{
+  "status": "success",
+  "call_id": "CAL-20261124095233-2067",
+  "recording_url": "http://192.168.1.52:8000/media/recordings/2026/11/CAL-20261124095233-2067_2f52da.mp3",
+  "file_size_bytes": 38
+}
+
+
+11. Student Bulk Data Sync / SIS Import
+url: http://192.168.1.52:8000/api/school/SCH-1001/students/sync/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "students": [
+    {
+      "code": "STU-SYNC-2001",
+      "name": "Rohan Mehra",
+      "class_name": "Grade 11",
+      "section": "Science A",
+      "guardian_name": "Vikram Mehra",
+      "guardian_relation": "Father",
+      "primary_phone": "+91 98234 56789",
+      "pin": "2001",
+      "remaining_minutes": 150
+    }
+  ]
+}
+
+Response :
+{
+  "status": "success",
+  "school_code": "SCH-1001",
+  "total_processed": 1,
+  "created": 1,
+  "updated": 0,
+  "errors": []
+}
+
+
+12. Payment Gateway Webhook Top-Up
+url: http://192.168.1.52:8000/api/payments/webhook/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "event": "payment.success",
+  "recharge_id": "RCG-LIVE-B14F2D",
+  "student_code": "STU-DV-1023",
+  "plan_code": "RPL-01",
+  "amount": 299.0
+}
+
+Response :
+{
+  "status": "success",
+  "recharge_id": "RCG-LIVE-B14F2D",
+  "student_code": "STU-DV-1023",
+  "minutes_added": 100,
+  "new_remaining_minutes": 413,
+  "validity_expiry": "2027-05-12"
+}
+
+
+13. Student Emergency SOS Alert
+url: http://192.168.1.52:8000/api/student/sos/
+method: POST
+headers: Content-Type: application/json
+
+Request:
+{
+  "student_code": "STU-DV-1023",
+  "device_id": "8f3b2a1c0d9e4567",
+  "location": "North Dorm Wing B · Floor 2",
+  "notes": "Medical emergency / asthma inhaler required"
+}
+
+Response :
+{
+  "status": "emergency_broadcast_active",
+  "alert_id": "SOS-20261124095233-7ADF",
+  "student_code": "STU-DV-1023",
+  "student_name": "Shaurya Gill",
+  "location": "North Dorm Wing B · Floor 2",
+  "warden_contacted": {
+    "name": "Major Rajeshwar Singh (Retd.)",
+    "phone": "+91 98101 23481",
+    "hostel_block": "Tagore Bhavan (Senior Boys)"
+  },
+  "campus_police_phone": "+91 98101 99100",
+  "emergency_contacts": [
+    {
+      "name": "Harpreet Gill",
+      "phone": "+91 98110 40123",
+      "relation": "Father"
+    }
+  ]
+}
+
+
+14. School Call Telemetry Data Export
+url: http://192.168.1.52:8000/api/school/SCH-1001/call-data/?limit=10
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "school_code": "SCH-1001",
+  "total_calls": 111,
+  "total_minutes": 1315,
+  "records": [
+    {
+      "call_id": "SOS-20261124095233-7ADF",
+      "student_code": "STU-DV-1023",
+      "student_name": "Shaurya Gill",
+      "destination_number": "+91 98101 23481",
+      "call_type": "Emergency",
+      "duration_seconds": 0,
+      "minutes_deducted": 0,
+      "call_status": "Completed",
+      "start_time": "2026-11-24T09:52:33.699539+00:00",
+      "recording_url": ""
+    },
+    {
+      "call_id": "CAL-20261124095233-2067",
+      "student_code": "STU-DV-1023",
+      "student_name": "Shaurya Gill",
+      "destination_number": "+91 98110 40123",
+      "call_type": "Father",
+      "duration_seconds": 120,
+      "minutes_deducted": 2,
+      "call_status": "Completed",
+      "start_time": "2026-11-24T09:50:33.566759+00:00",
+      "recording_url": "http://192.168.1.52:8000/media/recordings/2026/11/CAL-20261124095233-2067_2f52da.mp3"
+    }
+  ]
+}
+
+
+15. Student Validity Checkup
+url: http://192.168.1.52:8000/api/student/STU-DV-1023/validity/
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "student_code": "STU-DV-1023",
+  "name": "Shaurya Gill",
+  "school": "SCH-1001",
+  "validity_status": "Active",
+  "validity_expiry": "2027-09-09",
+  "days_remaining": 289,
+  "calling_allowed": true,
+  "remaining_minutes": 801,
+  "wallet_balance": 270.0,
+  "recharge_required": false,
+  "recharge_plans": [
+    {
+      "plan_code": "RPL-05",
+      "name": "Emergency Booster Pack",
+      "price": 99.0,
+      "validity_days": 15,
+      "minutes": 45,
+      "badge": "TOP-UP"
+    },
+    {
+      "plan_code": "RPL-04",
+      "name": "Emergency Top-Up Booster",
+      "price": 99.0,
+      "validity_days": 14,
+      "minutes": 45,
+      "badge": "Booster"
+    },
+    {
+      "plan_code": "RPL-01",
+      "name": "Starter Monthly Pack",
+      "price": 199.0,
+      "validity_days": 30,
+      "minutes": 100,
+      "badge": ""
+    },
+    {
+      "plan_code": "RPL-INR-01",
+      "name": "Weekend Calling Pass",
+      "price": 199.0,
+      "validity_days": 30,
+      "minutes": 120,
+      "badge": "STARTER"
+    }
+  ]
+}
