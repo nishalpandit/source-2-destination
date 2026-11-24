@@ -41,10 +41,10 @@
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Administrator Identity</h3><p>Official campus credentials used for login and audit attribution.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Dr. Evelyn Sterling" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" placeholder="Dr. Ramesh Chandra Sharma" required></div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Designation / Title <span class="req-star">*</span></label><input type="text" name="designation" class="s2d-input" placeholder="Principal / Dean of Residence" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Institutional Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" placeholder="e.sterling@oakridge-academy.edu" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Official Mobile Number <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+1 (555) 210-9088" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Institutional Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" placeholder="principal@doonvalley.edu.in" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Official Mobile Number <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23456" required></div>
               </div>
             </div>
             <div class="s2d-form-section">
@@ -56,7 +56,7 @@
                     {% for s in schools %}
                     <option value="{{ s.code }}">{{ s.code }} · {{ s.name }}</option>
                     {% empty %}
-                    <option value="SCH-1001">SCH-1001 · Oakridge Residential Academy</option>
+                    <option value="SCH-1001">SCH-1001 · Doon Valley Residential Academy</option>
                     {% endfor %}
                   </select>
                 </div>

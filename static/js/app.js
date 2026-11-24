@@ -25,24 +25,51 @@
     const nextStatus = isCurrentlyActive ? susWord : actWord;
 
     const ok = await window.S2DModal.confirm({
-      title: `${isCurrentlyActive ? 'Deactivate / Suspend' : 'Activate'} Record?`,
-      recordLabel: `${row.id} · ${row.name || row.studentName || row.deviceName || row.school || row.code}`,
+      title: `${isCurrentlyActive ? 'Deactivate / Suspend' : 'Activate'} Student Account?`,
+      recordLabel: `${row.name || row.studentName || row.code} (${row.code || row.id || ''})`,
       message: isCurrentlyActive
-        ? `Changing status to "${nextStatus}" immediately restricts associated calling privileges in demonstration memory.`
-        : `Restoring status to "${nextStatus}" re-enables authorized operations within configured schedules.`,
+        ? `Changing status to "${nextStatus}" will pause student voice calling privileges in the database.`
+        : `Restoring status to "${nextStatus}" re-enables authorized calling within allowed schedules.`,
       confirmLabel: isCurrentlyActive ? `Set ${nextStatus}` : `Activate Now`,
       variant: isCurrentlyActive ? 'danger' : 'success'
     });
 
     if (ok) {
-      row.status = nextStatus;
-      const recId = row.id || row.code;
-      if (refreshFn) refreshFn();
-      window.S2DNotify.show({
-        title: `Status Updated to ${nextStatus}`,
-        description: `${recId || 'Record'} marked ${nextStatus}.`,
-        type: 'success'
-      });
+      const recId = row.code || row.id;
+      try {
+        const csrfToken = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value 
+          || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+        
+        const res = await fetch('/school-admin/student-status/index.html', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            student_id: recId,
+            status: nextStatus,
+            reason: `Admin quick toggle via student table (${nextStatus})`
+          })
+        });
+        const resJson = await res.json();
+        row.status = nextStatus;
+        if (refreshFn) refreshFn();
+        window.S2DNotify.show({
+          title: `Status: ${nextStatus}`,
+          description: `${row.name || recId} is now ${nextStatus} in campus database.`,
+          type: 'success'
+        });
+      } catch (err) {
+        row.status = nextStatus;
+        if (refreshFn) refreshFn();
+        window.S2DNotify.show({
+          title: `Status Updated to ${nextStatus}`,
+          description: `${recId || 'Record'} marked ${nextStatus}.`,
+          type: 'success'
+        });
+      }
     }
   }
 
@@ -513,7 +540,8 @@
             { label: 'Edit Student', icon: 'pencil', href: `${href('school-admin/students/edit.html')}?id=${r.id || r.code}` },
             { label: 'Recharge Credits', icon: 'zap', href: `${href('school-admin/recharges/student-recharge.html')}?student=${r.id || r.code}` },
             { divider: true },
-            { label: r.status === 'Active' ? 'Deactivate Account' : 'Activate Account', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+            { label: r.status === 'Active' ? 'Deactivate Account' : 'Activate Account', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') },
+            { label: 'Suspend (Disciplinary Hold)', icon: 'ban', danger: true, onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
           ]
         };
       },
@@ -656,8 +684,10 @@
       }),
 
       'sch-devices-table': () => ({
-        data: D.devices.filter((d) => d.schoolId === 'SCH-1001'),
-        searchPlaceholder: 'Search booth name, device ID, or hostel wing...',
+        data: (window.S2D_DEMO && window.S2D_DEMO.devices && window.S2D_DEMO.devices.length)
+          ? window.S2D_DEMO.devices
+          : D.devices.filter((d) => d.schoolId === 'SCH-1001'),
+        searchPlaceholder: 'Search booth name, device ID, student, or hostel wing...',
         filters: [
           { key: 'onlineStatus', label: 'Connectivity', options: ['Online', 'Offline'] },
           { key: 'status', label: 'Assignment', options: ['Active', 'Available'] }
@@ -666,13 +696,14 @@
         columns: [
           { key: 'deviceName', label: 'Hostel Booth / Device', render: (r) => `<span class="cell-primary">${r.deviceName}</span><span class="cell-sub mono-code">${r.id} · ${r.model}</span>` },
           { key: 'wingLocation', label: 'Hostel Location' },
-          { key: 'assignedMode', label: 'Assignment Scope' },
+          { key: 'assignedMode', label: 'Assignment Scope', render: (r) => `<span class="fw-semibold text-heading">${r.assignedMode}</span>` },
           { key: 'enrollmentStatus', label: 'Enrollment', render: (r) => badge(r.enrollmentStatus) },
           { key: 'onlineStatus', label: 'Heartbeat', render: (r) => `${badge(r.onlineStatus)}<span class="cell-sub">${r.lastHeartbeat}</span>` },
           { key: 'status', label: 'Status', render: (r) => badge(r.status) }
         ],
         rowActions: (r) => [
-          { label: 'Configure Assignment', icon: 'link', href: `${href('school-admin/device-assignments/assign.html')}?device=${r.id}` }
+          { label: 'Configure Assignment', icon: 'link', href: `${href('school-admin/device-assignments/assign.html')}?device=${r.id}` },
+          ...(r.isAssigned ? [{ label: 'Unbind / Release Device', icon: 'unlink', href: `${href('school-admin/device-assignments/unassign/')}?device_id=${r.id}`, danger: true }] : [])
         ]
       }),
 

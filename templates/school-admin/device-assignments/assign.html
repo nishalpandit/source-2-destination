@@ -31,43 +31,103 @@
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom border-s2d">
           <div class="d-flex align-items-center gap-2">
             <span class="d-inline-block" style="width:8px;height:8px;border-radius:50%;background:#0284c7;"></span>
-            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Assign Enrolled Device</span>
+            <span class="fw-semibold text-heading" style="font-size:0.92rem;">Assign Device to Student or Wing</span>
           </div>
-          <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Device List</span></a></div>
+          <div class="d-flex align-items-center gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary"><i data-lucide="arrow-left"></i><span>Device Fleet</span></a></div>
         </div>
         {% if error %}
-        <div class="s2d-callout rose mb-4"><i data-lucide="alert-triangle"></i><div><strong>Device Assignment Error:</strong> {{ error }}</div></div>
+        <div class="s2d-callout rose mb-4"><i data-lucide="alert-triangle"></i><div><strong>Assignment Error:</strong> {{ error }}</div></div>
         {% else %}
-        <div class="s2d-callout emerald mb-4"><i data-lucide="check-circle-2"></i><div><strong>MDM Pre-Flight Active:</strong> Select an enrolled, online kiosk booth below to map it to a residential hostel wing or class cohort.</div></div>
+        <div class="s2d-callout sky mb-4"><i data-lucide="info"></i><div><strong>Hardware Assignment:</strong> Select an enrolled smartphone or booth to pair it with a boarding student (1-to-1 dedicated handset) or assign it as a shared corridor booth.</div></div>
         {% endif %}
         <div class="s2d-card"><div class="s2d-card-body">
           <form method="POST" action="assign.html">
             {% csrf_token %}
             <div class="row g-3">
               <div class="col-md-6 s2d-field">
-                <label class="s2d-label">Available Enrolled Device <span class="req-star">*</span></label>
-                <select name="device_id" class="s2d-select" required>
+                <label class="s2d-label">Enrolled Handset / Booth <span class="req-star">*</span></label>
+                <select name="device_id" class="s2d-select" required id="deviceSelect">
+                  <option value="">-- Select Enrolled Device to Assign --</option>
                   {% for d in devices %}
-                  <option value="{{ d.device_id }}">{{ d.device_id }} · {{ d.name }} ({{ d.status }} · {{ d.hostel_block }})</option>
+                  <option value="{{ d.device_id }}" 
+                          data-name="{{ d.name }}" 
+                          data-id="{{ d.device_id }}" 
+                          data-status="{{ d.status }}" 
+                          data-battery="{{ d.battery_level }}" 
+                          data-signal="{{ d.signal_strength }}" 
+                          data-bound="{% if d.assigned_student %}Bound to {{ d.assigned_student.name }} ({{ d.assigned_student.code }}){% elif d.assigned_wing %}{{ d.assigned_wing }}{% else %}Available (Ready to Assign){% endif %}"
+                          {% if preselected_device == d.device_id or devices|length == 1 %}selected{% endif %}>
+                    {% if not d.assigned_student and not d.assigned_wing %}📱 {{ d.name }} [{{ d.device_id }}] — (Ready to Assign){% elif d.assigned_student %}🔒 {{ d.name }} [{{ d.device_id }}] — (Bound to {{ d.assigned_student.name }}){% else %}🏢 {{ d.name }} [{{ d.device_id }}] — ({{ d.assigned_wing }}){% endif %}
+                  </option>
                   {% empty %}
                   <option value="">No enrolled kiosk devices found</option>
                   {% endfor %}
                 </select>
+                <span class="s2d-hint">Select the physical phone or booth terminal.</span>
               </div>
+
               <div class="col-md-6 s2d-field">
-                <label class="s2d-label">Target Class Cohort <span class="req-star">*</span></label>
-                <select name="academic_class" class="s2d-select" required>
+                <label class="s2d-label">Assignment Type <span class="req-star">*</span></label>
+                <select name="assignment_mode" class="s2d-select" id="assignmentModeSelect" required>
+                  <option value="Student" selected>Dedicated Student Handset (1-to-1 Device Binding)</option>
+                  <option value="Wing">Shared Hostel Booth (Shared Corridor Terminal)</option>
+                </select>
+                <span class="s2d-hint">Dedicated 1-to-1 locks the device strictly to an individual student's account.</span>
+              </div>
+
+              <!-- Live Selected Device Preview Card -->
+              <div class="col-12 d-none" id="devicePreviewCard">
+                <div class="p-3 rounded-3" style="background:#f8fafc;border:1px solid #e2e8f0;">
+                  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;background:#e0f2fe;color:#0284c7;">
+                        <i data-lucide="smartphone" style="width:18px;height:18px;"></i>
+                      </div>
+                      <div>
+                        <div class="fw-semibold text-heading" id="prevName">Device Name</div>
+                        <div class="text-muted" style="font-size:0.8rem;">Hardware ID: <code id="prevId" style="color:#0284c7;">-</code></div>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3" style="font-size:0.82rem;">
+                      <div><span class="text-muted">Status:</span> <span class="badge bg-success-subtle text-success fw-semibold" id="prevStatus">Online</span></div>
+                      <div><span class="text-muted">Battery:</span> <span class="fw-medium text-heading" id="prevBattery">95%</span></div>
+                      <div><span class="text-muted">Current:</span> <span class="fw-medium text-heading" id="prevBound">Available</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Student Mode Fields -->
+              <div class="col-md-12 s2d-field" id="studentModeFields">
+                <label class="s2d-label">Target Student <span class="req-star">*</span></label>
+                <select name="student_id" class="s2d-select" id="studentSelect">
+                  <option value="">-- Choose Student to Bind to this Handset --</option>
+                  {% for s in students %}
+                  <option value="{{ s.id }}">
+                    {{ s.code }} · {{ s.name }} ({{ s.class_name }} - {{ s.section }}{% if s.hostel_wing %} · {{ s.hostel_wing }}{% endif %})
+                  </option>
+                  {% empty %}
+                  <option value="">No active students available</option>
+                  {% endfor %}
+                </select>
+                <span class="s2d-hint">This handset will be bound to this student. The app will log them in directly on launch.</span>
+              </div>
+
+              <!-- Wing Mode Fields -->
+              <div class="col-md-6 s2d-field d-none" id="wingClassField">
+                <label class="s2d-label">Target Class Cohort</label>
+                <select name="academic_class" class="s2d-select">
                   <option value="All Classes">All Classes (Shared Hostel Wing Booth)</option>
                   {% for c in classes %}
                   <option value="{{ c.name }}">{{ c.name }}</option>
                   {% endfor %}
                 </select>
               </div>
-              <div class="col-md-6 s2d-field">
-                <label class="s2d-label">Target Hostel Wing / Block <span class="req-star">*</span></label>
-                <input type="text" name="hostel_wing" class="s2d-input" placeholder="e.g. Tagore Bhavan · Floor 2" required>
+              <div class="col-md-6 s2d-field d-none" id="wingLocationField">
+                <label class="s2d-label">Hostel Wing / Dorm Location</label>
+                <input type="text" name="hostel_wing" class="s2d-input" placeholder="e.g. Tagore Bhavan · Floor 2" value="Tagore Bhavan · Floor 2">
               </div>
-              <div class="col-md-6 s2d-field">
+              <div class="col-md-12 s2d-field d-none" id="wingWardenField">
                 <label class="s2d-label">Supervising Hostel Warden</label>
                 <select name="warden" class="s2d-select">
                   {% for w in wardens %}
@@ -81,6 +141,55 @@
             <div class="form-actions-bar"><div class="ms-auto d-flex gap-2"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="check"></i><span>Confirm Device Assignment</span></button></div></div>
           </form>
         </div></div>
+
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            var modeSelect = document.getElementById('assignmentModeSelect');
+            var studentFields = document.getElementById('studentModeFields');
+            var wingClass = document.getElementById('wingClassField');
+            var wingLoc = document.getElementById('wingLocationField');
+            var wingWarden = document.getElementById('wingWardenField');
+            var studentSelect = document.getElementById('studentSelect');
+            var deviceSelect = document.getElementById('deviceSelect');
+            var previewCard = document.getElementById('devicePreviewCard');
+
+            function updateMode() {
+              if (modeSelect.value === 'Student') {
+                studentFields.classList.remove('d-none');
+                studentSelect.setAttribute('required', 'required');
+                wingClass.classList.add('d-none');
+                wingLoc.classList.add('d-none');
+                wingWarden.classList.add('d-none');
+              } else {
+                studentFields.classList.add('d-none');
+                studentSelect.removeAttribute('required');
+                wingClass.classList.remove('d-none');
+                wingLoc.classList.remove('d-none');
+                wingWarden.classList.remove('d-none');
+              }
+            }
+
+            function updateDevicePreview() {
+              var opt = deviceSelect.options[deviceSelect.selectedIndex];
+              if (!opt || !opt.value) {
+                previewCard.classList.add('d-none');
+                return;
+              }
+              previewCard.classList.remove('d-none');
+              document.getElementById('prevName').textContent = opt.getAttribute('data-name') || opt.value;
+              document.getElementById('prevId').textContent = opt.getAttribute('data-id') || opt.value;
+              document.getElementById('prevStatus').textContent = opt.getAttribute('data-status') || 'Online';
+              document.getElementById('prevBattery').textContent = (opt.getAttribute('data-battery') || '95') + '%';
+              document.getElementById('prevBound').textContent = opt.getAttribute('data-bound') || 'Available';
+              if (window.lucide) { lucide.createIcons(); }
+            }
+
+            modeSelect.addEventListener('change', updateMode);
+            deviceSelect.addEventListener('change', updateDevicePreview);
+            updateMode();
+            updateDevicePreview();
+          });
+        </script>
     
       </main>
     </div>

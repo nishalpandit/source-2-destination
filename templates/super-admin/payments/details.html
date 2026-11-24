@@ -46,7 +46,7 @@
               <div><div class="kv-item-label">Transaction Category</div><div class="kv-item-value" data-bind-field="category">Student Recharge</div></div>
               <div><div class="kv-item-label">Payment Instrument</div><div class="kv-item-value" data-bind-field="method">Visa •••• 4242</div></div>
               <div><div class="kv-item-label">Timestamp</div><div class="kv-item-value mono-code" data-bind-field="date">2026-11-10 08:30</div></div>
-              <div><div class="kv-item-label">Total Settled</div><div class="kv-item-value mono-code">$<span data-bind-field="amount">22.00</span></div></div>
+              <div><div class="kv-item-label">Total Settled</div><div class="kv-item-value mono-code">₹<span data-bind-field="amount">{{ txn.amount|default:'76560.00' }}</span></div></div>
             </div>
           </div>
         </div>

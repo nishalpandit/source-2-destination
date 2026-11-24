@@ -42,10 +42,10 @@
             <div class="s2d-form-section">
               <div class="form-section-meta"><h3>Profile &amp; Contact</h3><p>Verified identity details.</p></div>
               <div class="row g-3">
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ profile.name|default:'Dr. Arthur Pendelton' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Full Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" data-bind-field="name" value="{{ profile.name|default:'Dr. Ramesh Chandra Sharma' }}" required></div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Designation <span class="req-star">*</span></label><input type="text" name="designation" class="s2d-input" data-bind-field="designation" value="{{ profile.designation|default:'Principal & Primary Admin' }}" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="{{ profile.email|default:'admin@oakridge-academy.edu' }}" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ profile.phone|default:'+1 (555) 210-9001' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" data-bind-field="email" value="{{ profile.email|default:'principal@doonvalley.edu.in' }}" required></div>
+                <div class="col-md-6 s2d-field"><label class="s2d-label">Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ profile.phone|default:'+91 98101 23456' }}" required></div>
               </div>
             </div>
             <div class="s2d-form-section">
@@ -56,7 +56,7 @@
                     {% for s in schools %}
                     <option value="{{ s.name }}" {% if profile and profile.school.id == s.id %}selected{% endif %}>{{ s.name }}</option>
                     {% empty %}
-                    <option value="Oakridge Residential Academy">Oakridge Residential Academy</option>
+                    <option value="Doon Valley Residential Academy">Doon Valley Residential Academy</option>
                     {% endfor %}
                   </select>
                 </div>

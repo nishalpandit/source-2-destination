@@ -156,11 +156,11 @@ def school_add(request):
             affiliation_board=request.POST.get('affiliation_board', 'CBSE'),
             website=request.POST.get('website', ''),
             city=city,
-            state=request.POST.get('state', 'CT'),
+            state=request.POST.get('state', 'Uttarakhand'),
             postal_code=request.POST.get('postal_code', ''),
-            country=request.POST.get('country', 'United States'),
+            country=request.POST.get('country', 'India'),
             address=request.POST.get('address', ''),
-            timezone=request.POST.get('timezone', 'America/New_York'),
+            timezone=request.POST.get('timezone', 'Asia/Kolkata'),
             hostel_blocks_count=int(request.POST.get('hostel_blocks_count') or 4),
             franchise=franchise,
             franchise_name_cache=franchise.name if franchise else '',
@@ -203,10 +203,12 @@ def school_add(request):
 def school_edit(request, school_id=None):
     """Super Admin: Edit campus profile and configuration."""
     target_id = school_id or request.GET.get('id')
-    school = School.objects.filter(Q(code=target_id) | Q(id=target_id if str(target_id).isdigit() else 0)).first()
+    if not target_id:
+        return redirect('/super-admin/schools/list.html')
 
+    school = School.objects.filter(Q(code=target_id) | Q(id=target_id if str(target_id).isdigit() else 0)).first()
     if not school:
-        school = School.objects.first()
+        return redirect('/super-admin/schools/list.html')
 
     if request.method == "POST" and school:
         # Section 1: Institution Identity
@@ -301,10 +303,12 @@ def school_edit(request, school_id=None):
 def school_details(request, school_id=None):
     """Super Admin: 360-degree School dossier & management view."""
     target_id = school_id or request.GET.get('id')
-    school = School.objects.filter(Q(code=target_id) | Q(id=target_id if str(target_id).isdigit() else 0)).select_related('franchise').first()
+    if not target_id:
+        return redirect('/super-admin/schools/list.html')
 
+    school = School.objects.filter(Q(code=target_id) | Q(id=target_id if str(target_id).isdigit() else 0)).select_related('franchise').first()
     if not school:
-        school = School.objects.first()
+        return redirect('/super-admin/schools/list.html')
 
     context = {
         "school": school,
@@ -607,9 +611,12 @@ def franchise_edit(request):
     Super Admin: Edit Franchise Partner details, territory boundary & commission %.
     """
     target_id = request.GET.get('id', '') or request.POST.get('id', '')
+    if not target_id:
+        return redirect('/super-admin/franchises/list.html')
+
     franchise = Franchise.objects.filter(Q(code=target_id) | Q(pk=target_id if target_id.isdigit() else 0)).first()
     if not franchise:
-        franchise = Franchise.objects.first()
+        return redirect('/super-admin/franchises/list.html')
 
     if request.method == 'POST' and franchise:
         franchise.name = request.POST.get('name', franchise.name).strip()
@@ -661,9 +668,12 @@ def franchise_details(request):
     Super Admin: Franchise 360° Territory Performance, Schools & Commission Ledger.
     """
     target_id = request.GET.get('id', '')
+    if not target_id:
+        return redirect('/super-admin/franchises/list.html')
+
     franchise = Franchise.objects.filter(Q(code=target_id) | Q(pk=target_id if target_id.isdigit() else 0)).first()
     if not franchise:
-        franchise = Franchise.objects.first()
+        return redirect('/super-admin/franchises/list.html')
 
     assigned_schools = franchise.schools.all().order_by('name') if franchise else []
     total_students = Student.objects.filter(school__franchise=franchise).count() if franchise else 0
@@ -836,11 +846,11 @@ def school_admin_edit(request):
 
     profile_dict = {
         "id": profile.admin_id if profile else "ADM-201",
-        "name": profile.name if profile else "Dr. Arthur Pendelton",
+        "name": profile.name if profile else "Dr. Ramesh Chandra Sharma",
         "designation": profile.designation if profile else "Principal & Primary Admin",
-        "email": profile.email if profile else "admin@oakridge-academy.edu",
-        "phone": profile.phone if profile else "+1 (555) 210-9001",
-        "school": profile.school.name if profile and profile.school else "Oakridge Residential Academy",
+        "email": profile.email if profile else "principal@doonvalley.edu.in",
+        "phone": profile.phone if profile else "+91 98101 23456",
+        "school": profile.school.name if profile and profile.school else "Doon Valley Residential Academy",
         "status": profile.status if profile else "Active"
     }
 
@@ -867,11 +877,11 @@ def school_admin_details(request):
 
     profile_dict = {
         "id": profile.admin_id if profile else "ADM-201",
-        "name": profile.name if profile else "Dr. Arthur Pendelton",
+        "name": profile.name if profile else "Dr. Ramesh Chandra Sharma",
         "designation": profile.designation if profile else "Principal & Primary Admin",
-        "email": profile.email if profile else "admin@oakridge-academy.edu",
-        "phone": profile.phone if profile else "+1 (555) 210-9001",
-        "school": profile.school.name if profile and profile.school else "Oakridge Residential Academy",
+        "email": profile.email if profile else "principal@doonvalley.edu.in",
+        "phone": profile.phone if profile else "+91 98101 23456",
+        "school": profile.school.name if profile and profile.school else "Doon Valley Residential Academy",
         "mfaEnabled": "Enabled" if (profile and profile.mfa_enforced) else "Disabled",
         "lastLogin": profile.last_active.strftime("%Y-%m-%d %H:%M") if profile else "2026-11-10 08:42",
         "status": profile.status if profile else "Active"
@@ -1026,7 +1036,7 @@ def device_details(request):
         "deviceName": device.name if device else "North Hall Booth 1",
         "serialNumber": device.serial_number if device else "SN-7701-S2D",
         "imei": device.imei if device else "864298031234567",
-        "school": device.school.name if device else "Oakridge Residential Academy",
+        "school": device.school.name if device else "Doon Valley Residential Academy",
         "wingLocation": device.assigned_wing if device else "North Wing",
         "onlineStatus": device.status if device else "Online",
         "batteryLevel": f"{device.battery_level}%" if device else "95%",
@@ -1230,7 +1240,7 @@ def payment_details(request):
     txn_dict = {
         "id": txn.transaction_id if txn else "TXN-98421",
         "date": txn.created_at.strftime("%Y-%m-%d %H:%M") if txn else "2026-11-10 14:22",
-        "entity": txn.school.name if txn and txn.school else "Oakridge Residential Academy",
+        "entity": txn.school.name if txn and txn.school else "Doon Valley Residential Academy",
         "franchise": txn.franchise.name if txn and txn.franchise else "North Telecom Franchise",
         "category": txn.category if txn else "Annual Subscription",
         "method": txn.payment_method if txn else "Razorpay / UPI",

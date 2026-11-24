@@ -47,7 +47,7 @@
                   </span>
                   <h3 class="s2d-card-title">{{ p.name }}</h3>
                 </div>
-                <div class="h2-s2d mb-0 mono-code">${{ p.price }}</div>
+                <div class="h2-s2d mb-0 mono-code">₹{{ p.price }}</div>
               </div>
               <div class="s2d-card-body">
                 <p class="text-secondary-s2d mb-3">{{ p.minutes_allocated }} calling minutes · {{ p.validity_days }} days validity · Max {{ p.per_call_cap }}m per call.</p>
@@ -73,7 +73,7 @@
                 <label class="s2d-label">Recharge Plan <span class="req-star">*</span></label>
                 <select name="plan" class="s2d-select" required>
                   {% for p in plans %}
-                  <option value="{{ p.code }}">{{ p.name }} (${{ p.price }} · {{ p.minutes_allocated }}m)</option>
+                  <option value="{{ p.code }}">{{ p.name }} (₹{{ p.price }} · {{ p.minutes_allocated }}m)</option>
                   {% endfor %}
                 </select>
               </div>

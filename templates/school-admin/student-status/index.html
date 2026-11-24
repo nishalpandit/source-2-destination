@@ -46,17 +46,17 @@
         <div class="s2d-card mb-4">
           <div class="s2d-card-header">
             <h3 class="s2d-card-title">Modify Student Lifecycle Status</h3>
-            <span class="badge s2d-badge-subtle">Active: {{ active_count }} · Inactive: {{ inactive_count }} · Suspended: {{ suspended_count }}</span>
+            <span class="badge s2d-badge-subtle" id="statusCountsBadge">Active: {{ active_count }} · Inactive: {{ inactive_count }} · Suspended: {{ suspended_count }}</span>
           </div>
           <div class="s2d-card-body">
-            <form method="POST" action="index.html">
+            <form method="POST" action="/school-admin/student-status/index.html" id="formSingleStatus">
               {% csrf_token %}
               <div class="row g-3 align-items-end">
                 <div class="col-md-4">
                   <label class="s2d-label">Target Student <span class="req-star">*</span></label>
-                  <select name="student_id" class="s2d-select" required>
+                  <select name="student_id" id="selectTargetStudent" class="s2d-select" required>
                     {% for s in students %}
-                    <option value="{{ s.code }}">{{ s.code }} · {{ s.name }} (Current: {{ s.status }})</option>
+                    <option value="{{ s.code }}" data-current="{{ s.status }}">{{ s.code }} · {{ s.name }} (Current: {{ s.status }})</option>
                     {% empty %}
                     <option value="" disabled>No enrolled students available</option>
                     {% endfor %}
@@ -64,7 +64,7 @@
                 </div>
                 <div class="col-md-3">
                   <label class="s2d-label">New Status <span class="req-star">*</span></label>
-                  <select name="status" class="s2d-select" required>
+                  <select name="status" id="selectNewStatus" class="s2d-select" required>
                     <option value="Active">Active (Calling Permitted)</option>
                     <option value="Inactive">Inactive (Calling Paused)</option>
                     <option value="Suspended">Suspended (Disciplinary / Admin Hold)</option>
@@ -72,20 +72,20 @@
                 </div>
                 <div class="col-md-3">
                   <label class="s2d-label">Transition Reason <span class="req-star">*</span></label>
-                  <input type="text" name="reason" class="s2d-input" placeholder="e.g. Returned from medical leave" required>
+                  <input type="text" name="reason" id="inputReason" class="s2d-input" placeholder="e.g. Returned from medical leave" required>
                 </div>
                 <div class="col-md-2">
-                  <button type="submit" class="btn-s2d btn-s2d-primary w-100"><i data-lucide="refresh-cw"></i><span>Apply Status</span></button>
+                  <button type="submit" id="btnApplySingleStatus" class="btn-s2d btn-s2d-primary w-100"><i data-lucide="refresh-cw"></i><span>Apply Status</span></button>
                 </div>
               </div>
             </form>
           </div>
         </div>
 
-        <div class="batch-toolbar mb-4">
+        <div class="batch-toolbar mb-4 d-flex align-items-center gap-2">
           <span class="text-secondary-s2d" style="font-size:0.78rem;font-weight:600;">Batch Activation:</span>
-          <button type="button" class="btn-s2d btn-s2d-success btn-sm-s2d"><i data-lucide="user-check"></i><span>Activate Selected</span></button>
-          <button type="button" class="btn-s2d btn-s2d-danger-outline btn-sm-s2d"><i data-lucide="pause"></i><span>Suspend Selected</span></button>
+          <button type="button" id="btnBatchActivate" class="btn-s2d btn-s2d-success btn-sm-s2d"><i data-lucide="user-check"></i><span>Activate Selected</span></button>
+          <button type="button" id="btnBatchSuspend" class="btn-s2d btn-s2d-danger-outline btn-sm-s2d"><i data-lucide="pause"></i><span>Suspend Selected</span></button>
         </div>
 
         <div class="mb-4" data-s2d-table="sch-students-table"></div>
@@ -136,5 +136,159 @@
     }
   </script>
   <script src="{% static 'js/app.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const formSingle = document.getElementById('formSingleStatus');
+      const btnBatchActivate = document.getElementById('btnBatchActivate');
+      const btnBatchSuspend = document.getElementById('btnBatchSuspend');
+      const badgeCounts = document.getElementById('statusCountsBadge');
+
+      function updateBadgeCounts(active, inactive, suspended) {
+        if (badgeCounts && active !== undefined) {
+          badgeCounts.textContent = `Active: ${active} · Inactive: ${inactive} · Suspended: ${suspended}`;
+        }
+      }
+
+      function getCsrfToken() {
+        return (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value 
+          || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+      }
+
+      // Handle Single Status Update Form via AJAX
+      if (formSingle) {
+        formSingle.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const studentCode = document.getElementById('selectTargetStudent').value;
+          const newStatus = document.getElementById('selectNewStatus').value;
+          const reasonInput = document.getElementById('inputReason');
+          const reason = reasonInput.value.trim() || 'Lifecycle administrative change';
+          const btn = document.getElementById('btnApplySingleStatus');
+          const oldBtnText = btn.innerHTML;
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:14px;height:14px;"></span> Applying...';
+
+          try {
+            const resp = await fetch('/school-admin/student-status/index.html', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+              },
+              body: JSON.stringify({
+                student_id: studentCode,
+                status: newStatus,
+                reason: reason
+              })
+            });
+            const res = await resp.json();
+            if (res.status === 'success') {
+              const table = window.S2DActiveTables && window.S2DActiveTables['sch-students-table'];
+              if (table && table.rawData) {
+                const rec = table.rawData.find(r => r.code === studentCode || r.id === studentCode);
+                if (rec) {
+                  rec.status = newStatus;
+                  table.renderRows();
+                }
+              }
+              const selOpt = document.querySelector(`#selectTargetStudent option[value="${studentCode}"]`);
+              if (selOpt) {
+                selOpt.textContent = selOpt.textContent.replace(/Current: \w+/, `Current: ${newStatus}`);
+              }
+              updateBadgeCounts(res.active_count, res.inactive_count, res.suspended_count);
+              window.S2DNotify.show({
+                title: 'Status Updated in Database',
+                description: res.message,
+                type: 'success'
+              });
+              reasonInput.value = '';
+            } else {
+              window.S2DNotify.show({
+                title: 'Update Error',
+                description: res.message || 'Could not update status.',
+                type: 'danger'
+              });
+            }
+          } catch (err) {
+            formSingle.submit();
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = oldBtnText;
+            if (window.lucide) lucide.createIcons();
+          }
+        });
+      }
+
+      // Handle Batch Activation / Suspension
+      async function triggerBatchAction(newStatus) {
+        const table = window.S2DActiveTables && window.S2DActiveTables['sch-students-table'];
+        const selectedIds = table ? Array.from(table.state.selectedIds) : [];
+        if (!selectedIds.length) {
+          window.S2DNotify.show({
+            title: 'No Students Selected',
+            description: 'Please select one or more students using the checkboxes in the table first.',
+            type: 'warning'
+          });
+          return;
+        }
+
+        const ok = await window.S2DModal.confirm({
+          title: `${newStatus === 'Active' ? 'Activate' : 'Suspend'} ${selectedIds.length} Student(s)?`,
+          recordLabel: `${selectedIds.length} student accounts`,
+          message: `This will update the account status to "${newStatus}" for all selected students in the database.`,
+          confirmLabel: newStatus === 'Active' ? 'Activate Now' : 'Suspend Accounts',
+          variant: newStatus === 'Active' ? 'success' : 'danger'
+        });
+        if (!ok) return;
+
+        try {
+          const resp = await fetch('/school-admin/student-status/index.html', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCsrfToken(),
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              student_ids: selectedIds,
+              status: newStatus,
+              reason: `Batch ${newStatus} applied via School Admin dashboard`
+            })
+          });
+          const res = await resp.json();
+          if (res.status === 'success') {
+            if (table && table.rawData) {
+              table.rawData.forEach(r => {
+                if (selectedIds.includes(r.id) || selectedIds.includes(r.code)) {
+                  r.status = newStatus;
+                }
+              });
+              table.state.selectedIds.clear();
+              table.renderRows();
+            }
+            updateBadgeCounts(res.active_count, res.inactive_count, res.suspended_count);
+            window.S2DNotify.show({
+              title: `Batch ${newStatus} Complete`,
+              description: res.message,
+              type: 'success'
+            });
+          }
+        } catch (err) {
+          window.S2DNotify.show({
+            title: 'Batch Action Failed',
+            description: 'Could not complete batch update.',
+            type: 'danger'
+          });
+        }
+      }
+
+      if (btnBatchActivate) {
+        btnBatchActivate.addEventListener('click', () => triggerBatchAction('Active'));
+      }
+      if (btnBatchSuspend) {
+        btnBatchSuspend.addEventListener('click', () => triggerBatchAction('Suspended'));
+      }
+    });
+  </script>
 </body>
 </html>

@@ -27,26 +27,21 @@
               id: 'sa-schools', label: 'School Management', icon: 'building-2',
               children: [
                 { label: 'School Directory', href: 'super-admin/schools/list.html' },
-                { label: 'Add New School', href: 'super-admin/schools/add.html' },
-                { label: 'Edit School Record', href: 'super-admin/schools/edit.html' },
-                { label: 'School 360° Details', href: 'super-admin/schools/details.html' }
+                { label: 'Add New School', href: 'super-admin/schools/add.html' }
               ]
             },
             {
               id: 'sa-franchises', label: 'Franchise Partners', icon: 'network',
               children: [
                 { label: 'Partner Directory', href: 'super-admin/franchises/list.html' },
-                { label: 'Onboard Franchise', href: 'super-admin/franchises/add.html' },
-                { label: 'Territory Performance', href: 'super-admin/franchises/details.html' }
+                { label: 'Onboard Franchise', href: 'super-admin/franchises/add.html' }
               ]
             },
             {
               id: 'sa-school-admins', label: 'School Administrators', icon: 'user-cog',
               children: [
                 { label: 'Administrator List', href: 'super-admin/school-admins/list.html' },
-                { label: 'Add School Admin', href: 'super-admin/school-admins/add.html' },
-                { label: 'Edit School Admin', href: 'super-admin/school-admins/edit.html' },
-                { label: 'Admin Profile & Logs', href: 'super-admin/school-admins/details.html' }
+                { label: 'Add School Admin', href: 'super-admin/school-admins/add.html' }
               ]
             }
           ]
@@ -86,17 +81,13 @@
             },
             {
               id: 'sa-payments', label: 'Payments & Ledger', icon: 'credit-card',
-              children: [
-                { label: 'Transaction Overview', href: 'super-admin/payments/overview.html' },
-                { label: 'Payment Receipt Detail', href: 'super-admin/payments/details.html' }
-              ]
+              href: 'super-admin/payments/overview.html'
             },
             {
               id: 'sa-devices', label: 'Device Fleet (MDM)', icon: 'tablet-smartphone',
               children: [
                 { label: 'Device Registry & Compliance', href: 'super-admin/devices/list.html' },
-                { label: 'Register & Assign Device', href: 'super-admin/devices/register.html' },
-                { label: 'Device Telemetry Details', href: 'super-admin/devices/details.html' }
+                { label: 'Register & Assign Device', href: 'super-admin/devices/register.html' }
               ]
             },
             { id: 'sa-reports', label: 'School-wise Reports', icon: 'bar-chart-3', href: 'super-admin/reports/index.html' }
@@ -138,18 +129,14 @@
               id: 'fr-schools', label: 'Assigned Schools', icon: 'building-2',
               children: [
                 { label: 'Assigned School List', href: 'franchise/schools/list.html' },
-                { label: 'Onboard School', href: 'franchise/schools/add.html' },
-                { label: 'Edit School Record', href: 'franchise/schools/edit.html' },
-                { label: 'School Details', href: 'franchise/schools/details.html' }
+                { label: 'Onboard School', href: 'franchise/schools/add.html' }
               ]
             },
             {
               id: 'fr-students', label: 'Student Directory', icon: 'users',
               children: [
                 { label: 'Student List', href: 'franchise/students/list.html' },
-                { label: 'Add Student', href: 'franchise/students/add.html' },
-                { label: 'Edit Student', href: 'franchise/students/edit.html' },
-                { label: 'Student Profile', href: 'franchise/students/details.html' }
+                { label: 'Add Student', href: 'franchise/students/add.html' }
               ]
             },
             { id: 'fr-bulk', label: 'Bulk Student Upload', icon: 'file-spreadsheet', href: 'franchise/bulk-upload/index.html' },
@@ -198,9 +185,7 @@
               id: 'sa2-students', label: 'Student Management', icon: 'graduation-cap',
               children: [
                 { label: 'Student Directory', href: 'school-admin/students/list.html' },
-                { label: 'Enroll Student', href: 'school-admin/students/add.html' },
-                { label: 'Edit Student', href: 'school-admin/students/edit.html' },
-                { label: 'Student 360° Details', href: 'school-admin/students/details.html' }
+                { label: 'Enroll Student', href: 'school-admin/students/add.html' }
               ]
             },
             { id: 'sa2-bulk', label: 'Bulk Student Upload', icon: 'file-spreadsheet', href: 'school-admin/bulk-upload/index.html' },
@@ -215,9 +200,7 @@
               id: 'sa2-guardians', label: 'Parents & Guardians', icon: 'heart-handshake',
               children: [
                 { label: 'Guardian & Whitelist', href: 'school-admin/guardians/list.html' },
-                { label: 'Add Guardian', href: 'school-admin/guardians/add.html' },
-                { label: 'Edit Guardian', href: 'school-admin/guardians/edit.html' },
-                { label: 'Guardian Details', href: 'school-admin/guardians/details.html' }
+                { label: 'Add Guardian', href: 'school-admin/guardians/add.html' }
               ]
             },
             { id: 'sa2-codes', label: 'Student Unique Codes', icon: 'key-round', href: 'school-admin/student-codes/index.html' },

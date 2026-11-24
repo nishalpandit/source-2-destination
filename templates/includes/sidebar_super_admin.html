@@ -39,8 +39,6 @@
       <div class="sidebar-submenu">
         <a href="/super-admin/schools/list.html" class="sidebar-sublink {% if request.path == '/super-admin/schools/list.html' %}active{% endif %}">School Directory</a>
         <a href="/super-admin/schools/add.html" class="sidebar-sublink {% if request.path == '/super-admin/schools/add.html' %}active{% endif %}">Add New School</a>
-        <a href="/super-admin/schools/edit.html" class="sidebar-sublink {% if request.path == '/super-admin/schools/edit.html' %}active{% endif %}">Edit School Record</a>
-        <a href="/super-admin/schools/details.html" class="sidebar-sublink {% if request.path == '/super-admin/schools/details.html' %}active{% endif %}">School 360° Details</a>
       </div>
     </div>
 
@@ -54,7 +52,6 @@
       <div class="sidebar-submenu">
         <a href="/super-admin/franchises/list.html" class="sidebar-sublink {% if request.path == '/super-admin/franchises/list.html' %}active{% endif %}">Partner Directory</a>
         <a href="/super-admin/franchises/add.html" class="sidebar-sublink {% if request.path == '/super-admin/franchises/add.html' %}active{% endif %}">Onboard Franchise</a>
-        <a href="/super-admin/franchises/details.html" class="sidebar-sublink {% if request.path == '/super-admin/franchises/details.html' %}active{% endif %}">Territory Performance</a>
       </div>
     </div>
 
@@ -66,10 +63,8 @@
       </button>
       <div class="sidebar-tooltip">School Administrators</div>
       <div class="sidebar-submenu">
-        <a href="/super-admin/school-admins/list.html" class="sidebar-sublink {% if request.path == '/super-admin/school-admins/list.html' %}active{% endif %}">Administrator List</a>
-        <a href="/super-admin/school-admins/add.html" class="sidebar-sublink {% if request.path == '/super-admin/school-admins/add.html' %}active{% endif %}">Add School Admin</a>
-        <a href="/super-admin/school-admins/edit.html" class="sidebar-sublink {% if request.path == '/super-admin/school-admins/edit.html' %}active{% endif %}">Edit School Admin</a>
-        <a href="/super-admin/school-admins/details.html" class="sidebar-sublink {% if request.path == '/super-admin/school-admins/details.html' %}active{% endif %}">Admin Profile &amp; Logs</a>
+        <a href="/super-admin/school-admins/list.html" class="sidebar-sublink {% if request.path == '/super-admin/school-admins/list.html' %}active{% endif %}">Administrator Fleet</a>
+        <a href="/super-admin/school-admins/add.html" class="sidebar-sublink {% if request.path == '/super-admin/school-admins/add.html' %}active{% endif %}">Provision Admin</a>
       </div>
     </div>
   </div>
@@ -147,17 +142,12 @@
       </div>
     </div>
 
-    <div class="nav-item-box {% if '/super-admin/payments/' in request.path %}open{% endif %}">
-      <button type="button" class="sidebar-parent-btn {% if '/super-admin/payments/' in request.path %}active-parent{% endif %}" aria-expanded="{% if '/super-admin/payments/' in request.path %}true{% else %}false{% endif %}">
+    <div class="nav-item-box">
+      <a href="/super-admin/payments/overview.html" class="sidebar-link {% if '/super-admin/payments/' in request.path %}active{% endif %}">
         <span class="sidebar-link-icon"><i data-lucide="credit-card"></i></span>
         <span class="sidebar-link-label">Payments &amp; Ledger</span>
-        <i data-lucide="chevron-right" class="sidebar-chevron"></i>
-      </button>
+      </a>
       <div class="sidebar-tooltip">Payments &amp; Ledger</div>
-      <div class="sidebar-submenu">
-        <a href="/super-admin/payments/overview.html" class="sidebar-sublink {% if request.path == '/super-admin/payments/overview.html' %}active{% endif %}">Transaction Overview</a>
-        <a href="/super-admin/payments/details.html" class="sidebar-sublink {% if request.path == '/super-admin/payments/details.html' %}active{% endif %}">Payment Receipt Detail</a>
-      </div>
     </div>
 
     <div class="nav-item-box {% if '/super-admin/devices/' in request.path %}open{% endif %}">
@@ -170,7 +160,6 @@
       <div class="sidebar-submenu">
         <a href="/super-admin/devices/list.html" class="sidebar-sublink {% if request.path == '/super-admin/devices/list.html' %}active{% endif %}">Device Registry &amp; Compliance</a>
         <a href="/super-admin/devices/register.html" class="sidebar-sublink {% if request.path == '/super-admin/devices/register.html' %}active{% endif %}">Register &amp; Assign Device</a>
-        <a href="/super-admin/devices/details.html" class="sidebar-sublink {% if request.path == '/super-admin/devices/details.html' %}active{% endif %}">Device Telemetry Details</a>
       </div>
     </div>
 

@@ -205,6 +205,14 @@ th.sorted-desc .sort-indicator {
   position: relative;
   width: 56px;
 }
+.row-action-cell:has(.s2d-dropdown-menu.show),
+.s2d-table tbody tr:has(.s2d-dropdown-menu.show),
+.table-card:has(.s2d-dropdown-menu.show),
+.s2d-table-wrap:has(.s2d-dropdown-menu.show) {
+  z-index: 1060;
+  position: relative;
+  overflow: visible !important;
+}
 
 .row-action-btn {
   width: 30px;

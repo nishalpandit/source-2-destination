@@ -39,8 +39,6 @@
       <div class="sidebar-submenu">
         <a href="/school-admin/students/list.html" class="sidebar-sublink {% if request.path == '/school-admin/students/' or request.path == '/school-admin/students/list.html' %}active{% endif %}">Student Directory</a>
         <a href="/school-admin/students/add.html" class="sidebar-sublink {% if request.path == '/school-admin/students/add.html' %}active{% endif %}">Enroll Student</a>
-        <a href="/school-admin/students/edit.html" class="sidebar-sublink {% if request.path == '/school-admin/students/edit.html' %}active{% endif %}">Edit Student</a>
-        <a href="/school-admin/students/details.html" class="sidebar-sublink {% if request.path == '/school-admin/students/details.html' %}active{% endif %}">Student 360° Details</a>
       </div>
     </div>
 
@@ -75,8 +73,6 @@
       <div class="sidebar-submenu">
         <a href="/school-admin/guardians/" class="sidebar-sublink {% if request.path == '/school-admin/guardians/' or request.path == '/school-admin/guardians/list.html' %}active{% endif %}">Guardian &amp; Whitelist</a>
         <a href="/school-admin/guardians/add.html" class="sidebar-sublink {% if request.path == '/school-admin/guardians/add.html' %}active{% endif %}">Add Guardian</a>
-        <a href="/school-admin/guardians/edit.html" class="sidebar-sublink {% if request.path == '/school-admin/guardians/edit.html' %}active{% endif %}">Edit Guardian</a>
-        <a href="/school-admin/guardians/details.html" class="sidebar-sublink {% if request.path == '/school-admin/guardians/details.html' %}active{% endif %}">Guardian Details</a>
       </div>
     </div>
 
@@ -159,8 +155,8 @@
       </button>
       <div class="sidebar-tooltip">Device Assignments</div>
       <div class="sidebar-submenu">
-        <a href="/school-admin/device-assignments/list.html" class="sidebar-sublink {% if request.path == '/school-admin/device-assignments/list.html' %}active{% endif %}">Assigned Booths</a>
-        <a href="/school-admin/device-assignments/assign.html" class="sidebar-sublink {% if request.path == '/school-admin/device-assignments/assign.html' %}active{% endif %}">Assign Booth Device</a>
+        <a href="/school-admin/device-assignments/list.html" class="sidebar-sublink {% if request.path == '/school-admin/device-assignments/list.html' %}active{% endif %}">All Enrolled Devices</a>
+        <a href="/school-admin/device-assignments/assign.html" class="sidebar-sublink {% if request.path == '/school-admin/device-assignments/assign.html' %}active{% endif %}">Assign Device / Phone</a>
       </div>
     </div>
 
