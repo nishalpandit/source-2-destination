@@ -102,7 +102,15 @@
                         {% endif %}
                       </td>
                       <td>
-                        <button type="button" class="btn-copy" data-copy-text="{{ c.code }}" title="Copy calling code"><i data-lucide="copy" style="width:14px;height:14px;"></i></button>
+                        <div class="d-flex align-items-center gap-1">
+                          <button type="button" class="btn-copy" data-copy-text="{{ c.code }}" title="Copy calling code"><i data-lucide="copy" style="width:14px;height:14px;"></i></button>
+                          <button type="button" class="btn-s2d btn-s2d-ghost btn-sm-s2d btn-icon-s2d text-primary" data-code-action="rotate" data-student-id="{{ c.student_code }}" title="Rotate Calling Code"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i></button>
+                          {% if c.status == 'Active' %}
+                          <button type="button" class="btn-s2d btn-s2d-ghost btn-sm-s2d btn-icon-s2d text-danger" data-code-action="suspend_code" data-student-id="{{ c.student_code }}" title="Suspend Code"><i data-lucide="ban" style="width:14px;height:14px;"></i></button>
+                          {% else %}
+                          <button type="button" class="btn-s2d btn-s2d-ghost btn-sm-s2d btn-icon-s2d text-success" data-code-action="activate_code" data-student-id="{{ c.student_code }}" title="Activate Code"><i data-lucide="check" style="width:14px;height:14px;"></i></button>
+                          {% endif %}
+                        </div>
                       </td>
                     </tr>
                     {% empty %}
@@ -138,6 +146,52 @@
   </script>
   <script src="{% static 'js/app.js' %}"></script>
   <script>
+    document.querySelectorAll('[data-code-action]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const action = btn.getAttribute('data-code-action');
+        const studentId = btn.getAttribute('data-student-id');
+        const actLabel = action === 'rotate' ? 'Rotate / Re-issue Calling Code' : (action === 'suspend_code' ? 'Suspend Calling Code' : 'Activate Calling Code');
+        const ok = await window.S2DModal.confirm({
+          title: `${actLabel}?`,
+          recordLabel: `Student ${studentId}`,
+          message: action === 'rotate'
+            ? 'A new collision-free cryptographic calling code will be issued immediately in the database.'
+            : `Code status will be updated to ${action === 'suspend_code' ? 'Suspended' : 'Active'} in the live database.`,
+          confirmLabel: action === 'rotate' ? 'Rotate Now' : (action === 'suspend_code' ? 'Suspend Code' : 'Activate Code'),
+          variant: action === 'suspend_code' ? 'danger' : 'primary'
+        });
+        if (!ok) return;
+
+        try {
+          const csrf = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value 
+            || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+          const res = await fetch('index.html', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrf,
+              'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({
+              student_id: studentId,
+              action: action
+            })
+          });
+          const json = await res.json();
+          if (json.status === 'success') {
+            window.S2DNotify.show({
+              title: 'Calling Code Updated',
+              description: `Action completed for ${studentId} in database.`,
+              type: 'success'
+            });
+            setTimeout(() => window.location.reload(), 500);
+          }
+        } catch (err) {
+          window.location.reload();
+        }
+      });
+    });
+
     document.querySelectorAll('.btn-copy').forEach((btn) => {
       btn.addEventListener('click', () => {
         const text = btn.getAttribute('data-copy-text');

@@ -1,12 +1,5 @@
 """
-Calling Rules, Schedules, Validity & Credit Engines
-Source 2 Destination — Shared Business Logic (Flowchart Layer 5)
-Provides precision engines for:
-1. Calling Duration Rules & Ceilings
-2. Weekly Calling Schedules & Curfew Quiet Hours
-3. Student Validity & Expiration Lifecycle
-4. Recharge Plans, Credit Ledger & Top-ups
-5. Call Authorization Engine (whitelisting, schedules, duration, validity)
+Business logic for calling rules, schedules, student validity, and call sessions.
 """
 import math
 import uuid
@@ -50,19 +43,16 @@ def get_global_validity_rule():
 
 
 class CallingDurationEngine:
-    """
-    Computes effective per-call and daily calling duration limits for a student,
-    strictly bounded by Super Admin hard ceilings and Franchise/School policies.
-    """
+    """Calculates per-call and daily duration limits for a student."""
     @classmethod
     def resolve_limits(cls, student):
         global_rule = get_global_duration_rule()
 
-        # Baseline limits from Super Admin ceiling
+        # start with global limits
         max_call_cap = global_rule.hard_max_call_duration  # 20 mins max
         daily_cap = global_rule.max_daily_student_cap      # 30 mins max
 
-        # Check campus-specific duration rule (if defined)
+        # check school override
         if student and student.school:
             campus_rule = CampusDurationRule.objects.filter(
                 school=student.school,
@@ -106,10 +96,7 @@ class CallingDurationEngine:
 
 
 class CallingScheduleEngine:
-    """
-    Evaluates whether an outgoing call request is within authorized schedule windows,
-    respecting academic quiet hours, curfew cutoffs, and student-wise exceptions.
-    """
+    """Checks whether outgoing calls are permitted at the current time."""
     DAY_ABBREVIATIONS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
 
     @classmethod
@@ -174,9 +161,7 @@ class CallingScheduleEngine:
 
 
 class ValidityService:
-    """
-    Manages account validity lifecycle, reminders, grace periods, and bulk extensions.
-    """
+    """Tracks account validity status, grace periods, and bulk extensions."""
     @classmethod
     def evaluate(cls, student):
         """
@@ -228,9 +213,7 @@ class ValidityService:
 
 
 class RechargeService:
-    """
-    Handles calling pack activations, minute balance top-ups, and ledger recordings.
-    """
+    """Handles recharge plans and updates minute balances."""
     @classmethod
     def process_recharge(cls, student, plan, payment_mode="Campus Bursar Desk Ledger", voucher_ref="", status="Successful"):
         """
@@ -273,16 +256,7 @@ class RechargeService:
 
 
 class CallAuthorizationEngine:
-    """
-    Precision Call Authorization Engine matching Layer 5 of flowchart:
-    All Calling Conditions Passed?
-    1. Check Enrolled Student Account Status (Active?)
-    2. Calling Validity Active? (Not Expired?)
-    3. Within Authorized Schedule?
-    4. Dialed Number Authorized on Guardian Whitelist?
-    5. Available Duration Remaining?
-    -> Return (authorized: bool, max_seconds: int, reason: str)
-    """
+    """Validates student status, validity, whitelist, schedule, and duration."""
     @classmethod
     def authorize_call(cls, student_code_or_obj, dialed_number):
         # Resolve Student
@@ -296,16 +270,16 @@ class CallAuthorizationEngine:
         if not student:
             return False, 0, "Student authentication failed: Invalid calling code."
 
-        # Check 1: Account Status
+        # check student account status
         if student.status != 'Active' or student.code_status == 'Suspended':
             return False, 0, "Access denied: Student account is suspended or inactive. Contact school admin."
 
-        # Check 2: Validity Status
+        # check validity status
         validity = ValidityService.evaluate(student)
         if not validity["is_usable"]:
             return False, 0, "Validity expired: Account calling validity expired. Recharge required."
 
-        # Check 3: Authorized Guardian Whitelist
+        # check guardian whitelist
         clean_dialed = "".join(filter(str.isdigit, str(dialed_number)))
         authorized_numbers = []
 
@@ -333,12 +307,12 @@ class CallAuthorizationEngine:
         if not is_whitelisted:
             return False, 0, f"Unauthorized number: Dialing {dialed_number} is rejected by parent whitelist policy."
 
-        # Check 4: Within Authorized Schedule Window
+        # check calling schedule window
         allowed_in_sched, sched_reason, window_type = CallingScheduleEngine.is_call_allowed(student)
         if not allowed_in_sched:
             return False, 0, f"Time restriction: {sched_reason}"
 
-        # Check 5: Available Duration
+        # check available duration
         dur_limits = CallingDurationEngine.resolve_limits(student)
         effective_minutes = dur_limits["effective_per_call_limit"]
 
@@ -350,11 +324,7 @@ class CallAuthorizationEngine:
 
 
 class CallSessionManager:
-    """
-    State machine and lifecycle coordinator for active calling sessions.
-    Handles token-based initiation, real-time minute metering, atomic balance deductions,
-    and call record ledger generation.
-    """
+    """Coordinates call session start, end, and minute deductions."""
     @classmethod
     def initiate_session(cls, student_code_or_obj, dialed_number, device_id="Kiosk Booth"):
         """

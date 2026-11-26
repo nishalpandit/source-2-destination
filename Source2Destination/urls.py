@@ -24,6 +24,7 @@ urlpatterns = [
     # Super Admin School Management Specific Views
     path('super-admin/schools/', admin_views.schools_list, name='super_admin_schools_list'),
     path('super-admin/schools/list.html', admin_views.schools_list, name='super_admin_schools_list_html'),
+    path('super-admin/schools/status/', admin_views.school_toggle_status, name='super_admin_school_status'),
     path('super-admin/schools/add.html', admin_views.school_add, name='super_admin_school_add'),
     path('super-admin/schools/edit.html', admin_views.school_edit, name='super_admin_school_edit'),
     path('super-admin/schools/details.html', admin_views.school_details, name='super_admin_school_details'),
@@ -41,27 +42,30 @@ urlpatterns = [
     path('super-admin/recharges/create-plan.html', admin_views.recharge_create_plan, name='super_admin_recharge_create_plan'),
     path('super-admin/recharges/history.html', admin_views.recharge_history, name='super_admin_recharge_history'),
 
-    # Super Admin Fleet: School Administrators (Phase 1)
+    # Super Admin Fleet: School Administrators 
     path('super-admin/school-admins/', admin_views.school_admins_list, name='super_admin_school_admins_list'),
     path('super-admin/school-admins/list.html', admin_views.school_admins_list, name='super_admin_school_admins_list_html'),
+    path('super-admin/school-admins/status/', admin_views.school_admin_toggle_status, name='super_admin_school_admin_status'),
     path('super-admin/school-admins/add.html', admin_views.school_admin_add, name='super_admin_school_admin_add'),
     path('super-admin/school-admins/edit.html', admin_views.school_admin_edit, name='super_admin_school_admin_edit'),
     path('super-admin/school-admins/details.html', admin_views.school_admin_details, name='super_admin_school_admin_details'),
 
-    # Super Admin Fleet: Regional Franchise Partners (Phase 1B)
+    # Super Admin Fleet: Regional Franchise Partners 
     path('super-admin/franchises/', admin_views.franchises_list, name='super_admin_franchises_list'),
     path('super-admin/franchises/list.html', admin_views.franchises_list, name='super_admin_franchises_list_html'),
+    path('super-admin/franchises/status/', admin_views.franchise_toggle_status, name='super_admin_franchise_status'),
     path('super-admin/franchises/add.html', admin_views.franchise_add, name='super_admin_franchise_add'),
     path('super-admin/franchises/edit.html', admin_views.franchise_edit, name='super_admin_franchise_edit'),
     path('super-admin/franchises/details.html', admin_views.franchise_details, name='super_admin_franchise_details'),
+    path('super-admin/subscriptions/renew/', admin_views.subscription_renew, name='super_admin_subscription_renew'),
 
-    # Super Admin Hardware: Android Enterprise Kiosks (Phase 2)
+    # Super Admin Hardware: Android Enterprise Kiosks 
     path('super-admin/devices/', admin_views.devices_list, name='super_admin_devices_list'),
     path('super-admin/devices/list.html', admin_views.devices_list, name='super_admin_devices_list_html'),
     path('super-admin/devices/register.html', admin_views.device_register, name='super_admin_device_register'),
     path('super-admin/devices/details.html', admin_views.device_details, name='super_admin_device_details'),
 
-    # Super Admin Commercial: Subscriptions & Payments (Phase 3)
+    # Super Admin Commercial: Subscriptions & Payments 
     path('super-admin/subscriptions/', admin_views.subscriptions_overview, name='super_admin_subscriptions_overview'),
     path('super-admin/subscriptions/overview.html', admin_views.subscriptions_overview, name='super_admin_subscriptions_overview_html'),
     path('super-admin/subscriptions/create.html', admin_views.subscription_create, name='super_admin_subscription_create'),
@@ -69,14 +73,14 @@ urlpatterns = [
     path('super-admin/payments/overview.html', admin_views.payments_overview, name='super_admin_payments_overview_html'),
     path('super-admin/payments/details.html', admin_views.payment_details, name='super_admin_payment_details'),
 
-    # Super Admin Intelligence: Call Telemetry & Reports (Phase 4)
+    # Super Admin Intelligence: Call Telemetry & Reports 
     path('super-admin/call-history/', admin_views.call_history, name='super_admin_call_history'),
     path('super-admin/call-history/index.html', admin_views.call_history, name='super_admin_call_history_html'),
     path('super-admin/reports/', admin_views.reports_overview, name='super_admin_reports_overview'),
     path('super-admin/reports/index.html', admin_views.reports_overview, name='super_admin_reports_overview_html'),
     path('super-admin/reports/export.csv', admin_views.export_reports_csv, name='super_admin_reports_export_csv'),
 
-    # Super Admin Governance: Platform Settings & Audit (Phase 5)
+    # Super Admin Governance: Platform Settings & Audit 
     path('super-admin/settings/general.html', admin_views.settings_general, name='super_admin_settings_general'),
     path('super-admin/settings/notifications.html', admin_views.settings_notifications, name='super_admin_settings_notifications'),
     path('super-admin/settings/audit-logs.html', admin_views.settings_audit_logs, name='super_admin_settings_audit_logs'),
@@ -176,9 +180,15 @@ urlpatterns = [
     path('school-admin/class-reports/export.csv', school_views.export_class_reports_csv, name='school_admin_class_reports_export_csv'),
     path('school-admin/settings/', school_views.school_settings, name='school_admin_settings'),
     path('school-admin/settings/index.html', school_views.school_settings, name='school_admin_settings_html'),
+    path('school-admin/devices/status/', school_views.device_toggle_status, name='school_admin_device_status'),
+    path('school-admin/guardians/status/', school_views.guardian_toggle_status, name='school_admin_guardian_status'),
+    path('school-admin/hostel-wardens/status/', school_views.warden_toggle_status, name='school_admin_warden_status'),
+    path('school-admin/classes/status/', school_views.class_toggle_status, name='school_admin_class_status'),
+    path('school-admin/classes/section-status/', school_views.section_toggle_status, name='school_admin_section_status'),
+    path('school-admin/validity/extend-student/', school_views.validity_extend_student, name='school_admin_validity_extend_student'),
     re_path(r'^school-admin/(?P<path>.+?)/?$', school_views.render_school_page, name='school_admin_page'),
 
-    # Clean & Direct Mobile API Endpoints (Flowchart Section 4 & Section 7)
+    # Mobile API Endpoints
     path('api/status/', Api_views.api_status, name='api_status'),
     path('api/device/enroll/', Api_views.device_enroll, name='api_device_enroll'),
     path('api/device/heartbeat/', Api_views.device_heartbeat, name='api_device_heartbeat'),
@@ -187,11 +197,11 @@ urlpatterns = [
     path('api/student/<str:student_code>/profile/', Api_views.student_profile, name='api_student_profile'),
     path('api/student/<str:student_code>/status/', Api_views.student_profile, name='api_student_status'),
     path('api/student/<str:student_code>/validity/', Api_views.student_validity, name='api_student_validity'),
+    path('api/student/<str:student_code>/schedule/', Api_views.student_schedule_verification, name='api_student_schedule_verification'),
     path('api/student/<str:student_code>/contacts/', Api_views.student_contacts, name='api_student_contacts'),
     path('api/student/<str:student_code>/history/', Api_views.student_call_history, name='api_student_call_history'),
     path('api/call/authorize/', Api_views.call_authorize, name='api_call_authorize'),
     path('api/call/terminate/', Api_views.call_terminate, name='api_call_terminate'),
-    path('api/call/recordings/upload/', Api_views.call_recording_upload, name='api_call_recording_upload'),
     path('api/school/<str:school_code>/students/sync/', Api_views.student_bulk_sync, name='api_student_bulk_sync'),
     path('api/payments/webhook/', Api_views.payment_webhook, name='api_payment_webhook'),
     path('api/student/sos/', Api_views.student_emergency_sos, name='api_student_sos'),
@@ -206,6 +216,7 @@ urlpatterns = [
     path('api/v1/kiosk/student/<str:student_code>/profile/', Api_views.student_profile),
     path('api/v1/kiosk/student/<str:student_code>/status/', Api_views.student_profile),
     path('api/v1/kiosk/student/<str:student_code>/validity/', Api_views.student_validity),
+    path('api/v1/kiosk/student/<str:student_code>/schedule/', Api_views.student_schedule_verification),
     path('api/v1/kiosk/student/<str:student_code>/contacts/', Api_views.student_contacts),
     path('api/v1/kiosk/student/<str:student_code>/history/', Api_views.student_call_history),
     path('api/v1/kiosk/call/authorize/', Api_views.call_authorize),

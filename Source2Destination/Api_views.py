@@ -1,10 +1,5 @@
 """
-API & Telemetry Views
-Source 2 Destination — Dedicated strictly to the Student Mobile Application & Android Enterprise Kiosk.
-Flowchart:
-- Section 7: Android Enterprise / Kiosk Device Control (Enrollment, Heartbeat, MDM lock)
-- Section 4: Student Mobile Application (Restricted Kiosk Mode, Auth, Whitelist, Calling)
-- Section 5: Central Backend & Call Session Engines
+API views for student mobile app and kiosk devices.
 """
 import os
 import json
@@ -28,7 +23,7 @@ from .calling_services import (
 
 
 def _parse_request_data(request):
-    """Safely extracts dictionary from JSON body or POST form data."""
+    """Parse request body as JSON or fallback to POST/GET params."""
     if request.body:
         try:
             return json.loads(request.body.decode('utf-8'))
@@ -38,7 +33,7 @@ def _parse_request_data(request):
 
 
 def api_status(request):
-    """Health check / API status endpoint."""
+    """Health check endpoint."""
     return JsonResponse({
         "status": "online",
         "service": "Source 2 Destination Student Mobile & Kiosk API",
@@ -49,11 +44,7 @@ def api_status(request):
 
 @csrf_exempt
 def device_enroll(request):
-    """
-    Android App First-Install Handshake (Flowchart Section 7).
-    Reports hardware device_id and model name to register in the campus fleet.
-    Payload: device_id, model_name (optional: school_code).
-    """
+    """Register kiosk hardware or update last seen timestamp."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required for device enrollment."}, status=405)
 
@@ -104,11 +95,7 @@ def device_enroll(request):
 
 @csrf_exempt
 def device_heartbeat(request):
-    """
-    Android Kiosk Heartbeat (Flowchart Section 7).
-    Simple ping to maintain device online status.
-    Payload: device_id.
-    """
+    """Keep-alive ping from kiosk devices."""
     data = _parse_request_data(request)
     device_id = (data.get('device_id') or '').strip()
 
@@ -126,17 +113,7 @@ def device_heartbeat(request):
 
 @csrf_exempt
 def student_auth(request):
-    """
-    Student App Hardware-Locked Authentication Gate (Flowchart Section 4).
-    Enforces Plan A:
-    1. Validates device_id exists.
-    2. Enforces 1-to-1 hardware binding:
-       - Mismatched student code -> 403 HARDWARE_MISMATCH.
-       - Unassigned device -> 403 DEVICE_NOT_ASSIGNED.
-    3. Validates PIN and active student status.
-    4. Returns student info, duration limit, and whitelisted contacts.
-    Payload: device_id, student_code, pin.
-    """
+    """Authenticate student by device and student code, returning limits and contacts."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required for student authentication."}, status=405)
 
@@ -148,7 +125,7 @@ def student_auth(request):
     if not device_id:
         return JsonResponse({"error": "MISSING_DEVICE_ID", "message": "device_id is required."}, status=400)
 
-    # 1. Device Enrollment Verification
+    # check if device is registered
     device = KioskDevice.objects.filter(device_id=device_id).select_related('school', 'assigned_student').first()
     if not device:
         return JsonResponse({
@@ -156,14 +133,14 @@ def student_auth(request):
             "message": "This device is not enrolled in the campus system."
         }, status=404)
 
-    # If student_code is omitted on dedicated handset, automatically resolve assigned student
+    # resolve student if device is assigned to a specific student
     if not student_code and device.assignment_type == 'Student' and device.assigned_student:
         student_code = device.assigned_student.code
 
     if not student_code:
         return JsonResponse({"error": "MISSING_STUDENT_CODE", "message": "student_code is required."}, status=400)
 
-    # 2. Strict Hardware Binding Security Gate (Plan A)
+    # verify device assignment
     if device.assignment_type == 'Student':
         if not device.assigned_student:
             return JsonResponse({
@@ -179,7 +156,7 @@ def student_auth(request):
 
         student = device.assigned_student
     else:
-        # Shared Hostel Booth Mode
+        # shared booth mode - match against school
         student = Student.objects.filter(
             Q(code=student_code) | Q(calling_code=student_code),
             school=device.school
@@ -190,14 +167,14 @@ def student_auth(request):
                 "message": f"Student code {student_code} does not exist at {device.school.name}."
             }, status=401)
 
-    # 3. Security PIN Verification (Optional: Hardware-locked devices authenticate directly without PIN)
+    # verify pin if student has one set
     if pin and student.pin and student.pin != pin:
         return JsonResponse({
             "error": "INVALID_PIN",
             "message": "Incorrect PIN."
         }, status=401)
 
-    # 4. Student Account Lifecycle Status
+    # verify account and validity
     if student.status != 'Active':
         return JsonResponse({
             "error": "ACCOUNT_INACTIVE",
@@ -210,7 +187,7 @@ def student_auth(request):
             "message": "Calling validity has expired. Recharge required."
         }, status=403)
 
-    # 5. Duration Limits & Whitelisted Contacts Assembly
+    # get duration limits and allowed contacts
     dur_limits = CallingDurationEngine.resolve_limits(student)
 
     contacts = []
@@ -256,11 +233,7 @@ def student_auth(request):
 
 
 def student_profile(request, student_code):
-    """
-    Student Real-time Profile & Quota (Flowchart Section 4).
-    Returns real-time balance, validity expiry, daily limit, and schedule status.
-    Path param: student_code.
-    """
+    """Fetch student quota, minutes balance, and calling status."""
     student = Student.objects.filter(
         Q(code=student_code) | Q(calling_code=student_code)
     ).select_related('school').first()
@@ -294,12 +267,7 @@ def student_profile(request, student_code):
 
 
 def student_validity(request, student_code):
-    """
-    Student Account Validity Checkup (Flowchart Section 4 & Section 5).
-    Evaluates account validity lifecycle, expiration date, calling status,
-    remaining quota, wallet balance, and recommended recharge packs.
-    Path param: student_code.
-    """
+    """Check student calling validity, remaining minutes, and available recharge packs."""
     student = Student.objects.filter(
         Q(code=student_code) | Q(calling_code=student_code)
     ).select_related('school').first()
@@ -351,12 +319,65 @@ def student_validity(request, student_code):
     }, status=200)
 
 
+def student_schedule_verification(request, student_code):
+    """Check if the student is currently allowed to make calls based on active schedule."""
+    student = Student.objects.filter(
+        Q(code=student_code) | Q(calling_code=student_code)
+    ).select_related('school').first()
+    if not student:
+        return JsonResponse({"error": "STUDENT_NOT_FOUND", "message": "Student not found."}, status=404)
+
+    now = timezone.localtime()
+    current_day = CallingScheduleEngine.DAY_ABBREVIATIONS[now.weekday()]
+    allowed_in_sched, reason, window_type = CallingScheduleEngine.is_call_allowed(student, check_dt=now)
+
+    school = student.school
+    schedules = CallingScheduleRule.objects.filter(
+        Q(school=school) | Q(school__isnull=True),
+        is_active=True
+    ).order_by('start_time')
+
+    active_rule = None
+    for s in schedules:
+        days = [d.strip().upper() for d in s.days_of_week.split(',')]
+        if current_day in days or "ALL" in days or ("MON-FRI" in s.days_of_week and current_day in ["MON", "TUE", "WED", "THU", "FRI"]):
+            if s.start_time <= now.time() <= s.end_time:
+                active_rule = s
+                break
+
+    schedule_list = [
+        {
+            "name": s.name,
+            "policy_type": s.policy_type,
+            "start_time": s.start_time.strftime("%H:%M"),
+            "end_time": s.end_time.strftime("%H:%M"),
+            "days": s.days_of_week
+        }
+        for s in schedules
+    ]
+
+    return JsonResponse({
+        "status": "success",
+        "student_code": student.code,
+        "student_name": student.name,
+        "school": school.name if school else "",
+        "current_time": now.strftime("%H:%M"),
+        "current_day": current_day,
+        "calling_allowed": allowed_in_sched,
+        "window_type": window_type,
+        "reason": reason,
+        "active_window": {
+            "name": active_rule.name,
+            "policy_type": active_rule.policy_type,
+            "start_time": active_rule.start_time.strftime("%H:%M"),
+            "end_time": active_rule.end_time.strftime("%H:%M")
+        } if active_rule else None,
+        "calling_schedules": schedule_list
+    }, status=200)
+
+
 def student_call_history(request, student_code):
-    """
-    Student Calling History (Flowchart Section 4).
-    Returns past call records for the student mobile app screen.
-    Path param: student_code. Optional query param: limit (default 20, max 100).
-    """
+    """Return recent call history for a student."""
     student = Student.objects.filter(
         Q(code=student_code) | Q(calling_code=student_code)
     ).first()
@@ -443,11 +464,7 @@ def student_whitelist_check(request, student_id):
 
 @csrf_exempt
 def call_authorize(request):
-    """
-    Call Initiation Pre-Flight Check (Flowchart Section 4 & 5).
-    Verifies whitelist, schedule, duration limits, and issues an active session token.
-    Payload: student_code, dialed_number, device_id (optional).
-    """
+    """Validate call permissions and generate session token."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required."}, status=405)
 
@@ -473,11 +490,7 @@ def call_authorize(request):
 
 @csrf_exempt
 def call_terminate(request):
-    """
-    Call Completion & Usage Metering (Flowchart Section 4 & 5).
-    Deducts minutes, records CallRecord ledger entry, and saves call telemetry.
-    Payload: student_code, dialed_number, duration_seconds, session_token (optional), termination_reason (optional).
-    """
+    """Record call end, deduct minutes, and save record."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required."}, status=405)
 
@@ -510,10 +523,7 @@ def call_terminate(request):
 
 
 def device_config(request, device_id):
-    """
-    Remote Kiosk Configuration & Policy Sync (Flowchart Section 7).
-    Returns hardware device parameters, assigned student, calling schedule windows, and duration rules.
-    """
+    """Fetch device config, calling schedule, and duration settings."""
     device = KioskDevice.objects.filter(device_id=device_id).select_related('school', 'assigned_student').first()
     if not device:
         return JsonResponse({"error": "DEVICE_NOT_FOUND", "message": f"Device '{device_id}' not registered."}, status=404)
@@ -560,66 +570,8 @@ def device_config(request, device_id):
 
 
 @csrf_exempt
-def call_recording_upload(request):
-    """
-    Call Audio Recording Upload (Flowchart Section 5 & 6).
-    Receives call audio file from Kiosk Phone and links it to CallRecord ledger.
-    Payload: multipart/form-data with 'call_id' and 'file' (or 'recording_file').
-    """
-    if request.method != "POST":
-        return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required."}, status=405)
-
-    call_id = request.POST.get('call_id') or request.GET.get('call_id')
-    audio_file = request.FILES.get('recording_file') or request.FILES.get('file') or request.FILES.get('audio')
-
-    if not call_id:
-        data = _parse_request_data(request)
-        call_id = data.get('call_id')
-
-    if not call_id:
-        return JsonResponse({"error": "MISSING_CALL_ID", "message": "call_id is required."}, status=400)
-
-    call_record = CallRecord.objects.filter(call_id=call_id).first()
-    if not call_record:
-        return JsonResponse({"error": "CALL_RECORD_NOT_FOUND", "message": f"CallRecord '{call_id}' not found."}, status=404)
-
-    if not audio_file:
-        return JsonResponse({"error": "MISSING_FILE", "message": "Audio recording file is required."}, status=400)
-
-    now = timezone.now()
-    rel_folder = os.path.join('recordings', now.strftime('%Y'), now.strftime('%m'))
-    abs_folder = os.path.join(settings.MEDIA_ROOT, rel_folder)
-    os.makedirs(abs_folder, exist_ok=True)
-
-    ext = os.path.splitext(audio_file.name)[1] or '.mp3'
-    clean_name = f"{call_id}_{uuid.uuid4().hex[:6]}{ext}"
-    abs_path = os.path.join(abs_folder, clean_name)
-
-    with open(abs_path, 'wb+') as destination:
-        for chunk in audio_file.chunks():
-            destination.write(chunk)
-
-    rel_url = f"{settings.MEDIA_URL}recordings/{now.strftime('%Y')}/{now.strftime('%m')}/{clean_name}"
-    call_record.audio_recording_url = rel_url
-    call_record.save(update_fields=['audio_recording_url'])
-
-    full_url = request.build_absolute_uri(rel_url)
-
-    return JsonResponse({
-        "status": "success",
-        "call_id": call_record.call_id,
-        "recording_url": full_url,
-        "file_size_bytes": os.path.getsize(abs_path)
-    }, status=200)
-
-
-@csrf_exempt
 def student_bulk_sync(request, school_code):
-    """
-    Student Bulk Data Sync / SIS Import (Flowchart Section 3 & 6).
-    Syncs student cohort and guardian whitelist data from external Campus SIS/ERP.
-    Payload: {"students": [{"code": "...", "name": "...", "class_name": "...", "primary_phone": "...", ...}]}
-    """
+    """Import or update student and guardian list in bulk."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required."}, status=405)
 
@@ -713,11 +665,7 @@ def student_bulk_sync(request, school_code):
 
 @csrf_exempt
 def payment_webhook(request):
-    """
-    Payment Gateway Webhook (Flowchart Section 4 & 5).
-    Listens for external payment confirmation, provisions minutes, and extends validity.
-    Payload: event, recharge_id, student_code, plan_code, amount.
-    """
+    """Process recharge payment confirmation and credit student balance."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required."}, status=405)
 
@@ -777,11 +725,7 @@ def payment_webhook(request):
 
 @csrf_exempt
 def student_emergency_sos(request):
-    """
-    Student Emergency SOS Broadcast (Flowchart Section 4 & 6).
-    Dispatches immediate alert to on-duty Hostel Warden and emergency response contacts.
-    Payload: student_code, device_id, location (optional), notes (optional).
-    """
+    """Dispatch emergency alert to on-duty warden and emergency contacts."""
     if request.method != "POST":
         return JsonResponse({"error": "METHOD_NOT_ALLOWED", "message": "POST required."}, status=405)
 
@@ -836,11 +780,7 @@ def student_emergency_sos(request):
 
 
 def school_call_data(request, school_code):
-    """
-    Campus Call Telemetry Data Export (Flowchart Section 6).
-    Supplies paginated call records, minutes usage, and telemetry for school administrators.
-    Query params: student_code, status, start_date, end_date, limit.
-    """
+    """Return call logs and summary statistics for a school."""
     school = School.objects.filter(code=school_code).first()
     if not school:
         return JsonResponse({"error": "SCHOOL_NOT_FOUND", "message": f"School '{school_code}' not found."}, status=404)
@@ -881,8 +821,7 @@ def school_call_data(request, school_code):
             "duration_seconds": r.duration_seconds,
             "minutes_deducted": r.minutes_deducted,
             "call_status": r.call_status,
-            "start_time": r.start_time.isoformat(),
-            "recording_url": request.build_absolute_uri(r.audio_recording_url) if r.audio_recording_url else ""
+            "start_time": r.start_time.isoformat()
         }
         for r in qs[:limit]
     ]

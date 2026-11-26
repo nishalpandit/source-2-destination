@@ -52,9 +52,7 @@ def get_current_school(request):
     return School.objects.filter(code='SCH-1001').first() or School.objects.first()
 
 
-# ==============================================================================
-# 1. PRIMARY CAMPUS DASHBOARD
-# ==============================================================================
+# --- 1. PRIMARY CAMPUS DASHBOARD ---
 def dashboard(request):
     """Render School Admin Primary Dashboard with live campus telemetry metrics."""
     school = get_current_school(request)
@@ -255,9 +253,7 @@ def dashboard(request):
     return render(request, 'school-admin/dashboard.html', context)
 
 
-# ==============================================================================
-# 2. STUDENT MANAGEMENT (DIRECTORY, ENROLL, 360 DETAILS, EDIT)
-# ==============================================================================
+# --- 2. STUDENT MANAGEMENT (DIRECTORY, ENROLL, 360 DETAILS, EDIT) ---
 def students_list(request):
     """Dynamic campus student directory view."""
     school = get_current_school(request)
@@ -506,9 +502,7 @@ def student_edit(request):
     return render(request, 'school-admin/students/edit.html', context)
 
 
-# ==============================================================================
-# 3. BULK STUDENT EXCEL / CSV UPLOAD
-# ==============================================================================
+# --- 3. BULK STUDENT EXCEL / CSV UPLOAD ---
 def download_sample_csv(request):
     """Stream formatted CSV template for bulk student enrollment."""
     response = HttpResponse(content_type='text/csv')
@@ -530,7 +524,7 @@ def download_sample_csv(request):
 def bulk_upload_students(request):
     """
     School Admin: Bulk Student Excel/CSV Upload.
-    Flowchart: Upload Excel -> Validate Mandatory/Duplicates -> Valid Records? -> [Yes] Import / [No] Display Errors.
+    Validate excel records and import students.
     """
     school = get_current_school(request)
     upload_result = None
@@ -559,7 +553,7 @@ def bulk_upload_students(request):
                 hostel = row.get('hostel_wing') or 'Boarding Wing'
                 minutes = int(row.get('allocated_minutes') or 120)
 
-                # Validation checks per flowchart
+                # field validation
                 if not name.strip():
                     error_rows.append({"row": row_idx, "name": name, "reason": "Missing mandatory student name"})
                     continue
@@ -644,9 +638,7 @@ def bulk_upload_students(request):
     return render(request, 'school-admin/bulk-upload/index.html', context)
 
 
-# ==============================================================================
-# 4. CLASS & SECTION MANAGEMENT
-# ==============================================================================
+# --- 4. CLASS & SECTION MANAGEMENT ---
 def classes_list(request):
     """Dynamic School Admin Academic Classes Management."""
     school = get_current_school(request)
@@ -811,9 +803,7 @@ def sections_list(request):
     return render(request, 'school-admin/classes/sections.html', context)
 
 
-# ==============================================================================
-# 5. PARENTS & GUARDIANS WHITELIST MANAGEMENT
-# ==============================================================================
+# --- 5. PARENTS & GUARDIANS WHITELIST MANAGEMENT ---
 def guardians_list(request):
     """Dynamic School Admin Parents & Guardians Directory."""
     school = get_current_school(request)
@@ -983,9 +973,7 @@ def guardian_edit(request):
     return render(request, 'school-admin/guardians/edit.html', context)
 
 
-# ==============================================================================
-# 6. STUDENT UNIQUE CODES & AUTHENTICATION ENGINE
-# ==============================================================================
+# --- 6. STUDENT UNIQUE CODES & AUTHENTICATION ENGINE ---
 def student_codes(request):
     """
     School Admin: Unique Student Calling Codes Management.
@@ -997,9 +985,18 @@ def student_codes(request):
     issued_info = None
 
     if request.method == "POST":
-        student_id = request.POST.get('student_id')
-        pin_policy = request.POST.get('pin_policy', 'Unique Code + 4-Digit Student PIN')
-        action = request.POST.get('action', 'issue')
+        data = {}
+        if request.body:
+            try:
+                data = json.loads(request.body.decode('utf-8'))
+            except Exception:
+                pass
+        if not data:
+            data = request.POST.dict()
+
+        student_id = data.get('student_id') or request.POST.get('student_id')
+        pin_policy = data.get('pin_policy') or request.POST.get('pin_policy', 'Unique Code + 4-Digit Student PIN')
+        action = data.get('action') or request.POST.get('action', 'issue')
 
         student = Student.objects.filter(
             Q(code=student_id) | Q(calling_code=student_id) | Q(id=student_id if str(student_id).isdigit() else 0),
@@ -1035,6 +1032,22 @@ def student_codes(request):
                     "code": candidate_code,
                     "pin_policy": pin_policy
                 }
+
+        is_ajax = (
+            request.headers.get('x-requested-with') == 'XMLHttpRequest' or
+            (request.content_type and 'application/json' in request.content_type) or
+            bool(request.body and data.get('ajax'))
+        )
+        if is_ajax:
+            return JsonResponse({
+                "status": "success",
+                "action": action,
+                "student_code": student.code if student else None,
+                "calling_code": student.calling_code if student else None,
+                "code_status": student.code_status if student else None,
+                "pin_policy": student.pin_policy if student else None,
+                "issued_info": issued_info
+            })
 
     student_codes_data = [
         {
@@ -1080,9 +1093,7 @@ def student_codes(request):
     return render(request, 'school-admin/student-codes/index.html', context)
 
 
-# ==============================================================================
-# 7. STUDENT ACTIVATION / DEACTIVATION & AUDIT LOGS
-# ==============================================================================
+# --- 7. STUDENT ACTIVATION / DEACTIVATION & AUDIT LOGS ---
 def student_status(request):
     """
     School Admin: Student Account Lifecycle & Activation / Deactivation.
@@ -1213,9 +1224,7 @@ def student_status(request):
     return render(request, 'school-admin/student-status/index.html', context)
 
 
-# ==============================================================================
-# 8. CALLING DURATION RULES & LIMITS
-# ==============================================================================
+# --- 8. CALLING DURATION RULES & LIMITS ---
 def calling_duration(request):
     """School Admin: Configure campus, wing, and class calling duration limits."""
     school = get_current_school(request)
@@ -1249,9 +1258,7 @@ def calling_duration(request):
     return render(request, 'school-admin/calling-duration/index.html', context)
 
 
-# ==============================================================================
-# 9. CALLING SCHEDULES & EXCEPTION WINDOWS
-# ==============================================================================
+# --- 9. CALLING SCHEDULES & EXCEPTION WINDOWS ---
 def calling_schedules(request):
     """School Admin: School, class, and student-wise calling schedules and exception windows."""
     school = get_current_school(request)
@@ -1259,7 +1266,7 @@ def calling_schedules(request):
     if request.method == "POST":
         action = request.POST.get('action')
         if action == 'publish_schedule':
-            # Flowchart: Batch save campus calling window policy
+            # update calling schedule rules
             rule, _ = CallingScheduleRule.objects.get_or_create(
                 school=school,
                 scope="School-Wide Standard",
@@ -1315,17 +1322,15 @@ def calling_schedules(request):
     return render(request, 'school-admin/calling-schedules/index.html', context)
 
 
-# ==============================================================================
-# 10. STUDENT VALIDITY DESK & MANUAL EXTENSIONS
-# ==============================================================================
+# --- 10. STUDENT VALIDITY DESK & MANUAL EXTENSIONS ---
 def validity_overview(request):
     """
     School Admin: Student account validity & expiring accounts monitoring.
-    Flowchart: View / Extend / Manage Validity -> Student Validity Records.
+    Manage student validity extensions.
     """
     school = get_current_school(request)
 
-    # Support Flowchart action: Direct manual validity extension
+    # manual validity extension
     if request.method == "POST":
         action = request.POST.get('action')
         if action == 'extend_validity':
@@ -1377,9 +1382,7 @@ def validity_overview(request):
     return render(request, 'school-admin/validity/index.html', context)
 
 
-# ==============================================================================
-# 11. RECHARGES MANAGEMENT & FINANCIAL LEDGER
-# ==============================================================================
+# --- 11. RECHARGES MANAGEMENT & FINANCIAL LEDGER ---
 def recharges_overview(request):
     """School Admin: Recharge desk overview and history."""
     school = get_current_school(request)
@@ -1448,13 +1451,11 @@ def student_recharge(request):
     return render(request, 'school-admin/recharges/student-recharge.html', context)
 
 
-# ==============================================================================
-# 12. CALL HISTORY & TELEMETRY LOGS
-# ==============================================================================
+# --- 12. CALL HISTORY & TELEMETRY LOGS ---
 def call_history(request):
     """
     School Admin: Campus Call History & Telemetry Log.
-    Flowchart: Search Calls by Student / Date / Number -> Call History Database.
+    Search call records by student, date, or number.
     """
     school = get_current_school(request)
     calls_qs = CallRecord.objects.filter(school=school).select_related('student', 'guardian').order_by('-start_time')
@@ -1516,13 +1517,11 @@ def call_history(request):
     return render(request, 'school-admin/call-history/index.html', context)
 
 
-# ==============================================================================
-# 13. HOSTEL WARDENS MANAGEMENT
-# ==============================================================================
+# --- 13. HOSTEL WARDENS MANAGEMENT ---
 def hostel_wardens_list(request):
     """
     School Admin: Hostel Warden Directory & Duty Roster.
-    Flowchart: Add / Edit / Assign Hostel Warden -> Hostel Warden Records.
+    Add or update hostel warden assignment.
     """
     school = get_current_school(request)
     wardens_qs = HostelWarden.objects.filter(school=school).order_by('name')
@@ -1651,13 +1650,10 @@ def hostel_warden_details(request):
     return render(request, 'school-admin/hostel-wardens/details.html', context)
 
 
-# ==============================================================================
-# 14. DEVICE ASSIGNMENT MANAGEMENT
-# ==============================================================================
+# --- 14. DEVICE ASSIGNMENT MANAGEMENT ---
 def device_assignments_list(request):
     """
     School Admin: Calling Booths & Device Assignments.
-    Flowchart: Section 7 Device Control, Section 3 Assign Device to Student.
     """
     school = get_current_school(request)
     devices = KioskDevice.objects.filter(school=school).select_related('assigned_student').order_by('name') if school else KioskDevice.objects.none()
@@ -1712,7 +1708,7 @@ def device_assignments_list(request):
 def device_assign(request):
     """
     School Admin: Assign Device to Student or Wing.
-    Flowchart: Device Available and Enrolled? -> [Yes] Save Device Mapping / [No] Show Device Assignment Error.
+    Assign enrolled kiosk device to student.
     """
     school = get_current_school(request)
     devices = (
@@ -1729,7 +1725,10 @@ def device_assign(request):
 
     if request.method == "POST":
         device_id = (request.POST.get('device_id') or '').strip()
-        device = KioskDevice.objects.filter(Q(device_id=device_id) & (Q(school=school) | Q(school__isnull=True))).first()
+        device = KioskDevice.objects.filter(
+            (Q(device_id=device_id) | (Q(id=int(device_id)) if str(device_id).isdigit() else Q())),
+            Q(school=school) | Q(school__isnull=True)
+        ).first()
 
         if not device:
             error = "Device is not enrolled in MDM or does not exist for this campus."
@@ -1750,7 +1749,10 @@ def device_assign(request):
             )
 
             if assignment_mode == 'Student':
-                student = Student.objects.filter(id=student_id, school=school).first() if student_id else None
+                student = Student.objects.filter(
+                    (Q(id=int(student_id)) if str(student_id).isdigit() else Q()) | Q(code=student_id) | Q(calling_code=student_id),
+                    school=school
+                ).first() if student_id else None
                 if not student:
                     error = "Please select a valid active student to assign this device to."
                 elif device.assigned_student and device.assigned_student.id != student.id:
@@ -1775,7 +1777,14 @@ def device_assign(request):
                         assigned_by=assigned_by,
                         status='Active'
                     )
-                    return redirect('/school-admin/device-assignments/list.html')
+                    is_ajax = (
+                        request.headers.get('x-requested-with') == 'XMLHttpRequest'
+                        or 'application/json' in request.headers.get('accept', '')
+                        or request.content_type == 'application/json'
+                    )
+                    if is_ajax:
+                        return JsonResponse({"status": "success", "message": f"Device {device.device_id} bound to student {student.name}.", "device_id": device.device_id})
+                    return redirect('/school-admin/device-assignments/list.html?assigned=1')
             else:
                 # Shared Hostel Wing Mode
                 hostel_wing = (request.POST.get('hostel_wing') or 'Tagore Bhavan').strip()
@@ -1797,7 +1806,14 @@ def device_assign(request):
                     assigned_by=assigned_by,
                     status='Active'
                 )
-                return redirect('/school-admin/device-assignments/list.html')
+                is_ajax = (
+                    request.headers.get('x-requested-with') == 'XMLHttpRequest'
+                    or 'application/json' in request.headers.get('accept', '')
+                    or request.content_type == 'application/json'
+                )
+                if is_ajax:
+                    return JsonResponse({"status": "success", "message": f"Device {device.device_id} assigned to {hostel_wing}.", "device_id": device.device_id})
+                return redirect('/school-admin/device-assignments/list.html?assigned=1')
 
     context = {
         "school": school,
@@ -1819,7 +1835,10 @@ def device_unassign(request):
     school = get_current_school(request)
     device_id = (request.POST.get('device_id') or request.GET.get('device_id') or '').strip()
     if device_id and school:
-        device = KioskDevice.objects.filter(device_id=device_id, school=school).first()
+        device = KioskDevice.objects.filter(
+            (Q(device_id=device_id) | (Q(id=int(device_id)) if str(device_id).isdigit() else Q())),
+            school=school
+        ).first()
         if device:
             device.assigned_student = None
             device.assigned_wing = ""
@@ -1827,16 +1846,21 @@ def device_unassign(request):
             device.save(update_fields=['assigned_student', 'assigned_wing', 'assignment_type'])
             DeviceAssignment.objects.filter(device=device, status='Active').update(status='Released')
 
-    return redirect('/school-admin/device-assignments/list.html')
+    is_ajax = (
+        request.headers.get('x-requested-with') == 'XMLHttpRequest'
+        or 'application/json' in request.headers.get('accept', '')
+        or request.content_type == 'application/json'
+    )
+    if is_ajax:
+        return JsonResponse({"status": "success", "message": "Device unassigned and marked available."})
+    return redirect('/school-admin/device-assignments/list.html?unassigned=1')
 
 
-# ==============================================================================
-# 15. STUDENT & CLASS REPORTS (REPORTING ENGINE & CSV EXPORTS)
-# ==============================================================================
+# --- 15. STUDENT & CLASS REPORTS (REPORTING ENGINE & CSV EXPORTS) ---
 def student_reports(request):
     """
     School Admin: Student-wise calling usage and remaining duration reports.
-    Flowchart: Filter by Student / Class / Section / Date -> Generate and Export Reports.
+    Generate usage and student reports.
     """
     school = get_current_school(request)
     students = Student.objects.filter(school=school).order_by('name') if school else Student.objects.none()
@@ -1990,13 +2014,11 @@ def export_class_reports_csv(request):
     return response
 
 
-# ==============================================================================
-# 16. SCHOOL PROFILE & OPERATIONAL SETTINGS
-# ==============================================================================
+# --- 16. SCHOOL PROFILE & OPERATIONAL SETTINGS ---
 def school_settings(request):
     """
     School Admin: Profile & Campus Operational Preferences (4 tabbed forms).
-    Flowchart: Update School Profile and Settings.
+    Update school profile and settings.
     """
     school = get_current_school(request)
 
@@ -2049,9 +2071,178 @@ def school_settings(request):
     return render(request, 'school-admin/settings/index.html', context)
 
 
-# ==============================================================================
-# 17. SUBPAGE FALLBACK RENDERER
-# ==============================================================================
+def _parse_school_post_data(request):
+    data = {}
+    if request.body:
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            pass
+    if not data:
+        data = request.POST.dict()
+    return data
+
+
+def device_toggle_status(request):
+    """School / Super Admin: Block/Unblock or change status for KioskDevice."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_school_post_data(request)
+    device_id = (data.get('device_id') or data.get('id') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([device_id] if device_id else [])
+    qs = KioskDevice.objects.filter(Q(device_id__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    school = get_current_school(request)
+    if school and not getattr(request.user, 'is_superuser', False):
+        qs = qs.filter(school=school)
+
+    updated = qs.update(status=target_status)
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated
+    })
+
+
+def guardian_toggle_status(request):
+    """School Admin: Revoke or restore authorization for guardian contact."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_school_post_data(request)
+    guardian_id = (data.get('guardian_id') or data.get('id') or data.get('code') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([guardian_id] if guardian_id else [])
+    qs = Guardian.objects.filter(Q(code__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    school = get_current_school(request)
+    if school:
+        qs = qs.filter(student__school=school)
+
+    updated = qs.update(status=target_status)
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated
+    })
+
+
+def warden_toggle_status(request):
+    """School Admin: Mark hostel warden Active or Inactive."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_school_post_data(request)
+    warden_id = (data.get('warden_id') or data.get('id') or data.get('code') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([warden_id] if warden_id else [])
+    qs = HostelWarden.objects.filter(Q(code__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    school = get_current_school(request)
+    if school:
+        qs = qs.filter(school=school)
+
+    updated = qs.update(status=target_status)
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated
+    })
+
+
+def class_toggle_status(request):
+    """School Admin: Activate or Archive academic class."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_school_post_data(request)
+    class_id = (data.get('class_id') or data.get('id') or data.get('className') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([class_id] if class_id else [])
+    qs = AcademicClass.objects.filter(Q(code__in=targets) | Q(name__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    school = get_current_school(request)
+    if school:
+        qs = qs.filter(school=school)
+
+    updated = qs.update(status=target_status)
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated
+    })
+
+
+def section_toggle_status(request):
+    """School Admin: Activate or Archive class section."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_school_post_data(request)
+    section_id = (data.get('section_id') or data.get('id') or data.get('code') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([section_id] if section_id else [])
+    qs = ClassSection.objects.filter(Q(code__in=targets) | Q(name__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    school = get_current_school(request)
+    if school:
+        qs = qs.filter(academic_class__school=school)
+
+    updated = qs.update(status=target_status)
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated
+    })
+
+
+def validity_extend_student(request):
+    """School Admin & Super Admin: Live student validity extension by N days."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_school_post_data(request)
+    student_id = (data.get('student_id') or data.get('student_code') or data.get('id') or '').strip()
+    days = int(data.get('days') or data.get('extension_days') or 90)
+    reason = (data.get('reason') or f"Administrative +{days}d extension").strip()
+
+    student = Student.objects.filter(
+        Q(code=student_id) | Q(calling_code=student_id) | Q(id=int(student_id) if student_id.isdigit() else 0)
+    ).first()
+    if not student:
+        return JsonResponse({"error": "STUDENT_NOT_FOUND", "message": f"Student '{student_id}' not found."}, status=404)
+
+    today = timezone.now().date()
+    base_date = student.validity_expiry if (student.validity_expiry and student.validity_expiry >= today) else today
+    new_expiry = base_date + timedelta(days=days)
+
+    student.validity_expiry = new_expiry
+    if student.status == 'Suspended':
+        student.status = 'Active'
+    if student.code_status == 'Suspended':
+        student.code_status = 'Active'
+    student.save(update_fields=['validity_expiry', 'status', 'code_status'])
+
+    ValidityExtensionLog.objects.create(
+        school=student.school,
+        target_type=f"Student {student.code}",
+        days_extended=days,
+        reason=reason
+    )
+
+    eval_res = ValidityService.evaluate(student)
+    return JsonResponse({
+        "status": "success",
+        "student_code": student.code,
+        "new_expiry": new_expiry.strftime("%Y-%m-%d"),
+        "validity_status": eval_res["status"],
+        "days_left": eval_res["days_left"],
+        "message": f"Extended validity through {new_expiry}."
+    })
+
+
+# --- 17. SUBPAGE FALLBACK RENDERER ---
 def render_school_page(request, path):
     """Render any School Admin subpage dynamically."""
     clean_path = os.path.normpath(path).replace('\\', '/').strip('/')

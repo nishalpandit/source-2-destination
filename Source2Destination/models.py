@@ -595,7 +595,6 @@ class ValidityExtensionLog(models.Model):
 class CallRecord(models.Model):
     """
     Campus Voice Call Session & Usage Telemetry Record.
-    Flowchart: Section 6 'Call History and Usage Database', Section 5 'Call Authorization & Usage Ledger'.
     """
     STATUS_CHOICES = [
         ('Completed', 'Completed'),
@@ -641,7 +640,6 @@ class CallRecord(models.Model):
 class KioskDevice(models.Model):
     """
     Hostel Calling Booth & Android Enterprise Dedicated Kiosk Device.
-    Flowchart: Section 7 'Android Enterprise / Kiosk Device Control', Section 6 'Device and Assignment Database'.
     """
     STATUS_CHOICES = [
         ('Online', 'Online'),
@@ -706,7 +704,6 @@ class KioskDevice(models.Model):
 class DeviceAssignment(models.Model):
     """
     Mapping between kiosk device, individual students, or hostel dorm cohorts.
-    Flowchart: Section 3 'Assign Device to Student -> Save Device Mapping'.
     """
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='device_assignments')
     device = models.ForeignKey(KioskDevice, on_delete=models.CASCADE, related_name='assignments')
@@ -737,7 +734,6 @@ class DeviceAssignment(models.Model):
 class HostelWarden(models.Model):
     """
     Hostel Duty Warden & Residential Supervisor.
-    Flowchart: Section 6 'Hostel Warden Database', Section 3 'Add / Edit / Assign Hostel Warden'.
     """
     STATUS_CHOICES = [
         ('On Duty', 'On Duty'),

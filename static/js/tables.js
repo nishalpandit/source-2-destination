@@ -266,8 +266,14 @@
         selectAll.addEventListener('change', () => {
           const pageRows = this.getCurrentPageSlice().pageItems;
           pageRows.forEach((r) => {
-            if (selectAll.checked) this.state.selectedIds.add(r.id);
-            else this.state.selectedIds.delete(r.id);
+            const rid = String(r.id);
+            if (selectAll.checked) {
+              this.state.selectedIds.add(rid);
+              this.state.selectedIds.add(r.id);
+            } else {
+              this.state.selectedIds.delete(rid);
+              this.state.selectedIds.delete(r.id);
+            }
           });
           this.renderRows();
         });
@@ -335,10 +341,11 @@
       }
 
       tbody.innerHTML = pageItems.map((row, rowIndex) => {
-        const isChecked = this.state.selectedIds.has(row.id);
+        const rowIdStr = String(row.id);
+        const isChecked = this.state.selectedIds.has(rowIdStr) || this.state.selectedIds.has(row.id);
         let cells = '';
         if (this.selectable) {
-          cells += `<td><input type="checkbox" class="s2d-checkbox" data-row-check="${row.id}" ${isChecked ? 'checked' : ''} aria-label="Select row ${row.id}"></td>`;
+          cells += `<td><input type="checkbox" class="s2d-checkbox" data-row-check="${rowIdStr}" ${isChecked ? 'checked' : ''} aria-label="Select row ${rowIdStr}"></td>`;
         }
         this.columns.forEach((col) => {
           const val = col.render ? col.render(row) : window.S2DNotify.escapeHtml(row[col.key] ?? '—');
@@ -520,6 +527,7 @@
         btn.addEventListener('click', async () => {
           const act = btn.getAttribute('data-bulk-act');
           const count = this.state.selectedIds.size;
+          if (count === 0) return;
           const ok = await window.S2DModal.confirm({
             title: `${act === 'activate' ? 'Activate' : 'Suspend'} ${count} Selected Record(s)?`,
             recordLabel: `${count} records selected`,
@@ -530,19 +538,56 @@
           if (!ok) return;
 
           const ids = Array.from(this.state.selectedIds);
-          if (this.bulkUrl || this.fetchUrl) {
-            const endpoint = this.bulkUrl || `${this.fetchUrl}bulk-status/`;
+          const tableKey = this.mount ? (this.mount.getAttribute('data-s2d-table') || '') : '';
+          const targetStatus = act === 'activate' ? 'Active' : 'Suspended';
+          let endpoint = this.bulkUrl;
+          let payload = { ids, status: targetStatus, action: act };
+
+          if (!endpoint) {
+            const BULK_MAPPINGS = {
+              'sch-students-table': { url: '/school-admin/student-status/index.html', idKey: 'student_ids' },
+              'fr-students-table': { url: '/school-admin/student-status/index.html', idKey: 'student_ids' },
+              'sa-schools-table': { url: '/super-admin/schools/status/', idKey: 'ids' },
+              'sa-franchises-table': { url: '/super-admin/franchises/status/', idKey: 'ids' },
+              'sa-school-admins-table': { url: '/super-admin/school-admins/status/', idKey: 'ids' },
+              'sa-devices-table': { url: '/school-admin/devices/status/', idKey: 'ids' },
+              'sch-devices-table': { url: '/school-admin/devices/status/', idKey: 'ids' },
+              'sch-guardians-table': { url: '/school-admin/guardians/status/', idKey: 'ids' },
+              'sch-wardens-table': { url: '/school-admin/hostel-wardens/status/', idKey: 'ids' },
+              'sch-classes-table': { url: '/school-admin/classes/status/', idKey: 'ids' },
+              'sch-sections-table': { url: '/school-admin/classes/section-status/', idKey: 'ids' }
+            };
+            const mapCfg = BULK_MAPPINGS[tableKey];
+            if (mapCfg) {
+              endpoint = mapCfg.url;
+              payload[mapCfg.idKey] = ids;
+            } else if (this.fetchUrl) {
+              endpoint = `${this.fetchUrl}bulk-status/`;
+            }
+          }
+
+          if (endpoint) {
             try {
+              const csrf = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value 
+                || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
               await fetch(endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ids, action: act })
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrf,
+                  'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(payload)
               });
-            } catch (e) { console.warn(e); }
+            } catch (e) {
+              console.warn('Bulk status dispatch error:', e);
+            }
           }
+
           this.rawData.forEach((r) => {
-            if (this.state.selectedIds.has(r.id) && 'status' in r) {
-              r.status = act === 'activate' ? 'Active' : 'Suspended';
+            const rid = String(r.id);
+            if ((this.state.selectedIds.has(rid) || this.state.selectedIds.has(r.id)) && 'status' in r) {
+              r.status = targetStatus;
             }
           });
           this.state.selectedIds.clear();

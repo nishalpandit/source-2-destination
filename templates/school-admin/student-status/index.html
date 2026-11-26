@@ -222,7 +222,14 @@
       // Handle Batch Activation / Suspension
       async function triggerBatchAction(newStatus) {
         const table = window.S2DActiveTables && window.S2DActiveTables['sch-students-table'];
-        const selectedIds = table ? Array.from(table.state.selectedIds) : [];
+        let selectedIds = table ? Array.from(table.state.selectedIds) : [];
+        if (!selectedIds.length) {
+          const checked = document.querySelectorAll('[data-s2d-table="sch-students-table"] [data-row-check]:checked');
+          checked.forEach(cb => {
+            const v = cb.getAttribute('data-row-check');
+            if (v && !selectedIds.includes(v)) selectedIds.push(v);
+          });
+        }
         if (!selectedIds.length) {
           window.S2DNotify.show({
             title: 'No Students Selected',

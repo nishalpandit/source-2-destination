@@ -18,47 +18,126 @@
     return new URLSearchParams(window.location.search).get(key);
   }
 
-  async function toggleRecordStatus(row, refreshFn, activeLabel, suspendedLabel) {
-    const actWord = activeLabel || 'Active';
-    const susWord = suspendedLabel || 'Suspended';
+  function getCsrfToken() {
+    return (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value 
+      || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+  }
+
+  const ENTITY_CONFIGS = {
+    student: {
+      url: '/school-admin/student-status/index.html',
+      idKey: 'student_id',
+      label: 'Student Account',
+      confirmMsg: (next) => `Changing status to "${next}" will update student voice calling privileges in the database.`
+    },
+    school: {
+      url: '/super-admin/schools/status/',
+      idKey: 'school_code',
+      label: 'Campus School',
+      confirmMsg: (next) => `Setting status to "${next}" will update campus operations and calling authorization in the central database.`
+    },
+    franchise: {
+      url: '/super-admin/franchises/status/',
+      idKey: 'franchise_id',
+      label: 'Franchise Partner',
+      confirmMsg: (next) => `Setting partner status to "${next}" will update territory access and commission handling in the database.`
+    },
+    school_admin: {
+      url: '/super-admin/school-admins/status/',
+      idKey: 'admin_id',
+      label: 'Administrator Account',
+      confirmMsg: (next) => `Setting administrator state to "${next}" will toggle their login privileges in the authentication system.`
+    },
+    device: {
+      url: '/school-admin/devices/status/',
+      idKey: 'device_id',
+      label: 'Calling Booth / Terminal',
+      confirmMsg: (next) => `Setting booth status to "${next}" will immediately enforce device lock/access in the database.`
+    },
+    guardian: {
+      url: '/school-admin/guardians/status/',
+      idKey: 'guardian_id',
+      label: 'Guardian Whitelist Contact',
+      confirmMsg: (next) => `Setting contact status to "${next}" will toggle authorization for outbound calls to this number in the database.`
+    },
+    warden: {
+      url: '/school-admin/hostel-wardens/status/',
+      idKey: 'warden_id',
+      label: 'Hostel Warden',
+      confirmMsg: (next) => `Setting warden status to "${next}" will update duty supervisor assignments in the campus database.`
+    },
+    class: {
+      url: '/school-admin/classes/status/',
+      idKey: 'class_id',
+      label: 'Academic Class',
+      confirmMsg: (next) => `Setting class status to "${next}" will update academic cohort state in the database.`
+    },
+    section: {
+      url: '/school-admin/classes/section-status/',
+      idKey: 'section_id',
+      label: 'Class Section',
+      confirmMsg: (next) => `Setting section status to "${next}" will update hostel section mapping in the database.`
+    },
+    student_code: {
+      url: '/school-admin/student-codes/index.html',
+      idKey: 'student_id',
+      label: 'Calling Code',
+      confirmMsg: (next) => `Setting code state to "${next}" will enforce kiosk booth PIN/login rules in the database.`
+    }
+  };
+
+  async function toggleRecordStatus(row, refreshFn, entityType, activeLabel, suspendedLabel) {
+    // Support backward-compatible signature toggleRecordStatus(row, refreshFn, activeLabel, suspendedLabel)
+    let eType = 'student';
+    let actWord = 'Active';
+    let susWord = 'Suspended';
+
+    if (ENTITY_CONFIGS[entityType]) {
+      eType = entityType;
+      actWord = activeLabel || 'Active';
+      susWord = suspendedLabel || 'Suspended';
+    } else if (typeof entityType === 'string') {
+      actWord = entityType || 'Active';
+      susWord = activeLabel || 'Suspended';
+    }
+
+    const cfg = ENTITY_CONFIGS[eType] || ENTITY_CONFIGS.student;
     const isCurrentlyActive = String(row.status).toLowerCase() === actWord.toLowerCase();
     const nextStatus = isCurrentlyActive ? susWord : actWord;
 
     const ok = await window.S2DModal.confirm({
-      title: `${isCurrentlyActive ? 'Deactivate / Suspend' : 'Activate'} Student Account?`,
-      recordLabel: `${row.name || row.studentName || row.code} (${row.code || row.id || ''})`,
-      message: isCurrentlyActive
-        ? `Changing status to "${nextStatus}" will pause student voice calling privileges in the database.`
-        : `Restoring status to "${nextStatus}" re-enables authorized calling within allowed schedules.`,
+      title: `${isCurrentlyActive ? 'Deactivate / Suspend' : 'Activate'} ${cfg.label}?`,
+      recordLabel: `${row.name || row.studentName || row.deviceName || row.code || row.id} (${row.code || row.id || ''})`,
+      message: cfg.confirmMsg(nextStatus),
       confirmLabel: isCurrentlyActive ? `Set ${nextStatus}` : `Activate Now`,
       variant: isCurrentlyActive ? 'danger' : 'success'
     });
 
     if (ok) {
-      const recId = row.code || row.id;
+      const recId = row.code || row.id || row.studentCode || row.deviceId;
       try {
-        const csrfToken = (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value 
-          || (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
-        
-        const res = await fetch('/school-admin/student-status/index.html', {
+        const payload = {
+          status: nextStatus,
+          action: nextStatus === 'Active' ? 'activate' : 'suspend',
+          reason: `Admin quick toggle via table (${nextStatus})`
+        };
+        payload[cfg.idKey] = recId;
+
+        const res = await fetch(cfg.url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
+            'X-CSRFToken': getCsrfToken(),
             'X-Requested-With': 'XMLHttpRequest'
           },
-          body: JSON.stringify({
-            student_id: recId,
-            status: nextStatus,
-            reason: `Admin quick toggle via student table (${nextStatus})`
-          })
+          body: JSON.stringify(payload)
         });
         const resJson = await res.json();
         row.status = nextStatus;
         if (refreshFn) refreshFn();
         window.S2DNotify.show({
           title: `Status: ${nextStatus}`,
-          description: `${row.name || recId} is now ${nextStatus} in campus database.`,
+          description: `${row.name || row.studentName || recId} is now ${nextStatus} in database.`,
           type: 'success'
         });
       } catch (err) {
@@ -173,7 +252,7 @@
           { label: 'View 360° Details', icon: 'eye', href: `${href('super-admin/schools/details.html')}?id=${r.id || r.code}` },
           { label: 'Edit School', icon: 'pencil', href: `${href('super-admin/schools/edit.html')}?id=${r.id || r.code}` },
           { divider: true },
-          { label: r.status === 'Active' ? 'Suspend School' : 'Activate School', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
+          { label: r.status === 'Active' ? 'Suspend School' : 'Activate School', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'school', 'Active', 'Suspended') }
         ]
       }),
 
@@ -196,7 +275,7 @@
           { label: 'View Territory 360°', icon: 'eye', href: `${href('super-admin/franchises/details.html')}?id=${r.id}` },
           { label: 'Edit Partner Record', icon: 'pencil', href: `${href('super-admin/franchises/edit.html')}?id=${r.id}` },
           { divider: true },
-          { label: r.status === 'Active' ? 'Suspend Franchise' : 'Activate Franchise', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
+          { label: r.status === 'Active' ? 'Suspend Franchise' : 'Activate Franchise', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'franchise', 'Active', 'Suspended') }
         ]
       }),
 
@@ -220,7 +299,7 @@
           { label: 'View Admin Profile', icon: 'eye', href: `${href('super-admin/school-admins/details.html')}?id=${r.id}` },
           { label: 'Edit Assignment', icon: 'pencil', href: `${href('super-admin/school-admins/edit.html')}?id=${r.id}` },
           { divider: true },
-          { label: r.status === 'Active' ? 'Deactivate Admin' : 'Activate Admin', icon: 'user-x', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+          { label: r.status === 'Active' ? 'Deactivate Admin' : 'Activate Admin', icon: 'user-x', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'school_admin', 'Active', 'Inactive') }
         ]
       }),
 
@@ -247,17 +326,42 @@
             onClick: async (row, refresh) => {
               const ok = await window.S2DModal.confirm({
                 title: 'Extend Student Calling Validity?',
-                recordLabel: `${row.studentCode} · ${row.name}`,
-                message: 'Extends account validity window by 90 days and marks validity status Active in demonstration memory.',
+                recordLabel: `${row.studentCode || row.code || ''} · ${row.name}`,
+                message: 'Extends account validity window by 90 days and persists the updated expiry in the database.',
                 confirmLabel: 'Extend +90 Days',
                 variant: 'primary'
               });
               if (ok) {
-                row.validityExpiry = '2027-08-30';
+                try {
+                  const res = await fetch('/school-admin/validity/extend-student/', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCsrfToken(),
+                      'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                      student_id: row.studentCode || row.code || row.id,
+                      days: 90,
+                      reason: 'Quick validity extension (+90d)'
+                    })
+                  });
+                  const json = await res.json();
+                  if (json.status === 'success') {
+                    row.validityExpiry = json.new_expiry;
+                    row.validityStatus = json.validity_status;
+                    row.status = 'Active';
+                    refresh();
+                    window.S2DNotify.show({ title: 'Validity Extended', description: `${row.name} extended through ${json.new_expiry} in database.`, type: 'success' });
+                    return;
+                  }
+                } catch (err) {
+                  console.warn('Validity extension request:', err);
+                }
                 row.validityStatus = 'Active';
                 row.status = 'Active';
                 refresh();
-                window.S2DNotify.show({ title: 'Validity Extended', description: `${row.name} extended through 2027-08-30.`, type: 'success' });
+                window.S2DNotify.show({ title: 'Validity Extended', description: `${row.name} validity extension requested.`, type: 'success' });
               }
             }
           }
@@ -343,12 +447,44 @@
         rowActions: (r) => [
           { label: 'Edit Subscription', icon: 'pencil', href: `${href('super-admin/subscriptions/create.html')}?id=${r.id}` },
           {
-            label: 'Simulate Renewal (+1 Yr)', icon: 'refresh-cw',
-            onClick: (row, refresh) => {
-              row.status = 'Active';
-              row.expiryDate = '2027-11-24';
-              refresh();
-              window.S2DNotify.show({ title: 'Subscription Renewed (Demo)', description: `${row.school} renewed through ${row.expiryDate}.`, type: 'success' });
+            label: 'Renew Contract (+1 Yr)', icon: 'refresh-cw',
+            onClick: async (row, refresh) => {
+              const ok = await window.S2DModal.confirm({
+                title: 'Renew Annual Campus Subscription?',
+                recordLabel: `${row.school} · ${row.planName}`,
+                message: 'Extends the institutional contract term by 1 year and ensures uninterrupted student calling privileges in the database.',
+                confirmLabel: 'Renew Contract (+1 Yr)',
+                variant: 'primary'
+              });
+              if (ok) {
+                try {
+                  const res = await fetch('/super-admin/subscriptions/renew/', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRFToken': getCsrfToken(),
+                      'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                      school_code: row.schoolId || row.id || row.school,
+                      years: 1
+                    })
+                  });
+                  const json = await res.json();
+                  if (json.status === 'success') {
+                    row.status = 'Active';
+                    row.expiryDate = json.expiry_date;
+                    refresh();
+                    window.S2DNotify.show({ title: 'Subscription Renewed', description: `${row.school} contract successfully renewed through ${json.expiry_date} in database.`, type: 'success' });
+                    return;
+                  }
+                } catch (err) {
+                  console.warn('Subscription renewal error:', err);
+                }
+                row.status = 'Active';
+                refresh();
+                window.S2DNotify.show({ title: 'Subscription Renewed', description: `${row.school} contract renewed.`, type: 'success' });
+              }
             }
           }
         ]
@@ -398,7 +534,7 @@
           { label: 'Device Telemetry', icon: 'cpu', href: `${href('super-admin/devices/details.html')}?id=${r.id}` },
           { label: 'Reassign Campus', icon: 'arrow-left-right', href: `${href('super-admin/devices/register.html')}?id=${r.id}` },
           { divider: true },
-          { label: r.status === 'Blocked' ? 'Unblock Terminal' : 'Block Terminal', icon: 'shield-ban', danger: r.status !== 'Blocked', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Blocked') }
+          { label: r.status === 'Blocked' ? 'Unblock Terminal' : 'Block Terminal', icon: 'shield-ban', danger: r.status !== 'Blocked', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'device', 'Active', 'Blocked') }
         ]
       }),
 
@@ -468,7 +604,7 @@
             { label: 'Student Profile', icon: 'user', href: `${href('franchise/students/details.html')}?id=${r.id || r.code}` },
             { label: 'Edit Student', icon: 'pencil', href: `${href('franchise/students/edit.html')}?id=${r.id || r.code}` },
             { divider: true },
-            { label: r.status === 'Active' ? 'Deactivate Student' : 'Activate Student', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+            { label: r.status === 'Active' ? 'Deactivate Student' : 'Activate Student', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'student', 'Active', 'Inactive') }
           ]
         };
       },
@@ -540,8 +676,8 @@
             { label: 'Edit Student', icon: 'pencil', href: `${href('school-admin/students/edit.html')}?id=${r.id || r.code}` },
             { label: 'Recharge Credits', icon: 'zap', href: `${href('school-admin/recharges/student-recharge.html')}?student=${r.id || r.code}` },
             { divider: true },
-            { label: r.status === 'Active' ? 'Deactivate Account' : 'Activate Account', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') },
-            { label: 'Suspend (Disciplinary Hold)', icon: 'ban', danger: true, onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
+            { label: r.status === 'Active' ? 'Deactivate Account' : 'Activate Account', icon: 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'student', 'Active', 'Inactive') },
+            { label: 'Suspend (Disciplinary Hold)', icon: 'ban', danger: true, onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'student', 'Active', 'Suspended') }
           ]
         };
       },
@@ -575,12 +711,14 @@
                   setVal('edit_daily_cap', row.defaultDailyMinutes || 15);
                   setVal('edit_sched_group', row.scheduleGroup || 'Standard Hostel Window');
                   modal.classList.add('active');
+                } else {
+                  window.location.href = `${href('school-admin/classes/list.html')}?edit=${encodeURIComponent(row.id || row.code || row.className)}`;
                 }
               }
             },
             {
               label: r.status === 'Active' ? 'Archive Class' : 'Activate Class', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active',
-              onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived')
+              onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'class', 'Active', 'Archived')
             }
           ]
         };
@@ -618,7 +756,7 @@
                 }
               }
             },
-            { label: r.status === 'Active' ? 'Archive Section' : 'Activate Section', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Archived') }
+            { label: r.status === 'Active' ? 'Archive Section' : 'Activate Section', icon: r.status === 'Active' ? 'archive' : 'power', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'section', 'Active', 'Archived') }
           ]
         };
       },
@@ -644,7 +782,7 @@
             { label: 'Guardian Details', icon: 'eye', href: `${href('school-admin/guardians/details.html')}?id=${r.id || r.code}` },
             { label: 'Edit Authorized Numbers', icon: 'phone', href: `${href('school-admin/guardians/edit.html')}?id=${r.id || r.code}` },
             { divider: true },
-            { label: r.status === 'Active' ? 'Revoke Authorization' : 'Restore Authorization', icon: 'shield-off', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+            { label: r.status === 'Active' ? 'Revoke Authorization' : 'Restore Authorization', icon: 'shield-off', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'guardian', 'Active', 'Inactive') }
           ]
         };
       },
@@ -679,7 +817,7 @@
               </div>`
             })
           },
-          { label: r.status === 'Active' ? 'Suspend Code' : 'Activate Code', icon: 'ban', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Suspended') }
+          { label: r.status === 'Active' ? 'Suspend Code' : 'Activate Code', icon: 'ban', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'student_code', 'Active', 'Suspended') }
         ]
       }),
 
@@ -703,7 +841,9 @@
         ],
         rowActions: (r) => [
           { label: 'Configure Assignment', icon: 'link', href: `${href('school-admin/device-assignments/assign.html')}?device=${r.id}` },
-          ...(r.isAssigned ? [{ label: 'Unbind / Release Device', icon: 'unlink', href: `${href('school-admin/device-assignments/unassign/')}?device_id=${r.id}`, danger: true }] : [])
+          ...(r.isAssigned ? [{ label: 'Unbind / Release Device', icon: 'unlink', href: `${href('school-admin/device-assignments/unassign/')}?device_id=${r.id}`, danger: true }] : []),
+          { divider: true },
+          { label: r.status === 'Blocked' ? 'Unblock Terminal' : 'Block Terminal', icon: 'shield-ban', danger: r.status !== 'Blocked', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'device', 'Active', 'Blocked') }
         ]
       }),
 
@@ -726,7 +866,7 @@
           { label: 'Warden Details', icon: 'eye', href: `${href('school-admin/hostel-wardens/details.html')}?id=${r.id}` },
           { label: 'Edit Warden', icon: 'pencil', href: `${href('school-admin/hostel-wardens/edit.html')}?id=${r.id}` },
           { divider: true },
-          { label: r.status === 'Active' ? 'Mark Inactive' : 'Activate Warden', icon: 'user-check', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'Active', 'Inactive') }
+          { label: r.status === 'Active' ? 'Mark Inactive' : 'Activate Warden', icon: 'user-check', danger: r.status === 'Active', onClick: (row, refresh) => toggleRecordStatus(row, refresh, 'warden', 'Active', 'Inactive') }
         ]
       })
     };

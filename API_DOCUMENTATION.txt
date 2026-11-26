@@ -3,7 +3,7 @@ Client: Student Mobile Application
 Target Device: Android Enterprise Kiosk Mode
 
 Base URL: http://192.168.1.52:8000 (or http://localhost:8000)
-Tested against active database without data deletion.
+Verified against active database.
 
 
 1. Device Enrollment
@@ -42,7 +42,7 @@ Response :
 }
 
 
-3. Student Login (Hardware-Locked)
+3. Student Login
 url: http://192.168.1.52:8000/api/student/auth/
 method: POST
 headers: Content-Type: application/json
@@ -131,7 +131,7 @@ Response :
 }
 
 
-6. Call Pre-Flight Authorization
+6. Call Authorization
 url: http://192.168.1.52:8000/api/call/authorize/
 method: POST
 headers: Content-Type: application/json
@@ -214,7 +214,7 @@ Response :
 }
 
 
-9. Remote Kiosk Configuration & Policy Sync
+9. Kiosk Configuration
 url: http://192.168.1.52:8000/api/device/8f3b2a1c0d9e4567/config/
 method: GET
 headers: Accept: application/json
@@ -257,25 +257,7 @@ Response :
 }
 
 
-10. Call Audio Recording Upload
-url: http://192.168.1.52:8000/api/call/recordings/upload/
-method: POST
-headers: Content-Type: multipart/form-data
-
-Form Data:
-call_id: CAL-20261124095233-2067
-recording_file: [audio/mp3 binary stream]
-
-Response :
-{
-  "status": "success",
-  "call_id": "CAL-20261124095233-2067",
-  "recording_url": "http://192.168.1.52:8000/media/recordings/2026/11/CAL-20261124095233-2067_2f52da.mp3",
-  "file_size_bytes": 38
-}
-
-
-11. Student Bulk Data Sync / SIS Import
+10. Student Bulk Sync
 url: http://192.168.1.52:8000/api/school/SCH-1001/students/sync/
 method: POST
 headers: Content-Type: application/json
@@ -308,7 +290,7 @@ Response :
 }
 
 
-12. Payment Gateway Webhook Top-Up
+11. Payment Gateway Webhook
 url: http://192.168.1.52:8000/api/payments/webhook/
 method: POST
 headers: Content-Type: application/json
@@ -333,7 +315,7 @@ Response :
 }
 
 
-13. Student Emergency SOS Alert
+12. Student Emergency SOS
 url: http://192.168.1.52:8000/api/student/sos/
 method: POST
 headers: Content-Type: application/json
@@ -369,7 +351,7 @@ Response :
 }
 
 
-14. School Call Telemetry Data Export
+13. School Call Data Export
 url: http://192.168.1.52:8000/api/school/SCH-1001/call-data/?limit=10
 method: GET
 headers: Accept: application/json
@@ -389,8 +371,7 @@ Response :
       "duration_seconds": 0,
       "minutes_deducted": 0,
       "call_status": "Completed",
-      "start_time": "2026-11-24T09:52:33.699539+00:00",
-      "recording_url": ""
+      "start_time": "2026-11-24T09:52:33.699539+00:00"
     },
     {
       "call_id": "CAL-20261124095233-2067",
@@ -401,14 +382,13 @@ Response :
       "duration_seconds": 120,
       "minutes_deducted": 2,
       "call_status": "Completed",
-      "start_time": "2026-11-24T09:50:33.566759+00:00",
-      "recording_url": "http://192.168.1.52:8000/media/recordings/2026/11/CAL-20261124095233-2067_2f52da.mp3"
+      "start_time": "2026-11-24T09:50:33.566759+00:00"
     }
   ]
 }
 
 
-15. Student Validity Checkup
+14. Student Validity Check
 url: http://192.168.1.52:8000/api/student/STU-DV-1023/validity/
 method: GET
 headers: Accept: application/json
@@ -457,6 +437,84 @@ Response :
       "validity_days": 30,
       "minutes": 120,
       "badge": "STARTER"
+    }
+  ]
+}
+
+
+15. Calling Schedule Verification
+url: http://192.168.1.52:8000/api/student/STU-DV-1023/schedule/
+method: GET
+headers: Accept: application/json
+
+Response :
+{
+  "status": "success",
+  "student_code": "STU-DV-1023",
+  "student_name": "Shaurya Gill",
+  "school": "Doon Valley Residential Academy",
+  "current_time": "05:35",
+  "current_day": "THU",
+  "calling_allowed": false,
+  "window_type": "restricted",
+  "reason": "Current time is outside authorized campus calling slots.",
+  "active_window": null,
+  "calling_schedules": [
+    {
+      "name": "Morning Hostel Window",
+      "policy_type": "allowed",
+      "start_time": "07:00",
+      "end_time": "08:15",
+      "days": "MON,TUE,WED,THU,FRI,SAT,SUN"
+    },
+    {
+      "name": "Academic Quiet Hours",
+      "policy_type": "restricted",
+      "start_time": "08:30",
+      "end_time": "16:30",
+      "days": "MON,TUE,WED,THU,FRI"
+    },
+    {
+      "name": "Weekend Morning Family Window",
+      "policy_type": "allowed",
+      "start_time": "09:00",
+      "end_time": "11:30",
+      "days": "SAT,SUN"
+    },
+    {
+      "name": "Evening Calling Window",
+      "policy_type": "allowed",
+      "start_time": "17:00",
+      "end_time": "20:30",
+      "days": "MON,TUE,WED,THU,FRI,SAT,SUN"
+    },
+    {
+      "name": "Weekday Evening Calling Window",
+      "policy_type": "allowed",
+      "start_time": "17:00",
+      "end_time": "19:30",
+      "days": "MON,TUE,WED,THU,FRI"
+    },
+    {
+      "name": "Warden Supervised Study Window",
+      "policy_type": "supervised",
+      "start_time": "20:30",
+      "end_time": "22:00",
+      "days": "MON,TUE,WED,THU,SUN"
+    },
+    {
+      "name": "Night Lights-Out Curfew",
+      "policy_type": "restricted",
+      "start_time": "21:30",
+      "end_time": "06:30",
+      "days": "MON,TUE,WED,THU,FRI,SAT,SUN"
+    },
+    {
+      "name": "Night Quiet Hours Curfew",
+      "policy_type": "restricted",
+      "start_time": "22:00",
+      "end_time": "06:45",
+      "days": "MON,TUE,WED,THU,FRI,SAT,SUN"
     }
   ]
 }

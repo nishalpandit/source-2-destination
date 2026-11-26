@@ -8,7 +8,7 @@ import csv
 import json
 from datetime import timedelta
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, Http404, HttpResponseBadRequest, JsonResponse
 from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.utils import timezone
@@ -211,7 +211,7 @@ def school_edit(request, school_id=None):
         return redirect('/super-admin/schools/list.html')
 
     if request.method == "POST" and school:
-        # Section 1: Institution Identity
+        # School details
         school.name = request.POST.get('name', school.name).strip()
         school.campus_type = request.POST.get('campus_type', school.campus_type)
         school.affiliation_board = request.POST.get('affiliation_board', school.affiliation_board)
@@ -228,7 +228,7 @@ def school_edit(request, school_id=None):
         school.timezone = request.POST.get('timezone', school.timezone)
         school.address = request.POST.get('address', school.address).strip()
 
-        # Section 2: Franchise & Leadership
+        # Franchise & principal
         franchise_id = request.POST.get('franchise_id') or request.POST.get('franchise')
         if franchise_id:
             new_franchise = Franchise.objects.filter(
@@ -245,7 +245,7 @@ def school_edit(request, school_id=None):
         school.secondary_contact_email = request.POST.get('secondary_contact_email', school.secondary_contact_email).strip()
         school.secondary_contact_phone = request.POST.get('secondary_contact_phone', school.secondary_contact_phone).strip()
 
-        # Section 3: Subscription & Calling Policies
+        # Subscription & calling caps
         school.subscription_plan = request.POST.get('subscription_plan', school.subscription_plan)
         school.billing_cycle = request.POST.get('billing_cycle', school.billing_cycle)
         if request.POST.get('student_seats'):
@@ -268,7 +268,7 @@ def school_edit(request, school_id=None):
             school.kiosk_group_tag = request.POST['kiosk_group_tag']
         school.emergency_calling_allowed = request.POST.get('emergency_calling_allowed') == 'on' or request.POST.get('emergency_calling_allowed') is True
 
-        # Section 4: Caller ID & Emergency Overrides
+        # Caller ID & emergency numbers
         if request.POST.get('primary_emergency_phone'):
             school.primary_emergency_phone = request.POST['primary_emergency_phone'].strip()
         if request.POST.get('secondary_emergency_phone'):
@@ -523,9 +523,7 @@ def recharge_history(request):
     return render(request, 'super-admin/recharges/history.html', context)
 
 
-# ==============================================================================
-# DIVISION II — PHASE 1B: FRANCHISE PARTNERS & TERRITORY FLEET (franchises/)
-# ==============================================================================
+# --- Franchise Partners ---
 
 def franchises_list(request):
     """
@@ -702,9 +700,7 @@ def franchise_details(request):
     return render(request, 'super-admin/franchises/details.html', context)
 
 
-# ==============================================================================
-# DIVISION II — PHASE 1: CAMPUS PRINCIPALS & ADMINISTRATOR FLEET (school-admins/)
-# ==============================================================================
+# --- School Administrators ---
 
 def school_admins_list(request):
     """
@@ -895,9 +891,7 @@ def school_admin_details(request):
     return render(request, 'super-admin/school-admins/details.html', context)
 
 
-# ==============================================================================
-# DIVISION II — PHASE 2: ANDROID ENTERPRISE KIOSKS & HARDWARE MDM (devices/)
-# ==============================================================================
+# --- Kiosk Devices ---
 
 def devices_list(request):
     """
@@ -1057,9 +1051,7 @@ def device_details(request):
     return render(request, 'super-admin/devices/details.html', context)
 
 
-# ==============================================================================
-# DIVISION II — PHASE 3: FINANCIAL TRANSACTIONS & SUBSCRIPTIONS (payments/, subscriptions/)
-# ==============================================================================
+# --- Subscriptions & Payments ---
 
 def subscriptions_overview(request):
     """
@@ -1256,9 +1248,7 @@ def payment_details(request):
     return render(request, 'super-admin/payments/details.html', context)
 
 
-# ==============================================================================
-# DIVISION II — PHASE 4: GLOBAL CALL TELEMETRY & REPORTS (call-history/, reports/)
-# ==============================================================================
+# --- Call Logs & Reports ---
 
 def call_history(request):
     """
@@ -1354,9 +1344,7 @@ def export_reports_csv(request):
     return response
 
 
-# ==============================================================================
-# DIVISION II — PHASE 5: GOVERNANCE & SETTINGS (settings/)
-# ==============================================================================
+# --- Platform Settings ---
 
 def settings_general(request):
     """
@@ -1436,6 +1424,165 @@ def settings_audit_logs(request):
         "audit_logs_json": json.dumps(audit_logs_data),
     }
     return render(request, 'super-admin/settings/audit-logs.html', context)
+
+
+def _parse_admin_post_data(request):
+    data = {}
+    if request.body:
+        try:
+            data = json.loads(request.body.decode('utf-8'))
+        except Exception:
+            pass
+    if not data:
+        data = request.POST.dict()
+    return data
+
+
+def school_toggle_status(request):
+    """Super Admin: Toggle active/suspended status for single or batch schools."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED", "message": "Method not allowed"}, status=405)
+    data = _parse_admin_post_data(request)
+    code = (data.get('school_code') or data.get('id') or data.get('code') or '').strip()
+    ids = data.get('ids') or data.get('school_codes') or []
+    target_status = (data.get('status') or 'Active').strip()
+    if target_status not in ['Active', 'Suspended']:
+        target_status = 'Active' if 'act' in target_status.lower() else 'Suspended'
+
+    target_codes = []
+    if isinstance(ids, list) and ids:
+        target_codes = [str(x).strip() for x in ids if str(x).strip()]
+    elif code:
+        target_codes = [code]
+
+    updated = School.objects.filter(code__in=target_codes).update(status=target_status)
+    log_admin_action(
+        actor=getattr(request.user, 'username', 'Super Admin'),
+        action_type="UPDATE",
+        domain="School Management",
+        target_id=",".join(target_codes),
+        description=f"Status set to {target_status} for {updated} school(s)."
+    )
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated,
+        "message": f"Updated {updated} school(s) to {target_status}."
+    })
+
+
+def franchise_toggle_status(request):
+    """Super Admin: Toggle active/suspended status for franchise partner."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_admin_post_data(request)
+    target_id = (data.get('franchise_id') or data.get('id') or data.get('code') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+    if target_status not in ['Active', 'Suspended']:
+        target_status = 'Active' if 'act' in target_status.lower() else 'Suspended'
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([target_id] if target_id else [])
+    qs = Franchise.objects.filter(Q(code__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    updated = qs.update(status=target_status)
+    log_admin_action(
+        actor=getattr(request.user, 'username', 'Super Admin'),
+        action_type="UPDATE",
+        domain="Franchise Management",
+        target_id=",".join(targets),
+        description=f"Franchise partner status set to {target_status}."
+    )
+    return JsonResponse({
+        "status": "success",
+        "new_status": target_status,
+        "count": updated
+    })
+
+
+def school_admin_toggle_status(request):
+    """Super Admin: Deactivate or activate school administrator accounts."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_admin_post_data(request)
+    target_id = (data.get('admin_id') or data.get('id') or '').strip()
+    ids = data.get('ids') or []
+    target_status = (data.get('status') or 'Active').strip()
+    is_active = (target_status == 'Active')
+
+    targets = [str(x).strip() for x in ids if str(x).strip()] if ids else ([target_id] if target_id else [])
+    profiles = SchoolAdminProfile.objects.filter(Q(id__in=[int(x) for x in targets if x.isdigit()]) | Q(school__code__in=targets))
+    for p in profiles:
+        p.status = 'Active' if is_active else 'Inactive'
+        p.save(update_fields=['status'])
+        if p.user:
+            p.user.is_active = is_active
+            p.user.save(update_fields=['is_active'])
+
+    users = User.objects.filter(Q(username__in=targets) | Q(email__in=targets) | Q(id__in=[int(x) for x in targets if x.isdigit()]))
+    users.update(is_active=is_active)
+
+    log_admin_action(
+        actor=getattr(request.user, 'username', 'Super Admin'),
+        action_type="UPDATE",
+        domain="School Administrators",
+        target_id=",".join(targets),
+        description=f"Admin account active state set to {is_active}."
+    )
+    return JsonResponse({
+        "status": "success",
+        "new_status": 'Active' if is_active else 'Inactive',
+        "is_active": is_active
+    })
+
+
+def subscription_renew(request):
+    """Super Admin: Renew campus subscription term by +1 or more years."""
+    if request.method != "POST":
+        return JsonResponse({"error": "POST_REQUIRED"}, status=405)
+    data = _parse_admin_post_data(request)
+    target_id = (data.get('school_code') or data.get('id') or data.get('school') or '').strip()
+    years = int(data.get('years') or 1)
+
+    school = School.objects.filter(Q(code=target_id) | Q(name__icontains=target_id)).first()
+    if not school:
+        sub = CampusSubscription.objects.filter(id=int(target_id) if target_id.isdigit() else 0).first()
+        if sub:
+            school = sub.school
+
+    new_expiry_date = timezone.now().date() + timedelta(days=365 * years)
+    if school:
+        school.status = 'Active'
+        school.save(update_fields=['status'])
+
+        sub, _ = CampusSubscription.objects.get_or_create(
+            school=school,
+            defaults={
+                "subscription_id": f"SUB-{school.code}",
+                "plan_name": getattr(school, 'subscription_plan', 'Enterprise Cloud') or "Enterprise Cloud",
+                "expiry_date": new_expiry_date,
+                "status": "Active"
+            }
+        )
+        sub.expiry_date = new_expiry_date
+        sub.status = "Active"
+        sub.save(update_fields=['expiry_date', 'status'])
+
+        log_admin_action(
+            actor=getattr(request.user, 'username', 'Super Admin'),
+            action_type="UPDATE",
+            domain="Subscription Management",
+            target_id=school.code,
+            description=f"Subscription renewed for {years} year(s) through {new_expiry_date}."
+        )
+
+        return JsonResponse({
+            "status": "success",
+            "school": school.name,
+            "expiry_date": new_expiry_date.strftime("%Y-%m-%d"),
+            "new_status": "Active"
+        })
+
+    return JsonResponse({"error": "SCHOOL_NOT_FOUND", "message": "Target school or subscription not found."}, status=404)
 
 
 
