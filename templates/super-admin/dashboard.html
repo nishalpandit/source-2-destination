@@ -52,9 +52,9 @@
                 <span class="stat-card-label">Total Revenue</span>
                 <span class="stat-icon-well"><i data-lucide="indian-rupee"></i></span>
               </div>
-              <div class="stat-card-value">₹{{ total_revenue|default:"34,20,970" }}</div>
+              <div class="stat-card-value">₹{{ total_revenue|default:"0" }}</div>
               <div class="stat-card-meta">
-                <span>Monthly inflow: ₹48.9k</span>
+                <span>Active platform billing</span>
               </div>
             </div>
           </div>
@@ -95,9 +95,9 @@
                 <span class="stat-card-label">Calling Booths</span>
                 <span class="stat-icon-well"><i data-lucide="tablet-smartphone"></i></span>
               </div>
-              <div class="stat-card-value">{{ active_kiosks|default:"418" }}</div>
+              <div class="stat-card-value">{{ active_kiosks|default:"0" }}</div>
               <div class="stat-card-meta">
-                <span>of {{ total_kiosks|default:"426" }} online</span>
+                <span>of {{ total_kiosks|default:"0" }} online</span>
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@
                 <span class="stat-card-label">Available Minutes</span>
                 <span class="stat-icon-well"><i data-lucide="phone-call"></i></span>
               </div>
-              <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes|default:"384,120" }}</div>
+              <div class="stat-card-value" style="font-size:1.85rem;">{{ total_minutes|default:"0" }}</div>
               <div class="stat-card-meta">
                 <span>Across all schools</span>
               </div>
@@ -173,6 +173,9 @@
   <script src="{% static 'js/sidebar.js' %}"></script>
   <script src="{% static 'js/tables.js' %}"></script>
   <script src="{% static 'js/forms.js' %}"></script>
+  <script>
+    window.S2D_SUPERADMIN_CHARTS = {{ sa_charts_json|safe }};
+  </script>
   <script src="{% static 'js/charts.js' %}"></script>
   <script src="{% static 'js/animations.js' %}"></script>
   <script src="{% static 'js/app.js' %}"></script>

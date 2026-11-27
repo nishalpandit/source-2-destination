@@ -50,9 +50,9 @@
                 <span class="stat-card-label">Total Commission</span>
                 <span class="stat-icon-well"><i data-lucide="coins"></i></span>
               </div>
-              <div class="stat-card-value">₹{{ earned_commission|default:"2,24,805.60" }}</div>
+              <div class="stat-card-value">₹{{ earned_commission|default:"0.00" }}</div>
               <div class="stat-card-meta">
-                <span>₹{{ pending_commission|default:"38,420.00" }} pending payout</span>
+                <span>₹{{ pending_commission|default:"0.00" }} pending payout</span>
               </div>
             </div>
           </div>
@@ -64,9 +64,9 @@
                 <span class="stat-card-label">Assigned Schools</span>
                 <span class="stat-icon-well"><i data-lucide="building-2"></i></span>
               </div>
-              <div class="stat-card-value">{{ total_campuses|default:"4" }}</div>
+              <div class="stat-card-value">{{ total_campuses|default:"0" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_campuses|default:"4" }} active</span>
+                <span class="stat-badge stat-badge--success">{{ active_campuses|default:"0" }} active</span>
               </div>
             </div>
           </div>
@@ -78,9 +78,9 @@
                 <span class="stat-card-label">Total Students</span>
                 <span class="stat-icon-well"><i data-lucide="users"></i></span>
               </div>
-              <div class="stat-card-value">{{ total_students|default:"6,420" }}</div>
+              <div class="stat-card-value">{{ total_students|default:"0" }}</div>
               <div class="stat-card-meta">
-                <span class="stat-badge stat-badge--success">{{ active_students|default:"6,180" }} active</span>
+                <span class="stat-badge stat-badge--success">{{ active_students|default:"0" }} active</span>
               </div>
             </div>
           </div>
@@ -92,7 +92,7 @@
                 <span class="stat-card-label">Calling Minutes</span>
                 <span class="stat-icon-well"><i data-lucide="timer"></i></span>
               </div>
-              <div class="stat-card-value">{{ calling_minutes|default:"1,38,490" }}</div>
+              <div class="stat-card-value">{{ calling_minutes|default:"0" }}</div>
               <div class="stat-card-meta">
                 <span>This month</span>
               </div>

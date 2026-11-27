@@ -35,6 +35,16 @@
           enabled: false
         }
       },
+      noData: {
+        text: 'No data available',
+        align: 'center',
+        verticalAlign: 'middle',
+        style: {
+          color: '#94A3B8',
+          fontSize: '13px',
+          fontFamily: BASE_FONT
+        }
+      },
       dataLabels: { enabled: false },
       stroke: {
         curve: 'smooth', // Fluid, humanized organic curve
@@ -99,32 +109,26 @@
     /* ==================== SUPER ADMIN CHARTS ==================== */
     'sa-revenue-trend': {
       build: (range, viewType) => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.revenueTrend) || null;
         const type = viewType || 'bar';
-        const map = {
-          '12M': {
-            cats: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'],
-            sub:  [24200, 26100, 27800, 29900, 31400, 33500, 35800, 38400, 41200, 43900, 46100, 48920],
-            rech: [11400, 12800, 13900, 15400, 16800, 18200, 19900, 21800, 23500, 25200, 26400, 27640]
-          },
-          '90D': {
-            cats: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8', 'Wk 9', 'Wk 10', 'Wk 11', 'Wk 12'],
-            sub:  [9800, 10200, 10600, 11100, 11400, 11900, 12200, 12600, 12900, 13400, 13800, 14200],
-            rech: [5200, 5600, 5900, 6300, 6600, 7000, 7300, 7700, 8000, 8400, 8800, 9200]
-          },
-          '30D': {
-            cats: ['Nov 1', 'Nov 4', 'Nov 7', 'Nov 10', 'Nov 13', 'Nov 16', 'Nov 19', 'Nov 22', 'Nov 25', 'Nov 28'],
-            sub:  [3900, 4150, 4380, 4620, 4850, 5100, 5320, 5580, 5840, 6100],
-            rech: [2100, 2280, 2450, 2620, 2810, 3020, 3210, 3420, 3640, 3850]
-          }
-        };
-        const d = map[range] || map['12M'];
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const sub = (dyn && Array.isArray(dyn.subscriptions)) ? dyn.subscriptions : [];
+        const rech = (dyn && Array.isArray(dyn.recharges)) ? dyn.recharges : [];
+        const hasData = cats.length > 0 && (sub.some(v => v > 0) || rech.some(v => v > 0));
+
+        if (!hasData) {
+          return Object.assign(baseChartOptions(type, 285), {
+            series: [{ name: '', data: [] }],
+            xaxis: { categories: [] }
+          });
+        }
 
         if (type === 'area') {
           return Object.assign(baseChartOptions('area', 285), {
             colors: [PALETTE.indigo, PALETTE.emerald],
             series: [
-              { name: 'Subscription Revenue', data: d.sub },
-              { name: 'Student Recharges', data: d.rech }
+              { name: 'Subscription Revenue', data: sub },
+              { name: 'Student Recharges', data: rech }
             ],
             fill: {
               type: 'gradient',
@@ -132,13 +136,12 @@
             },
             stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
             markers: { size: 3.5, strokeWidth: 2, strokeColors: '#FFFFFF', hover: { size: 6 } },
-            xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+            xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
             yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
             tooltip: { shared: true, intersect: false, y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
           });
         }
 
-        // Substantial, balanced modern column view
         return Object.assign(baseChartOptions('bar', 285), {
           colors: [PALETTE.indigo, PALETTE.emerald],
           plotOptions: {
@@ -150,8 +153,8 @@
             }
           },
           series: [
-            { name: 'Subscription Revenue', data: d.sub },
-            { name: 'Student Recharges', data: d.rech }
+            { name: 'Subscription Revenue', data: sub },
+            { name: 'Student Recharges', data: rech }
           ],
           fill: {
             type: 'gradient',
@@ -165,7 +168,7 @@
             }
           },
           stroke: { show: true, width: 2, colors: ['transparent'] },
-          xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } },
           yaxis: { labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT }, formatter: (v) => '₹' + (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) } },
           tooltip: { shared: true, intersect: false, y: { formatter: (v) => '₹' + Number(v).toLocaleString('en-IN') } }
         });
@@ -173,130 +176,180 @@
     },
 
     'sa-school-growth': {
-      build: () => Object.assign(baseChartOptions('line', 265), {
-        colors: [PALETTE.indigo, PALETTE.teal],
-        stroke: { curve: 'smooth', width: 3 },
-        markers: { size: 4, strokeWidth: 2, strokeColors: '#FFFFFF' },
-        series: [
-          { name: 'Total Registered Schools', data: [28, 31, 34, 36, 39, 41, 44, 46, 48, 50, 51, 52] },
-          { name: 'Active Boarding Campuses', data: [26, 29, 32, 34, 37, 39, 42, 44, 46, 48, 49, 50] }
-        ],
-        xaxis: { categories: ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
-      })
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.schoolGrowth) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const series = (dyn && Array.isArray(dyn.series)) ? dyn.series : [];
+        if (!cats.length || !series.length) {
+          return Object.assign(baseChartOptions('line', 265), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('line', 265), {
+          colors: [PALETTE.indigo, PALETTE.teal],
+          stroke: { curve: 'smooth', width: 3 },
+          markers: { size: 4, strokeWidth: 2, strokeColors: '#FFFFFF' },
+          series: series,
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
+        });
+      }
     },
 
     'sa-call-usage-trend': {
-      build: (range) => {
-        const d = range === '7D'
-          ? { cats: ['Wed', 'Thu', 'Fri', 'Sat', 'Sun', 'Mon', 'Tue'], mins: [7820, 8140, 9420, 12680, 14120, 8390, 8940], calls: [910, 945, 1120, 1480, 1620, 980, 1040] }
-          : { cats: ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'], mins: [52400, 54800, 56100, 58900, 61200, 59800, 63400, 66850], calls: [6120, 6380, 6510, 6890, 7120, 6940, 7410, 7820] };
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.callUsage) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const mins = (dyn && Array.isArray(dyn.mins)) ? dyn.mins : [];
+        const calls = (dyn && Array.isArray(dyn.calls)) ? dyn.calls : [];
+        if (!cats.length || !mins.length || !mins.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 265), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 265), {
           colors: [PALETTE.indigo, PALETTE.sky],
           plotOptions: { bar: { columnWidth: '46%', borderRadius: 5, borderRadiusApplication: 'end' } },
           series: [
-            { name: 'Calling Minutes', data: d.mins },
-            { name: 'Completed Sessions', data: d.calls }
+            { name: 'Calling Minutes', data: mins },
+            { name: 'Completed Sessions', data: calls }
           ],
-          xaxis: { categories: d.cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
         });
       }
     },
 
     'sa-subscription-bar': {
-      build: () => Object.assign(baseChartOptions('bar', 285), {
-        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.amber, PALETTE.rose],
-        plotOptions: {
-          bar: {
-            borderRadius: 6,
-            columnWidth: '48%',
-            distributed: true
-          }
-        },
-        series: [{
-          name: 'Campuses Enrolled',
-          data: [24, 19, 7, 2]
-        }],
-        xaxis: {
-          categories: ['Enterprise Annual', 'Campus Growth', 'Standard Qtr', 'Suspended'],
-          axisBorder: { show: false },
-          axisTicks: { show: false },
-          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
-        },
-        legend: { show: false },
-        tooltip: { y: { formatter: (v) => v + ' Schools' } }
-      })
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.subscriptions) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const data = (dyn && Array.isArray(dyn.data)) ? dyn.data : [];
+        const hasData = data.some(v => v > 0);
+        if (!hasData) {
+          return Object.assign(baseChartOptions('bar', 285), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('bar', 285), {
+          colors: [PALETTE.indigo, PALETTE.teal, PALETTE.amber, PALETTE.rose],
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              columnWidth: '48%',
+              distributed: true
+            }
+          },
+          series: [{
+            name: 'Campuses Enrolled',
+            data: data
+          }],
+          xaxis: {
+            categories: cats,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+          },
+          legend: { show: false },
+          tooltip: { y: { formatter: (v) => v + ' Schools' } }
+        });
+      }
     },
 
     'sa-subscription-donut': {
-      // Modern bar chart replacing oval donut
-      build: () => Object.assign(baseChartOptions('bar', 285), {
-        colors: [PALETTE.indigo, PALETTE.teal, PALETTE.amber, PALETTE.rose],
-        plotOptions: {
-          bar: {
-            borderRadius: 6,
-            columnWidth: '48%',
-            distributed: true
-          }
-        },
-        series: [{
-          name: 'Campuses Enrolled',
-          data: [24, 19, 7, 2]
-        }],
-        xaxis: {
-          categories: ['Enterprise Annual', 'Campus Growth', 'Standard Qtr', 'Suspended'],
-          axisBorder: { show: false },
-          axisTicks: { show: false },
-          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
-        },
-        legend: { show: false },
-        tooltip: { y: { formatter: (v) => v + ' Schools' } }
-      })
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.subscriptions) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const data = (dyn && Array.isArray(dyn.data)) ? dyn.data : [];
+        const hasData = data.some(v => v > 0);
+        if (!hasData) {
+          return Object.assign(baseChartOptions('bar', 285), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('bar', 285), {
+          colors: [PALETTE.indigo, PALETTE.teal, PALETTE.amber, PALETTE.rose],
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              columnWidth: '48%',
+              distributed: true
+            }
+          },
+          series: [{
+            name: 'Campuses Enrolled',
+            data: data
+          }],
+          xaxis: {
+            categories: cats,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+          },
+          legend: { show: false },
+          tooltip: { y: { formatter: (v) => v + ' Schools' } }
+        });
+      }
     },
 
     'sa-student-status-donut': {
-      // Modern bar chart replacing oval donut
-      build: () => Object.assign(baseChartOptions('bar', 260), {
-        colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
-        plotOptions: {
-          bar: {
-            borderRadius: 6,
-            columnWidth: '45%',
-            distributed: true
-          }
-        },
-        series: [{
-          name: 'Student Accounts',
-          data: [17210, 680, 540]
-        }],
-        xaxis: {
-          categories: ['Active Accounts', 'Expiring <14d', 'Inactive / Expired'],
-          axisBorder: { show: false },
-          axisTicks: { show: false },
-          labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
-        },
-        legend: { show: false },
-        tooltip: { y: { formatter: (v) => Number(v).toLocaleString('en-IN') + ' Students' } }
-      })
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.studentStatus) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const data = (dyn && Array.isArray(dyn.data)) ? dyn.data : [];
+        const hasData = data.some(v => v > 0);
+        if (!hasData) {
+          return Object.assign(baseChartOptions('bar', 260), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('bar', 260), {
+          colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
+          plotOptions: {
+            bar: {
+              borderRadius: 6,
+              columnWidth: '45%',
+              distributed: true
+            }
+          },
+          series: [{
+            name: 'Student Accounts',
+            data: data
+          }],
+          xaxis: {
+            categories: cats,
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { style: { colors: '#64748B', fontSize: '11px', fontWeight: 500 } }
+          },
+          legend: { show: false },
+          tooltip: { y: { formatter: (v) => Number(v).toLocaleString('en-IN') + ' Students' } }
+        });
+      }
     },
 
     'sa-school-usage-bar': {
-      build: () => Object.assign(baseChartOptions('bar', 275), {
-        colors: [PALETTE.indigo],
-        plotOptions: { bar: { borderRadius: 5, columnWidth: '48%', horizontal: false } },
-        series: [{ name: 'Monthly Calling Minutes', data: [51200, 42850, 34890, 31420, 27310, 25900, 18740] }],
-        xaxis: { categories: ['Greenwood', 'Oakridge', 'Harborview', 'Westfield', 'Maplewood', 'St. Jude', 'Crestview'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11px' } } },
-        tooltip: { y: { formatter: (v) => Number(v).toLocaleString('en-US') + ' mins' } }
-      })
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.schoolUsage) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const data = (dyn && Array.isArray(dyn.data)) ? dyn.data : [];
+        if (!cats.length || !data.length || !data.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 275), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('bar', 275), {
+          colors: [PALETTE.indigo],
+          plotOptions: { bar: { borderRadius: 5, columnWidth: '48%', horizontal: false } },
+          series: [{ name: 'Monthly Calling Minutes', data: data }],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11px' } } },
+          tooltip: { y: { formatter: (v) => Number(v).toLocaleString('en-US') + ' mins' } }
+        });
+      }
     },
 
     'sa-payment-status-chart': {
-      build: () => Object.assign(baseChartOptions('bar', 275), {
-        colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose, PALETTE.sky],
-        plotOptions: { bar: { borderRadius: 5, columnWidth: '46%', distributed: true } },
-        series: [{ name: 'Transactions (30d)', data: [1284, 96, 31, 18] }],
-        legend: { show: false },
-        xaxis: { categories: ['Successful', 'Pending Settlement', 'Failed Auth', 'Refunded'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
-      })
+      build: () => {
+        const dyn = (window.S2D_SUPERADMIN_CHARTS && window.S2D_SUPERADMIN_CHARTS.paymentStatus) || null;
+        const cats = (dyn && Array.isArray(dyn.categories)) ? dyn.categories : [];
+        const data = (dyn && Array.isArray(dyn.data)) ? dyn.data : [];
+        if (!cats.length || !data.length || !data.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 275), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('bar', 275), {
+          colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose, PALETTE.sky],
+          plotOptions: { bar: { borderRadius: 5, columnWidth: '46%', distributed: true } },
+          series: [{ name: 'Transactions (30d)', data: data }],
+          legend: { show: false },
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px' } } }
+        });
+      }
     },
 
     /* ==================== FRANCHISE CHARTS ==================== */
@@ -304,16 +357,21 @@
       build: (range, viewType) => {
         const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.revenue) || null;
         const type = viewType || 'bar';
-        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-        const gross = dyn && dyn.gross && dyn.gross.length ? dyn.gross : [10200, 11100, 11900, 12800, 13600, 14500, 15400, 16200, 17100, 17900, 18800, 19450];
-        const comm = dyn && dyn.commission && dyn.commission.length ? dyn.commission : [1836, 1998, 2142, 2304, 2448, 2610, 2772, 2916, 3078, 3222, 3384, 3501];
+        const cats = dyn && Array.isArray(dyn.categories) ? dyn.categories : [];
+        const gross = dyn && Array.isArray(dyn.gross) ? dyn.gross : [];
+        const comm = dyn && Array.isArray(dyn.commission) ? dyn.commission : [];
+        const hasData = cats.length > 0 && (gross.some(v => v > 0) || comm.some(v => v > 0));
+
+        if (!hasData) {
+          return Object.assign(baseChartOptions(type, 275), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
 
         if (type === 'area') {
           return Object.assign(baseChartOptions('area', 275), {
             colors: [PALETTE.indigo, PALETTE.teal],
             series: [
               { name: 'Gross Revenue', data: gross },
-              { name: 'Commission (18%)', data: comm }
+              { name: 'Commission', data: comm }
             ],
             fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.32, opacityTo: 0.04 } },
             stroke: { curve: 'smooth', width: 3, lineCap: 'round' },
@@ -336,7 +394,7 @@
           },
           series: [
             { name: 'Gross Revenue', data: gross },
-            { name: 'Commission (18%)', data: comm }
+            { name: 'Commission', data: comm }
           ],
           fill: {
             type: 'gradient',
@@ -353,9 +411,13 @@
     'fr-commission-bar': {
       build: () => {
         const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.commissionBar) || null;
-        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-        const settled = dyn && dyn.settled && dyn.settled.length ? dyn.settled : [22100, 23900, 25800, 27400, 29100, 32580];
-        const pending = dyn && dyn.pending && dyn.pending.length ? dyn.pending : [0, 0, 0, 0, 1800, 34200];
+        const cats = dyn && Array.isArray(dyn.categories) ? dyn.categories : [];
+        const settled = dyn && Array.isArray(dyn.settled) ? dyn.settled : [];
+        const pending = dyn && Array.isArray(dyn.pending) ? dyn.pending : [];
+        const hasData = cats.length > 0 && (settled.some(v => v > 0) || pending.some(v => v > 0));
+        if (!hasData) {
+          return Object.assign(baseChartOptions('bar', 265), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 265), {
           colors: [PALETTE.teal, PALETTE.amber],
           plotOptions: { bar: { borderRadius: 4, columnWidth: '50%' } },
@@ -372,8 +434,11 @@
     'fr-school-students-bar': {
       build: () => {
         const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.schoolStudents) || null;
-        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'];
-        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [790, 684, 512, 430, 345];
+        const cats = dyn && Array.isArray(dyn.categories) ? dyn.categories : [];
+        const data = dyn && Array.isArray(dyn.data) ? dyn.data : [];
+        if (!cats.length || !data.length || !data.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 275), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 275), {
           colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
           plotOptions: {
@@ -401,11 +466,13 @@
     },
 
     'fr-school-students-donut': {
-      // Modern bar chart replacing oval donut
       build: () => {
         const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.schoolStudents) || null;
-        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Bishop Cotton', 'Doon Valley', 'Mayo Int.', 'Scindia', 'Sahyadri'];
-        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [790, 684, 512, 430, 345];
+        const cats = dyn && Array.isArray(dyn.categories) ? dyn.categories : [];
+        const data = dyn && Array.isArray(dyn.data) ? dyn.data : [];
+        if (!cats.length || !data.length || !data.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 275), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 275), {
           colors: [PALETTE.indigo, PALETTE.teal, PALETTE.sky, PALETTE.amber, PALETTE.emerald],
           plotOptions: {
@@ -435,8 +502,11 @@
     'fr-calling-usage-line': {
       build: () => {
         const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.callingUsage) || null;
-        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['Wk 1', 'Wk 2', 'Wk 3', 'Wk 4', 'Wk 5', 'Wk 6', 'Wk 7', 'Wk 8'];
-        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [18400, 22100, 19500, 24800, 20900, 26400, 23120, 27940];
+        const cats = dyn && Array.isArray(dyn.categories) ? dyn.categories : [];
+        const data = dyn && Array.isArray(dyn.data) ? dyn.data : [];
+        if (!cats.length || !data.length || !data.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 255), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 255), {
           colors: [PALETTE.indigo],
           plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
@@ -449,8 +519,11 @@
     'fr-recharge-trend': {
       build: () => {
         const dyn = (window.S2D_FRANCHISE_CHARTS && window.S2D_FRANCHISE_CHARTS.rechargesTrend) || null;
-        const cats = dyn && dyn.categories && dyn.categories.length ? dyn.categories : ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-        const data = dyn && dyn.data && dyn.data.length ? dyn.data : [142, 158, 165, 189, 204, 218, 246];
+        const cats = dyn && Array.isArray(dyn.categories) ? dyn.categories : [];
+        const data = dyn && Array.isArray(dyn.data) ? dyn.data : [];
+        if (!cats.length || !data.length || !data.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 255), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 255), {
           colors: [PALETTE.emerald],
           plotOptions: { bar: { borderRadius: 5, columnWidth: '46%' } },
@@ -463,7 +536,6 @@
     /* ==================== SCHOOL ADMIN CHARTS ==================== */
     'sch-daily-calls': {
       build: (range) => {
-        // Strictly only bars per user requirement (no trend/area)
         const r = range || '30D';
         const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.dailyCalls;
         let cats = [];
@@ -478,20 +550,11 @@
           cats = live.labels;
           completed = live.completed || [];
           restricted = live.restricted || [];
-        } else {
-          if (r === '12M') {
-            cats = ['Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-            completed = [42, 48, 55, 62, 70, 78, 85, 92, 98, 105, 112, 120];
-            restricted = [4, 5, 3, 6, 4, 7, 5, 8, 6, 7, 5, 6];
-          } else if (r === '6M') {
-            cats = ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-            completed = [78, 85, 92, 98, 105, 120];
-            restricted = [4, 7, 5, 8, 6, 6];
-          } else {
-            cats = Array.from({ length: 30 }, (_, i) => `Day ${i + 1}`);
-            completed = Array.from({ length: 30 }, () => Math.floor(Math.random() * 18 + 5));
-            restricted = Array.from({ length: 30 }, () => Math.floor(Math.random() * 3));
-          }
+        }
+
+        const hasData = cats.length > 0 && (completed.some(v => v > 0) || restricted.some(v => v > 0));
+        if (!hasData) {
+          return Object.assign(baseChartOptions('bar', 270), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
         }
 
         const isDense = cats.length > 15;
@@ -536,6 +599,9 @@
         const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.dailyCalls;
         const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
         const completed = (live && Array.isArray(live.completed)) ? live.completed : [];
+        if (!cats.length || !completed.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 270), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 270), {
           colors: [PALETTE.sky],
           plotOptions: { bar: { horizontal: false, columnWidth: '44%', borderRadius: 5, borderRadiusApplication: 'end' } },
@@ -552,6 +618,10 @@
         const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
         const activeData = (live && Array.isArray(live.active)) ? live.active : [];
         const inactiveData = (live && Array.isArray(live.inactive)) ? live.inactive : [];
+        const hasData = cats.length > 0 && (activeData.some(v => v > 0) || inactiveData.some(v => v > 0));
+        if (!hasData) {
+          return Object.assign(baseChartOptions('bar', 260), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
 
         return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.indigo, PALETTE.muted],
@@ -572,6 +642,9 @@
         const active = stats.active_students || 0;
         const expiring = stats.expiring_count || 0;
         const inactive = stats.inactive_students || 0;
+        if (!active && !expiring && !inactive) {
+          return Object.assign(baseChartOptions('bar', 260), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.emerald, PALETTE.amber, PALETTE.rose],
           plotOptions: {
@@ -602,7 +675,9 @@
         const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.classUsage;
         const cats = (live && Array.isArray(live.labels)) ? live.labels : [];
         const mins = (live && Array.isArray(live.minutes)) ? live.minutes : [];
-
+        if (!cats.length || !mins.length || !mins.some(v => v > 0)) {
+          return Object.assign(baseChartOptions('bar', 260), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
         return Object.assign(baseChartOptions('bar', 260), {
           colors: [PALETTE.teal],
           plotOptions: { bar: { borderRadius: 5, horizontal: true, barHeight: '55%' } },
@@ -614,15 +689,24 @@
     },
 
     'sch-recharge-trend': {
-      build: () => Object.assign(baseChartOptions('bar', 260), {
-        colors: [PALETTE.emerald, PALETTE.indigo],
-        plotOptions: { bar: { horizontal: false, columnWidth: '46%', borderRadius: 5, borderRadiusApplication: 'end' } },
-        series: [
-          { name: 'Parent Portal Top-Ups', data: [38, 44, 52, 94, 61, 68] },
-          { name: 'School Desk Allocations', data: [14, 12, 18, 42, 19, 23] }
-        ],
-        xaxis: { categories: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov'], axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
-      })
+      build: () => {
+        const live = window.S2D_SCHOOL_CHARTS && window.S2D_SCHOOL_CHARTS.rechargesTrend;
+        const cats = (live && Array.isArray(live.categories)) ? live.categories : [];
+        const parent = (live && Array.isArray(live.parent)) ? live.parent : [];
+        const desk = (live && Array.isArray(live.desk)) ? live.desk : [];
+        if (!cats.length || (!parent.some(v => v > 0) && !desk.some(v => v > 0))) {
+          return Object.assign(baseChartOptions('bar', 260), { series: [{ name: '', data: [] }], xaxis: { categories: [] } });
+        }
+        return Object.assign(baseChartOptions('bar', 260), {
+          colors: [PALETTE.emerald, PALETTE.indigo],
+          plotOptions: { bar: { horizontal: false, columnWidth: '46%', borderRadius: 5, borderRadiusApplication: 'end' } },
+          series: [
+            { name: 'Parent Portal Top-Ups', data: parent },
+            { name: 'School Desk Allocations', data: desk }
+          ],
+          xaxis: { categories: cats, axisBorder: { show: false }, axisTicks: { show: false }, labels: { style: { colors: '#64748B', fontSize: '11.5px', fontFamily: BASE_FONT } } }
+        });
+      }
     }
   };
 
@@ -637,7 +721,21 @@
     if (!entry || !entry.spec) return;
     const state = chartState[key] || { range: '12M', view: 'bar' };
     const updated = entry.spec.build(state.range, state.view);
-    entry.instance.updateOptions(updated, true, true);
+    try {
+      if (entry.instance) {
+        if (!updated.series || updated.series.length === 0) {
+          entry.instance.destroy();
+          entry.el.innerHTML = '';
+          const chart = new window.ApexCharts(entry.el, updated);
+          chart.render();
+          entry.instance = chart;
+        } else {
+          entry.instance.updateOptions(updated, true, true);
+        }
+      }
+    } catch (e) {
+      console.warn('Chart update handled:', e);
+    }
   }
 
   function mountCharts() {
