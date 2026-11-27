@@ -46,29 +46,29 @@
           <div class="col-6 col-lg-3">
             <div class="kpi-card">
               <div class="kpi-label">Total Franchisees</div>
-              <div class="kpi-value mt-2">{{ total_franchises|default:4 }}</div>
-              <div class="kpi-meta"><span class="kpi-delta up">{{ active_franchises|default:4 }} Active</span><span>Licensed Partners</span></div>
+              <div class="kpi-value mt-2">{{ total_franchises }}</div>
+              <div class="kpi-meta"><span class="kpi-delta up">{{ active_franchises }} Active</span><span>Licensed Partners</span></div>
             </div>
           </div>
           <div class="col-6 col-lg-3">
             <div class="kpi-card">
               <div class="kpi-label">Managed Campuses</div>
-              <div class="kpi-value mt-2">{{ total_schools|default:11 }}</div>
+              <div class="kpi-value mt-2">{{ total_schools }}</div>
               <div class="kpi-meta"><span>Across all territories</span></div>
             </div>
           </div>
           <div class="col-6 col-lg-3">
             <div class="kpi-card">
               <div class="kpi-label">Average Commission</div>
-              <div class="kpi-value mt-2">16.8%</div>
-              <div class="kpi-meta"><span class="kpi-delta neutral">15.0% &ndash; 18.0%</span><span>Contracted rate</span></div>
+              <div class="kpi-value mt-2">{{ avg_commission|default:"0.0%" }}</div>
+              <div class="kpi-meta"><span class="kpi-delta neutral">{{ commission_range|default:"0.0%" }}</span><span>Contracted rate</span></div>
             </div>
           </div>
           <div class="col-6 col-lg-3">
             <div class="kpi-card">
               <div class="kpi-label">Active Territories</div>
-              <div class="kpi-value mt-2">{{ active_franchises|default:4 }}</div>
-              <div class="kpi-meta"><span class="kpi-delta up">100% SLA Coverage</span></div>
+              <div class="kpi-value mt-2">{{ active_franchises }}</div>
+              <div class="kpi-meta"><span class="kpi-delta up">{% if active_franchises > 0 %}100% SLA Coverage{% else %}0% SLA Coverage{% endif %}</span></div>
             </div>
           </div>
         </div>

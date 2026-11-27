@@ -39,9 +39,9 @@
 
         <!-- Warden Duty Status Cards -->
         <div class="row g-3 mb-4">
-          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Wardens On Duty</span><span class="kpi-icon"><i data-lucide="user-check"></i></span></div><div class="kpi-value">{{ on_duty_count|default:"3" }}</div><div class="kpi-meta"><span class="kpi-delta up">Active Shift Roster</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Booths Supervised</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">{{ supervised_booths_count|default:"4" }}</div><div class="kpi-meta"><span>Hostel Calling Booths</span></div></div></div>
-          <div class="col-md-4"><div class="kpi-card kpi-card--slate"><div class="kpi-top"><span class="kpi-label">Off Duty / Relief</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div><div class="kpi-value">{{ off_duty_count|default:"1" }}</div><div class="kpi-meta"><span class="kpi-delta neutral">Next Rotation: 22:00</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--emerald"><div class="kpi-top"><span class="kpi-label">Wardens On Duty</span><span class="kpi-icon"><i data-lucide="user-check"></i></span></div><div class="kpi-value">{{ on_duty_count|default:"0" }}</div><div class="kpi-meta"><span class="kpi-delta up">Active Shift Roster</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--blue"><div class="kpi-top"><span class="kpi-label">Booths Supervised</span><span class="kpi-icon"><i data-lucide="building-2"></i></span></div><div class="kpi-value">{{ supervised_booths_count|default:"0" }}</div><div class="kpi-meta"><span>Hostel Calling Booths</span></div></div></div>
+          <div class="col-md-4"><div class="kpi-card kpi-card--slate"><div class="kpi-top"><span class="kpi-label">Off Duty / Relief</span><span class="kpi-icon"><i data-lucide="clock"></i></span></div><div class="kpi-value">{{ off_duty_count|default:"0" }}</div><div class="kpi-meta"><span class="kpi-delta neutral">Rotation Off</span></div></div></div>
         </div>
 
         <div data-s2d-table="sch-wardens-table"></div>

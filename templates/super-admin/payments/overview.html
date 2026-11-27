@@ -36,10 +36,10 @@
           
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Settled Volume (MTD)</div><div class="stat-card-value mt-2">{{ settled_volume|default:'₹7,65,600' }}</div><div class="stat-card-meta"><span class="stat-badge stat-badge--success">Razorpay / UPI</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Pending Clearance</div><div class="stat-card-value mt-2">{{ pending_volume|default:'₹72,200' }}</div><div class="stat-card-meta"><span class="stat-badge stat-badge--warning">NEFT / RTGS</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Failed Attempts</div><div class="stat-card-value mt-2">{{ failed_volume|default:'₹2,480' }}</div><div class="stat-card-meta"><span class="stat-badge stat-badge--danger">Gateway Declines</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Refunded Reversals</div><div class="stat-card-value mt-2">{{ refunded_volume|default:'₹4,100' }}</div><div class="stat-card-meta"><span>Audited</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Settled Volume (MTD)</div><div class="stat-card-value mt-2">{{ settled_volume|default:'₹0' }}</div><div class="stat-card-meta"><span class="stat-badge stat-badge--success">Razorpay / UPI</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Pending Clearance</div><div class="stat-card-value mt-2">{{ pending_volume|default:'₹0' }}</div><div class="stat-card-meta"><span class="stat-badge stat-badge--warning">NEFT / RTGS</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Failed Attempts</div><div class="stat-card-value mt-2">{{ failed_volume|default:'₹0' }}</div><div class="stat-card-meta"><span class="stat-badge stat-badge--danger">Gateway Declines</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="s2d-stat-card"><div class="stat-card-label">Refunded Reversals</div><div class="stat-card-value mt-2">{{ refunded_volume|default:'₹0' }}</div><div class="stat-card-meta"><span>Audited</span></div></div></div>
         </div>
         <div data-s2d-table="sa-payments-table"></div>
     

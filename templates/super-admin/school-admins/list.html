@@ -36,10 +36,10 @@
           <div class="d-flex align-items-center gap-2"><a href="add.html" class="btn-s2d btn-s2d-primary"><i data-lucide="user-plus"></i><span>Add School Admin</span></a></div>
         </div>
         <div class="row g-3 mb-4">
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Total School Admins</div><div class="kpi-value mt-2">{{ total_admins|default:68 }}</div><div class="kpi-meta"><span class="kpi-delta up">{{ active_admins|default:64 }} Active</span><span>Across {{ schools_count|default:52 }} schools</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">MFA Enforced</div><div class="kpi-value mt-2">{{ mfa_percent|default:94.1 }}%</div><div class="kpi-meta"><span>TOTP / Authenticator</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Pending Onboarding</div><div class="kpi-value mt-2">{{ pending_count|default:3 }}</div><div class="kpi-meta"><span class="kpi-delta warn">Invite Sent</span></div></div></div>
-          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Deactivated Accounts</div><span class="kpi-value mt-2">{{ deactivated_count|default:4 }}</span><div class="kpi-meta"><span>Audit preserved</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Total School Admins</div><div class="kpi-value mt-2">{{ total_admins }}</div><div class="kpi-meta"><span class="kpi-delta up">{{ active_admins }} Active</span><span>Across {{ schools_count }} schools</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">MFA Enforced</div><div class="kpi-value mt-2">{{ mfa_percent }}%</div><div class="kpi-meta"><span>TOTP / Authenticator</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Pending Onboarding</div><div class="kpi-value mt-2">{{ pending_count }}</div><div class="kpi-meta"><span class="kpi-delta warn">Invite Sent</span></div></div></div>
+          <div class="col-6 col-lg-3"><div class="kpi-card"><div class="kpi-label">Deactivated Accounts</div><span class="kpi-value mt-2">{{ deactivated_count }}</span><div class="kpi-meta"><span>Audit preserved</span></div></div></div>
         </div>
         <div data-s2d-table="sa-school-admins-table"></div>
     
