@@ -15,7 +15,7 @@ from .models import (
     School, Franchise, Student, AcademicClass, ClassSection, Guardian, StudentStatusLog,
     GlobalDurationRule, CampusDurationRule, CallingScheduleRule, StudentScheduleException,
     RechargePlan, StudentRecharge, ValidityExtensionLog,
-    CallRecord, KioskDevice, DeviceAssignment, HostelWarden
+    CallRecord, KioskDevice, DeviceAssignment, HostelWarden, SchoolAdminProfile
 )
 from .calling_services import (
     get_global_duration_rule, ValidityService, RechargeService,
@@ -24,13 +24,7 @@ from .calling_services import (
 
 
 def get_current_school(request):
-    """
-    Resolve active school tenant:
-    1. Explicit query parameter (?school_code=...) saved into session when valid
-    2. Persisted session school_code
-    3. Authenticated user's matched school by admin_email
-    4. Default campus fallback (SCH-1001 or first available School)
-    """
+
     query_code = (request.GET.get('school_code') or '').strip()
     if query_code:
         school = School.objects.filter(code=query_code).first()
@@ -44,10 +38,14 @@ def get_current_school(request):
         if school:
             return school
 
-    if getattr(request, 'user', None) and request.user.is_authenticated and request.user.email:
-        school = School.objects.filter(admin_email__iexact=request.user.email).first()
-        if school:
-            return school
+    if getattr(request, 'user', None) and request.user.is_authenticated:
+        profile = SchoolAdminProfile.objects.filter(user=request.user).select_related('school').first()
+        if profile and profile.school:
+            return profile.school
+        if request.user.email:
+            school = School.objects.filter(admin_email__iexact=request.user.email).first()
+            if school:
+                return school
 
     return School.objects.filter(code='SCH-1001').first() or School.objects.first()
 
@@ -1252,7 +1250,7 @@ def calling_duration(request):
     context = {
         "school": school,
         "global_rule": global_rule,
-        "standard_cap": standard_rule.max_call_duration if standard_rule else school.daily_duration_cap or 15,
+        "standard_cap": standard_rule.max_call_duration if standard_rule else (school.daily_duration_cap if school else 15),
         "junior_cap": junior_rule.max_call_duration if junior_rule else 10,
     }
     return render(request, 'school-admin/calling-duration/index.html', context)

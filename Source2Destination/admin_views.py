@@ -13,7 +13,7 @@ from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.utils import timezone
 from django.contrib.auth.models import User
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Avg, Min, Max
 from .models import (
     School, Franchise, Student, GlobalDurationRule, CampusDurationRule,
     CallingScheduleRule, GlobalValidityRule, RechargePlan, StudentRecharge,
@@ -44,22 +44,69 @@ def log_admin_action(actor="Super Admin", action_type="UPDATE", domain="General"
 
 def dashboard(request):
     """Render Super Admin Primary Dashboard with live system metrics."""
-    total_campuses = School.objects.count() or 52
-    active_campuses = School.objects.filter(status='Active').count() or 50
-    active_school_percent = round((active_campuses / total_campuses * 100), 1) if total_campuses > 0 else 96.2
+    total_campuses = School.objects.count()
+    active_campuses = School.objects.filter(status='Active').count()
+    active_school_percent = round((active_campuses / total_campuses * 100), 1) if total_campuses > 0 else 0.0
 
-    db_students_count = Student.objects.count()
-    total_students = db_students_count if db_students_count > 0 else (School.objects.aggregate(total=Sum('enrolled_students'))['total'] or 18430)
-    db_active_count = Student.objects.filter(status='Active').count()
-    active_students = db_active_count if db_active_count > 0 else (School.objects.aggregate(total=Sum('active_students'))['total'] or 17210)
+    total_students = Student.objects.count()
+    active_students = Student.objects.filter(status='Active').count()
 
-    franchises_count = Franchise.objects.filter(status='Active').count() or 4
-    total_minutes = Student.objects.aggregate(total=Sum('remaining_minutes'))['total'] or 384120
-    active_kiosks = KioskDevice.objects.filter(status='Online').count() or 418
-    total_kiosks = KioskDevice.objects.count() or 426
+    franchises_count = Franchise.objects.filter(status='Active').count()
+    total_minutes = Student.objects.aggregate(total=Sum('remaining_minutes'))['total'] or 0
+    active_kiosks = KioskDevice.objects.filter(status='Online').count()
+    total_kiosks = KioskDevice.objects.count()
+
+    total_revenue_val = (FinancialTransaction.objects.filter(status='Successful').aggregate(total=Sum('amount'))['total'] or 0) + \
+                        (StudentRecharge.objects.filter(status='Successful').aggregate(total=Sum('amount'))['total'] or 0)
+    total_revenue = f"{int(total_revenue_val):,}" if total_revenue_val > 0 else "0"
 
     recent_schools = School.objects.select_related('franchise').order_by('-id')[:5]
     recent_recharges = StudentRecharge.objects.select_related('student', 'school', 'plan').order_by('-created_at')[:5]
+
+    # Dynamic Dashboard Charts
+    sub_plans = ['Enterprise Annual', 'Campus Growth', 'Standard Qtr', 'Suspended']
+    sub_counts = []
+    has_sub_data = False
+    for plan in sub_plans:
+        if plan == 'Suspended':
+            c = School.objects.filter(subscription_status='Suspended').count()
+        else:
+            c = School.objects.filter(subscription_plan__iexact=plan).count()
+        sub_counts.append(c)
+        if c > 0:
+            has_sub_data = True
+
+    month_cats = []
+    sub_rev_monthly = []
+    rech_rev_monthly = []
+    has_rev_data = False
+    now = timezone.now()
+    for i in range(11, -1, -1):
+        m_date = (now.replace(day=1) - timedelta(days=i * 28)).replace(day=1)
+        m_label = m_date.strftime("%b")
+        month_cats.append(m_label)
+        s_rev = FinancialTransaction.objects.filter(
+            status='Successful', created_at__year=m_date.year, created_at__month=m_date.month
+        ).aggregate(tot=Sum('amount'))['tot'] or 0
+        r_rev = StudentRecharge.objects.filter(
+            status='Successful', created_at__year=m_date.year, created_at__month=m_date.month
+        ).aggregate(tot=Sum('amount'))['tot'] or 0
+        sub_rev_monthly.append(int(s_rev))
+        rech_rev_monthly.append(int(r_rev))
+        if s_rev > 0 or r_rev > 0:
+            has_rev_data = True
+
+    sa_charts = {
+        "revenueTrend": {
+            "categories": month_cats if has_rev_data else [],
+            "subscriptions": sub_rev_monthly if has_rev_data else [],
+            "recharges": rech_rev_monthly if has_rev_data else []
+        },
+        "subscriptions": {
+            "categories": sub_plans if has_sub_data else [],
+            "data": sub_counts if has_sub_data else []
+        }
+    }
 
     context = {
         "total_campuses": total_campuses,
@@ -71,9 +118,10 @@ def dashboard(request):
         "total_minutes": total_minutes,
         "active_kiosks": active_kiosks,
         "total_kiosks": total_kiosks,
-        "total_revenue": "34,20,970",
+        "total_revenue": total_revenue,
         "recent_schools": recent_schools,
         "recent_recharges": recent_recharges,
+        "sa_charts_json": json.dumps(sa_charts),
     }
     return render(request, 'super-admin/dashboard.html', context)
 
@@ -89,6 +137,8 @@ def schools_list(request):
     total_enrolled = School.objects.aggregate(total=Sum('enrolled_students'))['total'] or 0
     avg_per_campus = int(total_enrolled / total_campuses) if total_campuses > 0 else 0
     expiring_subs = School.objects.filter(subscription_status='Expiring').count()
+    franchise_assigned_count = School.objects.filter(franchise__isnull=False).count()
+    franchise_assigned_percent = f"{round((franchise_assigned_count / total_campuses * 100), 1)}%" if total_campuses > 0 else "0%"
     franchises = list(Franchise.objects.filter(status='Active').values('code', 'name'))
     schools_qs = School.objects.select_related('franchise').order_by('-id')
 
@@ -120,6 +170,7 @@ def schools_list(request):
         "total_enrolled": f"{total_enrolled:,}",
         "avg_per_campus": avg_per_campus,
         "expiring_subs": expiring_subs,
+        "franchise_assigned_percent": franchise_assigned_percent,
         "franchises": franchises,
         "franchise_count": len(franchises)
     }
@@ -533,6 +584,11 @@ def franchises_list(request):
     total_franchises = franchises_qs.count()
     active_franchises = franchises_qs.filter(status='Active').count()
     total_schools = School.objects.filter(franchise__isnull=False).count()
+    avg_comm = franchises_qs.aggregate(avg=Avg('commission_rate'))['avg']
+    avg_commission = f"{avg_comm:.1f}%" if avg_comm is not None else "0.0%"
+    min_comm = franchises_qs.aggregate(min=Min('commission_rate'))['min']
+    max_comm = franchises_qs.aggregate(max=Max('commission_rate'))['max']
+    commission_range = f"{min_comm:.1f}% – {max_comm:.1f}%" if min_comm is not None else "0.0%" 
 
     franchises_data = []
     for f in franchises_qs:
@@ -560,6 +616,8 @@ def franchises_list(request):
         "total_franchises": total_franchises,
         "active_franchises": active_franchises,
         "total_schools": total_schools,
+        "avg_commission": avg_commission,
+        "commission_range": commission_range,
     }
     return render(request, 'super-admin/franchises/list.html', context)
 
@@ -706,25 +764,11 @@ def school_admins_list(request):
     """
     Super Admin: Campus Administrator Fleet Directory & Telemetry.
     """
-    # Seed initial profiles from existing Schools if database is fresh
-    if not SchoolAdminProfile.objects.exists():
-        for i, sch in enumerate(School.objects.all()[:10], start=101):
-            SchoolAdminProfile.objects.create(
-                school=sch,
-                admin_id=f"ADM-{i}",
-                name=sch.admin_name or f"Principal {sch.name.split()[0]}",
-                email=sch.admin_email or f"admin{i}@{sch.code.lower()}.edu",
-                phone=sch.admin_phone or f"+91 98101 {i:04d}",
-                designation="Principal & Primary Administrator",
-                mfa_enforced=True,
-                status="Active" if i % 15 != 0 else "Deactivated"
-            )
-
     admins_qs = SchoolAdminProfile.objects.select_related('school', 'user').order_by('-id')
     total_admins = admins_qs.count()
     active_admins = admins_qs.filter(status='Active').count()
     mfa_count = admins_qs.filter(mfa_enforced=True).count()
-    mfa_percent = round((mfa_count / total_admins * 100), 1) if total_admins > 0 else 94.1
+    mfa_percent = round((mfa_count / total_admins * 100), 1) if total_admins > 0 else 0.0
     pending_count = admins_qs.filter(status='Pending Onboarding').count()
     deactivated_count = admins_qs.filter(status='Deactivated').count()
     schools_count = School.objects.count()
@@ -897,25 +941,10 @@ def devices_list(request):
     """
     Super Admin: Fleet-wide Android Enterprise Kiosk Registry.
     """
-    # Seed fallback kiosks if database is fresh
-    if not KioskDevice.objects.exists():
-        for i, sch in enumerate(School.objects.all()[:12], start=7701):
-            KioskDevice.objects.create(
-                device_id=f"DEV-{i}",
-                school=sch,
-                name=f"Hostel Wing {i%4 + 1} - Booth {i%3 + 1}",
-                serial_number=f"SN-{i}-S2D",
-                imei=f"86429803{i:06d}",
-                hostel_block=f"Block {chr(65 + i%4)}",
-                assigned_wing=f"Dormitory Wing {chr(65 + i%4)}",
-                status='Online' if i % 8 != 0 else 'Maintenance',
-                kiosk_mode_locked=True
-            )
-
     devices_qs = KioskDevice.objects.select_related('school').order_by('device_id')
     total_terminals = devices_qs.count()
     online_count = devices_qs.filter(status='Online').count()
-    online_percent = round((online_count / total_terminals * 100), 1) if total_terminals > 0 else 97.1
+    online_percent = round((online_count / total_terminals * 100), 1) if total_terminals > 0 else 0.0
     compliant_count = devices_qs.filter(kiosk_mode_locked=True).count()
     tamper_blocked_count = devices_qs.filter(status='Maintenance').count()
 
@@ -1057,23 +1086,9 @@ def subscriptions_overview(request):
     """
     Super Admin: Institutional SaaS Subscription Contracts & ARR Ledger.
     """
-    if not CampusSubscription.objects.exists():
-        for i, sch in enumerate(School.objects.all()[:8], start=1):
-            CampusSubscription.objects.create(
-                subscription_id=f"SUB-2026-{i:03d}",
-                school=sch,
-                plan_name="Enterprise Boarding Annual" if i % 2 == 0 else "Campus Growth Annual",
-                tier="Enterprise Boarding" if i % 2 == 0 else "Standard Campus",
-                contract_value=840000.00 if i % 2 == 0 else 590000.00,
-                student_seats=sch.student_seats or 750,
-                device_seats=sch.device_count or 25,
-                expiry_date=timezone.now().date() + timedelta(days=280 - (i * 30)),
-                auto_renew=True,
-                status="Active" if i <= 6 else ("Expiring Soon" if i == 7 else "Expired")
-            )
-
     subs_qs = CampusSubscription.objects.select_related('school', 'school__franchise').order_by('-id')
-    arr_total = subs_qs.filter(status='Active').aggregate(t=Sum('contract_value'))['t'] or 3482000
+    arr_total_val = subs_qs.filter(status='Active').aggregate(t=Sum('contract_value'))['t'] or 0
+    arr_total = f"₹{int(arr_total_val):,}" if arr_total_val > 0 else "₹0" 
     active_contracts = subs_qs.filter(status='Active').count()
     expiring_soon = subs_qs.filter(status='Expiring Soon').count()
     expired_contracts = subs_qs.filter(status__in=['Expired', 'Past Due']).count()
@@ -1097,7 +1112,7 @@ def subscriptions_overview(request):
     context = {
         "subscriptions": subs_qs,
         "subscriptions_json": json.dumps(subscriptions_data),
-        "arr_total": f"₹{arr_total:,.0f}",
+        "arr_total": arr_total,
         "active_contracts": active_contracts,
         "expiring_soon": expiring_soon,
         "expired_contracts": expired_contracts,
@@ -1174,25 +1189,15 @@ def payments_overview(request):
     """
     Super Admin: Consolidated Payments Ledger across subscriptions and recharges.
     """
-    if not FinancialTransaction.objects.exists():
-        for i, sch in enumerate(School.objects.all()[:10], start=101):
-            FinancialTransaction.objects.create(
-                transaction_id=f"TXN-{20261100 + i}",
-                school=sch,
-                franchise=sch.franchise,
-                category="Annual Subscription" if i % 3 == 0 else "Student Recharge",
-                amount=76560.00 if i % 3 == 0 else 850.00,
-                payment_method="Razorpay / UPI" if i % 2 == 0 else "NEFT / RTGS",
-                gateway_reference=f"pay_razor_{i*789}",
-                payer_name=sch.admin_name,
-                status="Successful" if i % 9 != 0 else "Pending"
-            )
-
     txns_qs = FinancialTransaction.objects.select_related('school', 'franchise', 'student').order_by('-created_at')
-    settled_volume = txns_qs.filter(status='Successful').aggregate(t=Sum('amount'))['t'] or 765600
-    pending_volume = txns_qs.filter(status='Pending').aggregate(t=Sum('amount'))['t'] or 72200
-    failed_volume = txns_qs.filter(status='Failed').aggregate(t=Sum('amount'))['t'] or 2480
-    refunded_volume = txns_qs.filter(status='Refunded').aggregate(t=Sum('amount'))['t'] or 4100
+    settled_val = txns_qs.filter(status='Successful').aggregate(t=Sum('amount'))['t'] or 0
+    pending_val = txns_qs.filter(status='Pending').aggregate(t=Sum('amount'))['t'] or 0
+    failed_val = txns_qs.filter(status='Failed').aggregate(t=Sum('amount'))['t'] or 0
+    refunded_val = txns_qs.filter(status='Refunded').aggregate(t=Sum('amount'))['t'] or 0
+    settled_volume = f"₹{int(settled_val):,}" if settled_val > 0 else "₹0"
+    pending_volume = f"₹{int(pending_val):,}" if pending_val > 0 else "₹0"
+    failed_volume = f"₹{int(failed_val):,}" if failed_val > 0 else "₹0"
+    refunded_volume = f"₹{int(refunded_val):,}" if refunded_val > 0 else "₹0" 
 
     payments_data = [
         {
@@ -1212,10 +1217,10 @@ def payments_overview(request):
     context = {
         "transactions": txns_qs,
         "payments_json": json.dumps(payments_data),
-        "settled_volume": f"₹{settled_volume:,.0f}",
-        "pending_volume": f"₹{pending_volume:,.0f}",
-        "failed_volume": f"₹{failed_volume:,.0f}",
-        "refunded_volume": f"₹{refunded_volume:,.0f}",
+        "settled_volume": settled_volume,
+        "pending_volume": pending_volume,
+        "failed_volume": failed_volume,
+        "refunded_volume": refunded_volume,
     }
     return render(request, 'super-admin/payments/overview.html', context)
 
@@ -1285,9 +1290,33 @@ def reports_overview(request):
     Super Admin: Multi-Campus Usage Analytics & Executive Report Generator.
     """
     schools_qs = School.objects.all().order_by('-enrolled_students')
-    total_minutes = Student.objects.aggregate(t=Sum('remaining_minutes'))['t'] or 384120
-    total_students = Student.objects.count() or 18430
-    active_students = Student.objects.filter(status='Active').count() or 17210
+    total_minutes = Student.objects.aggregate(t=Sum('remaining_minutes'))['t'] or 0
+    total_students = Student.objects.count()
+    active_students = Student.objects.filter(status='Active').count()
+    inactive_students = Student.objects.filter(status__in=['Inactive', 'Suspended']).count()
+    today = timezone.now().date()
+    expiring_students = Student.objects.filter(status='Active', validity_expiry__lte=today + timedelta(days=14), validity_expiry__gte=today).count()
+
+    school_usage_categories = []
+    school_usage_data = []
+    for s in schools_qs[:10]:
+        mins = CallRecord.objects.filter(school=s).aggregate(m=Sum('minutes_deducted'))['m'] or 0
+        school_usage_categories.append(s.name)
+        school_usage_data.append(int(mins))
+
+    has_usage_data = any(v > 0 for v in school_usage_data)
+    student_health_data = [active_students, expiring_students, inactive_students] if total_students > 0 else []
+
+    superadmin_charts = {
+        "schoolUsage": {
+            "categories": school_usage_categories if has_usage_data else [],
+            "data": school_usage_data if has_usage_data else []
+        },
+        "studentStatus": {
+            "categories": ['Active Accounts', 'Expiring <14d', 'Inactive / Expired'] if total_students > 0 else [],
+            "data": student_health_data
+        }
+    }
 
     schools_data = [
         {
@@ -1311,6 +1340,7 @@ def reports_overview(request):
         "total_minutes": total_minutes,
         "total_students": total_students,
         "active_students": active_students,
+        "superadmin_charts_json": json.dumps(superadmin_charts),
     }
     return render(request, 'super-admin/reports/index.html', context)
 
@@ -1394,16 +1424,6 @@ def settings_audit_logs(request):
     """
     Super Admin: Immutable Administrative Audit Log Ledger.
     """
-    # Seed baseline audit records if empty
-    if not SystemAuditLog.objects.exists():
-        log_admin_action(
-            actor="Super Admin",
-            action_type="LOGIN",
-            domain="Security",
-            target_id="SESSION-01",
-            description="Elevated Super Admin root session authenticated via 2FA"
-        )
-
     logs_qs = SystemAuditLog.objects.all().order_by('-timestamp')[:200]
 
     audit_logs_data = [

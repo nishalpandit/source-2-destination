@@ -36,17 +36,15 @@ def get_current_franchise(request):
 def dashboard(request):
     """Render Franchise Partner Dashboard with live regional telemetry metrics."""
     franchise = get_current_franchise(request)
-    schools_qs = School.objects.filter(franchise=franchise)
-    total_campuses = schools_qs.count() or 4
-    active_campuses = schools_qs.filter(status='Active').count() or 4
-    students_qs = Student.objects.filter(school__franchise=franchise)
-    db_students = students_qs.count()
-    total_students = db_students if db_students > 0 else (schools_qs.aggregate(total=Sum('enrolled_students'))['total'] or 6420)
-    db_active = students_qs.filter(status='Active').count()
-    active_students = db_active if db_active > 0 else (schools_qs.aggregate(total=Sum('active_students'))['total'] or 6180)
+    schools_qs = School.objects.filter(franchise=franchise) if franchise else School.objects.none()
+    total_campuses = schools_qs.count()
+    active_campuses = schools_qs.filter(status='Active').count()
+    students_qs = Student.objects.filter(school__franchise=franchise) if franchise else Student.objects.none()
+    total_students = students_qs.count()
+    active_students = students_qs.filter(status='Active').count()
 
     recent_schools = schools_qs.order_by('-id')[:5]
-    recharges_qs = StudentRecharge.objects.filter(school__franchise=franchise).select_related('student', 'school', 'plan').order_by('-created_at')
+    recharges_qs = StudentRecharge.objects.filter(school__franchise=franchise).select_related('student', 'school', 'plan').order_by('-created_at') if franchise else StudentRecharge.objects.none()
     recent_recharges = recharges_qs[:5]
 
     comm_rate = float(franchise.commission_rate or 18.0) / 100.0 if franchise else 0.18
@@ -58,7 +56,7 @@ def dashboard(request):
     pending_commission_val = float(pending_recharges.aggregate(total=Sum('amount'))['total'] or 0.0)
     pending_commission = pending_commission_val * comm_rate
 
-    calls_qs = CallRecord.objects.filter(school__franchise=franchise)
+    calls_qs = CallRecord.objects.filter(school__franchise=franchise) if franchise else CallRecord.objects.none()
     calling_minutes = calls_qs.aggregate(total=Sum('minutes_deducted'))['total'] or 0
 
     # Build dynamic monthly categories and series for revenue & commission chart
@@ -72,8 +70,6 @@ def dashboard(request):
         month_names.append(m_name)
         m_recharges = successful_recharges.filter(created_at__year=m_date.year, created_at__month=m_date.month)
         m_gross = float(m_recharges.aggregate(s=Sum('amount'))['s'] or 0.0)
-        if m_gross == 0.0 and i > 0 and successful_recharges.count() < 10:
-            m_gross = 12000.0 + (6 - i) * 1250.0
         gross_monthly.append(round(m_gross, 2))
         comm_monthly.append(round(m_gross * comm_rate, 2))
 
@@ -81,7 +77,7 @@ def dashboard(request):
     school_names = []
     school_student_counts = []
     for s in schools_qs[:5]:
-        s_count = Student.objects.filter(school=s).count() or s.enrolled_students or s.student_seats or 100
+        s_count = Student.objects.filter(school=s).count()
         school_names.append(s.name[:18])
         school_student_counts.append(s_count)
 
@@ -92,8 +88,8 @@ def dashboard(request):
             "commission": comm_monthly
         },
         "schoolStudents": {
-            "categories": school_names if school_names else ["Doon Valley", "Bishop Cotton", "Mayo Int."],
-            "data": school_student_counts if school_student_counts else [684, 512, 430]
+            "categories": school_names,
+            "data": school_student_counts
         }
     }
 
@@ -105,9 +101,9 @@ def dashboard(request):
         "active_students": active_students,
         "recent_schools": recent_schools,
         "recent_recharges": recent_recharges,
-        "earned_commission": f"{earned_commission:,.2f}" if earned_commission > 0 else "2,24,805.60",
-        "pending_commission": f"{pending_commission:,.2f}" if pending_commission > 0 else "38,420.00",
-        "calling_minutes": f"{calling_minutes:,}" if calling_minutes > 0 else "1,38,490",
+        "earned_commission": f"{earned_commission:,.2f}",
+        "pending_commission": f"{pending_commission:,.2f}",
+        "calling_minutes": f"{calling_minutes:,}",
         "franchise_charts_json": json.dumps(franchise_charts),
     }
     return render(request, 'franchise/dashboard.html', context)
@@ -719,6 +715,7 @@ def commissions_overview(request):
     comm_monthly = []
     settled_monthly = []
     pending_monthly = []
+    has_comm_data = False
     for i in range(5, -1, -1):
         m_date = (now.replace(day=1) - timedelta(days=i * 28)).replace(day=1)
         m_name = m_date.strftime("%b")
@@ -727,32 +724,32 @@ def commissions_overview(request):
         m_pend = pending_recharges.filter(created_at__year=m_date.year, created_at__month=m_date.month)
         s_val = float(m_succ.aggregate(s=Sum('amount'))['s'] or 0.0) * comm_rate
         p_val = float(m_pend.aggregate(s=Sum('amount'))['s'] or 0.0) * comm_rate
-        if s_val == 0.0 and i > 0 and successful_recharges.count() < 10:
-            s_val = 22000.0 + (6 - i) * 1800.0
         settled_monthly.append(round(s_val, 2))
         pending_monthly.append(round(p_val, 2))
         g_val = s_val / comm_rate if comm_rate > 0 else 0
         gross_monthly.append(round(g_val, 2))
         comm_monthly.append(round(s_val, 2))
+        if s_val > 0 or p_val > 0:
+            has_comm_data = True
 
     franchise_charts = {
         "revenue": {
-            "categories": month_names,
-            "gross": gross_monthly,
-            "commission": comm_monthly
+            "categories": month_names if has_comm_data else [],
+            "gross": gross_monthly if has_comm_data else [],
+            "commission": comm_monthly if has_comm_data else []
         },
         "commissionBar": {
-            "categories": month_names,
-            "settled": settled_monthly,
-            "pending": pending_monthly
+            "categories": month_names if has_comm_data else [],
+            "settled": settled_monthly if has_comm_data else [],
+            "pending": pending_monthly if has_comm_data else []
         }
     }
 
     context = {
         "franchise": franchise,
-        "total_revenue": total_revenue if total_revenue > 0 else 1489200.00,
-        "earned_commission": earned_commission if earned_commission > 0 else 268056.00,
-        "pending_commission": pending_commission if pending_commission > 0 else 34200.00,
+        "total_revenue": total_revenue,
+        "earned_commission": earned_commission,
+        "pending_commission": pending_commission,
         "commissions_json": json.dumps(commissions_data),
         "franchise_charts_json": json.dumps(franchise_charts),
     }
@@ -1047,6 +1044,7 @@ def reports_overview(request):
     now = timezone.now()
     week_cats = []
     week_data = []
+    has_week_data = False
     calls_qs = CallRecord.objects.filter(school__in=schools_qs)
     for i in range(7, -1, -1):
         w_start = now - timedelta(days=(i + 1) * 7)
@@ -1054,18 +1052,20 @@ def reports_overview(request):
         w_label = f"Wk {8 - i}"
         week_cats.append(w_label)
         w_mins = calls_qs.filter(start_time__gte=w_start, start_time__lt=w_end).aggregate(m=Sum('minutes_deducted'))['m'] or 0
-        if w_mins == 0 and calls_qs.count() < 100:
-            w_mins = 18000 + (8 - i) * 1200
-        week_data.append(w_mins)
+        week_data.append(int(w_mins))
+        if w_mins > 0:
+            has_week_data = True
+
+    has_school_student_data = any(v > 0 for v in school_students)
 
     franchise_charts = {
         "callingUsage": {
-            "categories": week_cats,
-            "data": week_data
+            "categories": week_cats if has_week_data else [],
+            "data": week_data if has_week_data else []
         },
         "schoolStudents": {
-            "categories": school_names if school_names else ["Doon Valley", "Bishop Cotton", "Mayo Int."],
-            "data": school_students if school_students else [684, 512, 430]
+            "categories": school_names if has_school_student_data else [],
+            "data": school_students if has_school_student_data else []
         }
     }
 
