@@ -24,6 +24,19 @@ from .calling_services import (
 
 
 def get_current_school(request):
+    """
+    Retrieve the active school for the current session.
+    Strictly isolated: Authenticated School Administrators are locked to their assigned school profile.
+    Superusers or unauthenticated demo requests can switch via query/session code.
+    """
+    if getattr(request, 'user', None) and request.user.is_authenticated and not request.user.is_superuser:
+        profile = SchoolAdminProfile.objects.filter(user=request.user).select_related('school').first()
+        if profile and profile.school:
+            return profile.school
+        if request.user.email:
+            school = School.objects.filter(admin_email__iexact=request.user.email).first()
+            if school:
+                return school
 
     query_code = (request.GET.get('school_code') or '').strip()
     if query_code:
@@ -37,15 +50,6 @@ def get_current_school(request):
         school = School.objects.filter(code=session_code).first()
         if school:
             return school
-
-    if getattr(request, 'user', None) and request.user.is_authenticated:
-        profile = SchoolAdminProfile.objects.filter(user=request.user).select_related('school').first()
-        if profile and profile.school:
-            return profile.school
-        if request.user.email:
-            school = School.objects.filter(admin_email__iexact=request.user.email).first()
-            if school:
-                return school
 
     return School.objects.filter(code='SCH-1001').first() or School.objects.first()
 
@@ -1525,24 +1529,24 @@ def hostel_wardens_list(request):
     wardens_qs = HostelWarden.objects.filter(school=school).order_by('name')
 
     on_duty_count = wardens_qs.filter(status='On Duty').count()
-    total_booths_covered = sum(w.booths_monitored for w in wardens_qs)
+    total_booths_covered = KioskDevice.objects.filter(school=school, assigned_warden__isnull=False).count() if school else 0
 
-    wardens_data = [
-        {
+    wardens_data = []
+    for w in wardens_qs:
+        assigned_count = KioskDevice.objects.filter(school=school, assigned_warden=w).count()
+        wardens_data.append({
             "id": w.code,
             "name": w.name,
             "email": w.email or f"{w.name.lower().replace(' ', '.')}@doonvalley.edu.in",
             "phone": w.phone,
             "hostelWing": w.hostel_block,
             "shiftHours": w.shift_timings,
-            "supervisedStudents": 45,
-            "supervisedDevices": w.booths_monitored,
+            "supervisedStudents": assigned_count,
+            "supervisedDevices": assigned_count,
             "emergencyOverride": "Authorized",
             "status": "Active" if w.status == "On Duty" else "Inactive",
             "rawStatus": w.status,
-        }
-        for w in wardens_qs
-    ]
+        })
 
     context = {
         "school": school,
@@ -1618,24 +1622,20 @@ def hostel_warden_details(request):
         warden = HostelWarden.objects.filter(school=school).select_related('school').first() or HostelWarden.objects.select_related('school').first()
 
     target_school = warden.school if warden else school
-    devices_qs = KioskDevice.objects.filter(school=target_school) if target_school else KioskDevice.objects.none()
-    if warden and warden.hostel_block:
-        block_devices = devices_qs.filter(hostel_block__icontains=warden.hostel_block)
-        if block_devices.exists():
-            devices_qs = block_devices
+    devices_qs = KioskDevice.objects.filter(school=target_school, assigned_warden=warden).select_related('assigned_student') if (target_school and warden) else KioskDevice.objects.none()
 
     devices_data = [
         {
             "id": d.device_id,
             "deviceName": d.name,
-            "model": d.app_version,
+            "model": d.name,
             "schoolId": target_school.code if target_school else "",
             "wingLocation": d.hostel_block,
-            "assignedMode": d.assigned_wing or "Hostel Wing Booth",
+            "assignedMode": f"Student: {d.assigned_student.name} ({d.assigned_student.code})" if d.assigned_student else "Unassigned",
             "enrollmentStatus": "Enrolled",
             "onlineStatus": d.status,
             "lastHeartbeat": d.last_heartbeat.strftime("%H:%M Today") if d.last_heartbeat else "Just now",
-            "status": "Active" if d.status == "Online" else "Available",
+            "status": "Active" if d.assigned_student else "Available",
         }
         for d in devices_qs
     ]
@@ -1643,6 +1643,7 @@ def hostel_warden_details(request):
     context = {
         "warden": warden,
         "school": target_school,
+        "assigned_devices_count": devices_qs.count(),
         "devices_json": json.dumps(devices_data),
     }
     return render(request, 'school-admin/hostel-wardens/details.html', context)
@@ -1654,8 +1655,8 @@ def device_assignments_list(request):
     School Admin: Calling Booths & Device Assignments.
     """
     school = get_current_school(request)
-    devices = KioskDevice.objects.filter(school=school).select_related('assigned_student').order_by('name') if school else KioskDevice.objects.none()
-    assignments = DeviceAssignment.objects.filter(school=school).select_related('device', 'student') if school else DeviceAssignment.objects.none()
+    devices = KioskDevice.objects.filter(school=school).select_related('assigned_student', 'assigned_warden').order_by('name') if school else KioskDevice.objects.none()
+    assignments = DeviceAssignment.objects.filter(school=school).select_related('device', 'student', 'warden') if school else DeviceAssignment.objects.none()
 
     online_count = devices.filter(status='Online').count()
     offline_count = devices.filter(status='Offline').count()
@@ -1663,32 +1664,35 @@ def device_assignments_list(request):
 
     devices_data = []
     for d in devices:
-        if d.assigned_student:
+        if d.assigned_student and d.assigned_warden:
+            assigned_mode = f"Student: {d.assigned_student.name} ({d.assigned_student.code}) · Warden: {d.assigned_warden.name}"
+        elif d.assigned_student:
             assigned_mode = f"Student: {d.assigned_student.name} ({d.assigned_student.code})"
-            assignment_badge = "Active (1-to-1)"
+        elif d.assigned_warden:
+            assigned_mode = f"Warden: {d.assigned_warden.name} ({d.assigned_warden.code})"
         elif d.assigned_wing:
             assigned_mode = f"Wing: {d.assigned_wing} ({d.hostel_block})"
-            assignment_badge = "Active (Booth)"
         else:
             assigned_mode = "Unassigned / Available"
-            assignment_badge = "Available"
 
         devices_data.append({
             "id": d.device_id,
             "deviceName": d.name,
-            "model": d.app_version,
+            "model": d.name,
             "schoolId": school.code if school else "",
             "wingLocation": d.hostel_block,
             "assignedMode": assigned_mode,
             "enrollmentStatus": "Enrolled",
             "onlineStatus": d.status,
             "lastHeartbeat": d.last_heartbeat.strftime("%H:%M Today") if d.last_heartbeat else "Just now",
-            "status": "Active" if (d.assigned_student or d.assigned_wing) else "Available",
+            "status": "Active" if (d.assigned_student or d.assigned_warden or d.assigned_wing) else "Available",
             "assignedStudentId": d.assigned_student.id if d.assigned_student else None,
             "assignedStudentCode": d.assigned_student.code if d.assigned_student else "",
             "assignedStudentName": d.assigned_student.name if d.assigned_student else "",
+            "assignedWardenId": d.assigned_warden.id if d.assigned_warden else None,
+            "assignedWardenName": d.assigned_warden.name if d.assigned_warden else "",
             "assignmentType": d.assignment_type,
-            "isAssigned": bool(d.assigned_student or d.assigned_wing),
+            "isAssigned": bool(d.assigned_student or d.assigned_warden or d.assigned_wing),
         })
 
     context = {
@@ -1705,17 +1709,18 @@ def device_assignments_list(request):
 
 def device_assign(request):
     """
-    School Admin: Assign Device to Student or Wing.
-    Assign enrolled kiosk device to student.
+    School Admin: Assign Device 1-to-1 to Student with Supervising Hostel Warden.
+    Only unassigned devices and unassigned active students appear in dropdowns.
     """
     school = get_current_school(request)
     devices = (
-        KioskDevice.objects.filter(Q(school=school) | Q(school__isnull=True))
-        .select_related('assigned_student')
-        .order_by('assigned_student__id', 'name')
+        KioskDevice.objects.filter(Q(school=school) | Q(school__isnull=True), assigned_student__isnull=True)
+        .order_by('name')
     ) if school else KioskDevice.objects.none()
-    students = Student.objects.filter(school=school, status='Active').order_by('name') if school else Student.objects.none()
-    classes = AcademicClass.objects.filter(school=school).order_by('name') if school else AcademicClass.objects.none()
+    students = (
+        Student.objects.filter(school=school, status='Active', assigned_devices__isnull=True)
+        .order_by('name')
+    ) if school else Student.objects.none()
     wardens = HostelWarden.objects.filter(school=school).order_by('name') if school else HostelWarden.objects.none()
 
     error = None
@@ -1732,75 +1737,51 @@ def device_assign(request):
             error = "Device is not enrolled in MDM or does not exist for this campus."
         elif device.status == 'Offline':
             error = "Device is currently Offline. Please ensure kiosk heartbeat is restored before assignment."
+        elif device.assigned_student is not None:
+            error = f"Device {device.device_id} is already assigned to student {device.assigned_student.name} ({device.assigned_student.code}). Please unassign it first."
         else:
-            mode_param = (request.POST.get('assignment_mode') or '').strip()
             student_id = (request.POST.get('student_id') or '').strip()
-            if mode_param == 'Wing' or (not mode_param and not student_id and (request.POST.get('hostel_wing') or request.POST.get('academic_class'))):
-                assignment_mode = 'Wing'
+            warden_id = (request.POST.get('warden_id') or request.POST.get('warden') or '').strip()
+
+            student = Student.objects.filter(
+                (Q(id=int(student_id)) if str(student_id).isdigit() else Q()) | Q(code=student_id) | Q(calling_code=student_id),
+                school=school,
+                status='Active'
+            ).first() if student_id else None
+
+            warden = HostelWarden.objects.filter(
+                (Q(id=int(warden_id)) if str(warden_id).isdigit() else Q()) | Q(code=warden_id),
+                school=school
+            ).first() if warden_id else None
+
+            if not student:
+                error = "Please select a valid unassigned active student."
+            elif KioskDevice.objects.filter(school=school, assigned_student=student).exists():
+                error = f"Student {student.name} ({student.code}) already has an assigned device. Please unassign their existing device first."
+            elif not warden:
+                error = "Please select a supervising hostel warden for this device."
             else:
-                assignment_mode = 'Student'
+                assigned_by = (
+                    request.user.get_full_name()
+                    if getattr(request, 'user', None) and request.user.is_authenticated and request.user.get_full_name()
+                    else "Campus Admin"
+                )
 
-            assigned_by = (
-                request.user.get_full_name()
-                if getattr(request, 'user', None) and request.user.is_authenticated and request.user.get_full_name()
-                else "Campus Admin"
-            )
-
-            if assignment_mode == 'Student':
-                student = Student.objects.filter(
-                    (Q(id=int(student_id)) if str(student_id).isdigit() else Q()) | Q(code=student_id) | Q(calling_code=student_id),
-                    school=school
-                ).first() if student_id else None
-                if not student:
-                    error = "Please select a valid active student to assign this device to."
-                elif device.assigned_student and device.assigned_student.id != student.id:
-                    error = f"Device {device.device_id} is already assigned to student {device.assigned_student.name} ({device.assigned_student.code}). Please unbind it first."
-                else:
-                    # 1-to-1 Device Policy: Clear any previous device assigned to this student
-                    KioskDevice.objects.filter(school=school, assigned_student=student).exclude(id=device.id).update(assigned_student=None)
-
-                    device.assigned_student = student
-                    device.assignment_type = 'Student'
-                    if student.hostel_wing:
-                        device.hostel_block = student.hostel_wing
-                    device.save(update_fields=['assigned_student', 'assignment_type', 'hostel_block'])
-
-                    DeviceAssignment.objects.create(
-                        school=school,
-                        device=device,
-                        student=student,
-                        assignment_type='Student',
-                        academic_class=student.class_name,
-                        hostel_wing=student.hostel_wing or "Boarding Wing",
-                        assigned_by=assigned_by,
-                        status='Active'
-                    )
-                    is_ajax = (
-                        request.headers.get('x-requested-with') == 'XMLHttpRequest'
-                        or 'application/json' in request.headers.get('accept', '')
-                        or request.content_type == 'application/json'
-                    )
-                    if is_ajax:
-                        return JsonResponse({"status": "success", "message": f"Device {device.device_id} bound to student {student.name}.", "device_id": device.device_id})
-                    return redirect('/school-admin/device-assignments/list.html?assigned=1')
-            else:
-                # Shared Hostel Wing Mode
-                hostel_wing = (request.POST.get('hostel_wing') or 'Tagore Bhavan').strip()
-                academic_class = (request.POST.get('academic_class') or 'All Classes').strip()
-
-                device.assigned_student = None
-                device.assignment_type = 'Wing'
-                device.hostel_block = hostel_wing
-                device.assigned_wing = academic_class
-                device.save(update_fields=['assigned_student', 'assignment_type', 'hostel_block', 'assigned_wing'])
+                device.assigned_student = student
+                device.assigned_warden = warden
+                device.assigned_wing = ""
+                device.assignment_type = 'Student'
+                device.hostel_block = student.hostel_wing or warden.hostel_block
+                device.save(update_fields=['assigned_student', 'assigned_warden', 'assigned_wing', 'assignment_type', 'hostel_block'])
 
                 DeviceAssignment.objects.create(
                     school=school,
                     device=device,
-                    student=None,
-                    assignment_type='Wing',
-                    hostel_wing=hostel_wing,
-                    academic_class=academic_class,
+                    student=student,
+                    warden=warden,
+                    assignment_type='Student',
+                    academic_class=student.class_name,
+                    hostel_wing=student.hostel_wing or warden.hostel_block,
                     assigned_by=assigned_by,
                     status='Active'
                 )
@@ -1810,14 +1791,13 @@ def device_assign(request):
                     or request.content_type == 'application/json'
                 )
                 if is_ajax:
-                    return JsonResponse({"status": "success", "message": f"Device {device.device_id} assigned to {hostel_wing}.", "device_id": device.device_id})
+                    return JsonResponse({"status": "success", "message": f"Device {device.device_id} bound to {student.name} (Warden: {warden.name}).", "device_id": device.device_id})
                 return redirect('/school-admin/device-assignments/list.html?assigned=1')
 
     context = {
         "school": school,
         "devices": devices,
         "students": students,
-        "classes": classes,
         "wardens": wardens,
         "preselected_device": preselected_device,
         "error": error,
@@ -1839,9 +1819,10 @@ def device_unassign(request):
         ).first()
         if device:
             device.assigned_student = None
+            device.assigned_warden = None
             device.assigned_wing = ""
             device.assignment_type = 'Student'
-            device.save(update_fields=['assigned_student', 'assigned_wing', 'assignment_type'])
+            device.save(update_fields=['assigned_student', 'assigned_warden', 'assigned_wing', 'assignment_type'])
             DeviceAssignment.objects.filter(device=device, status='Active').update(status='Released')
 
     is_ajax = (
@@ -2046,8 +2027,7 @@ def school_settings(request):
             new_name = (request.POST.get('school_name') or request.POST.get('name') or school.name).strip()
             school.name = new_name
             school.admin_name = request.POST.get('admin_name', school.admin_name).strip()
-            school.admin_email = request.POST.get('admin_email', school.admin_email).strip()
-            school.admin_phone = request.POST.get('admin_phone', school.admin_phone).strip()
+            # Note: admin_email and admin_phone are locked and cannot be changed by School Admin
             if 'hostel_blocks_count' in request.POST and request.POST['hostel_blocks_count'].isdigit():
                 school.hostel_blocks_count = int(request.POST['hostel_blocks_count'])
             if 'daily_duration_cap' in request.POST and request.POST['daily_duration_cap'].isdigit():

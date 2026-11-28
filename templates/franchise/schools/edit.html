@@ -45,9 +45,20 @@
               <div class="col-md-4 s2d-field"><label class="s2d-label">State <span class="req-star">*</span></label><input type="text" name="state" class="s2d-input" value="{{ school.state }}" required></div>
               <div class="col-md-4 s2d-field"><label class="s2d-label">Postal / PIN Code</label><input type="text" name="postal_code" class="s2d-input" value="{{ school.postal_code }}"></div>
               <div class="col-md-12 s2d-field"><label class="s2d-label">Campus Address</label><input type="text" name="address" class="s2d-input" value="{{ school.address }}"></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Primary Admin Name <span class="req-star">*</span></label><input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Principal Email <span class="req-star">*</span></label><input type="email" name="adminEmail" class="s2d-input" value="{{ school.admin_email }}" required></div>
-              <div class="col-md-4 s2d-field"><label class="s2d-label">Campus Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-bind-field="phone" data-validate-phone="true" value="{{ school.admin_phone }}" required></div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Primary Admin Name <span class="req-star">*</span></label>
+                <input type="text" name="adminName" class="s2d-input" data-bind-field="adminName" value="{{ school.admin_name }}" required>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Principal Email (Immutable)</label>
+                <input type="email" class="s2d-input" value="{{ school.admin_email }}" readonly style="background:var(--s2d-surface-subtle); cursor:not-allowed;">
+                <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);"><i data-lucide="lock" style="width:11px;height:11px;display:inline;"></i> Only Super Admin can modify</span>
+              </div>
+              <div class="col-md-4 s2d-field">
+                <label class="s2d-label">Campus Phone (Immutable)</label>
+                <input type="tel" class="s2d-input" value="{{ school.admin_phone }}" readonly style="background:var(--s2d-surface-subtle); cursor:not-allowed;">
+                <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);"><i data-lucide="lock" style="width:11px;height:11px;display:inline;"></i> Only Super Admin can modify</span>
+              </div>
               <div class="col-md-6 s2d-field"><label class="s2d-label">Secondary Contact / Chief Warden</label><input type="text" name="secondary_contact_name" class="s2d-input" value="{{ school.secondary_contact_name }}"></div>
               <div class="col-md-3 s2d-field"><label class="s2d-label">Student Seats</label><input type="number" name="student_seats" class="s2d-input" value="{{ school.student_seats|default:400 }}"></div>
               <div class="col-md-3 s2d-field"><label class="s2d-label">Daily Call Cap (Minutes)</label><input type="number" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="{{ school.daily_duration_cap }}"></div>

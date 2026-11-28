@@ -44,7 +44,7 @@
               <!-- SECTION 1: TERRITORY & CAMPUS IDENTITY -->
               <div class="s2d-form-section">
                 <div class="form-section-meta">
-                  <h3>Territory &amp; Campus Identity</h3>
+                  <h3>Campus Identity &amp; Location</h3>
                   <p>Institution name, affiliation board, and locked regional partner allocation.</p>
                 </div>
                 <div class="row g-3">
@@ -59,85 +59,47 @@
                     <div data-drf-error="name"></div>
                   </div>
                   <div class="col-md-4 s2d-field">
-                    <label class="s2d-label" for="fr_school_code">Campus Short Code</label>
-                    <input type="text" id="fr_school_code" name="code" class="s2d-input mono-code" placeholder="BRK-12">
-                    <span class="field-hint">Leave blank to auto-generate from franchise sequence.</span>
-                  </div>
-                  <div class="col-md-4 s2d-field">
-                    <label class="s2d-label" for="fr_campus_type">Campus Governance Model <span class="req-star">*</span></label>
-                    <select id="fr_campus_type" name="campus_type" class="s2d-select" required>
-                      <option value="Co-ed Residential Boarding">Co-ed Residential Boarding</option>
-                      <option value="All-Boys Boarding School">All-Boys Boarding School</option>
-                      <option value="All-Girls Boarding School">All-Girls Boarding School</option>
-                      <option value="Day-cum-Residential Hostel">Day-cum-Residential Hostel</option>
-                      <option value="Military / Preparatory Academy">Military / Preparatory Academy</option>
-                    </select>
+                    <label class="s2d-label" for="fr_school_code">Campus Short Code <span class="req-star">*</span></label>
+                    <input type="text" id="fr_school_code" name="code" class="s2d-input mono-code" placeholder="BRK-12" required>
+                    <span class="field-hint">Used as prefix in student codes and kiosk enrollment.</span>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_affiliation_board">Educational Affiliation Board</label>
                     <select id="fr_affiliation_board" name="affiliation_board" class="s2d-select">
-                      <option value="CBSE">CBSE (Central Board)</option>
+                      <option value="CBSE" selected>CBSE (Central Board)</option>
                       <option value="ICSE">ICSE / ISC</option>
-                      <option value="IB World">International Baccalaureate (IB)</option>
-                      <option value="Cambridge">Cambridge International (CIE)</option>
                       <option value="State Board">State Board of Education</option>
-                      <option value="NEASC">NEASC Accredited</option>
+                      <option value="IB / International">IB / International</option>
                     </select>
                   </div>
-                  <div class="col-md-8 s2d-field">
+                  <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_website">Institutional Website</label>
                     <input type="url" id="fr_website" name="website" class="s2d-input" placeholder="https://www.berkshireacademy.edu">
                   </div>
                   <div class="col-md-4 s2d-field">
-                    <label class="s2d-label" for="fr_hostel_blocks">Active Hostel Blocks</label>
-                    <input type="number" id="fr_hostel_blocks" name="hostel_blocks_count" class="s2d-input" min="1" max="50" value="3">
-                  </div>
-                </div>
-              </div>
-
-              <!-- SECTION 2: PHYSICAL LOCATION -->
-              <div class="s2d-form-section">
-                <div class="form-section-meta">
-                  <h3>Campus Location &amp; Facilities</h3>
-                  <p>Physical campus address, timezone, and regional dispatch coordinates.</p>
-                </div>
-                <div class="row g-3">
-                  <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_city">City <span class="req-star">*</span></label>
                     <input type="text" id="fr_city" name="city" class="s2d-input" placeholder="e.g. Dehradun" required>
                   </div>
-                  <div class="col-md-2 s2d-field">
-                    <label class="s2d-label" for="fr_state">State / Province <span class="req-star">*</span></label>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_state">State <span class="req-star">*</span></label>
                     <input type="text" id="fr_state" name="state" class="s2d-input" placeholder="e.g. Uttarakhand" value="Uttarakhand" required>
                   </div>
-                  <div class="col-md-3 s2d-field">
-                    <label class="s2d-label" for="fr_postal_code">Postal Code</label>
+                  <div class="col-md-4 s2d-field">
+                    <label class="s2d-label" for="fr_postal_code">Postal / PIN Code</label>
                     <input type="text" id="fr_postal_code" name="postal_code" class="s2d-input" placeholder="248001">
                   </div>
-                  <div class="col-md-3 s2d-field">
-                    <label class="s2d-label" for="fr_country">Country</label>
-                    <input type="text" id="fr_country" name="country" class="s2d-input" value="India">
-                  </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="fr_address">Campus Physical Address</label>
-                    <input type="text" id="fr_address" name="address" class="s2d-input" placeholder="1200 Mall Road, North Campus">
-                  </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="fr_timezone">Campus Timezone <span class="req-star">*</span></label>
-                    <select id="fr_timezone" name="timezone" class="s2d-select" required>
-                      <option value="Asia/Kolkata" selected>Asia/Kolkata (IST Standard)</option>
-                      <option value="America/New_York">America/New_York (EST/EDT)</option>
-                      <option value="UTC">UTC Standard</option>
-                    </select>
+                  <div class="col-md-12 s2d-field">
+                    <label class="s2d-label" for="fr_address">Campus Physical Address <span class="req-star">*</span></label>
+                    <input type="text" id="fr_address" name="address" class="s2d-input" placeholder="e.g. 1200 Mall Road, North Campus" required>
                   </div>
                 </div>
               </div>
 
-              <!-- SECTION 3: CAMPUS LEADERSHIP CONTACTS -->
+              <!-- SECTION 2: CAMPUS LEADERSHIP & LOGIN CREDENTIALS -->
               <div class="s2d-form-section">
                 <div class="form-section-meta">
-                  <h3>Campus Leadership Contacts</h3>
-                  <p>Designate the institutional primary administrator (Principal) and secondary contact (Hostel Warden).</p>
+                  <h3>Campus Administrator &amp; Login Credentials</h3>
+                  <p>Designate the institutional primary administrator and configure their portal login credentials.</p>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-4 s2d-field">
@@ -146,84 +108,63 @@
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_admin_email">Primary Admin Email <span class="req-star">*</span></label>
-                    <input type="email" id="fr_admin_email" name="adminEmail" class="s2d-input" placeholder="principal@doonvalley.edu.in" required>
+                    <input type="email" id="fr_admin_email" name="admin_email" class="s2d-input" placeholder="principal@institution.edu.in" required>
                   </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_phone">Campus Contact Phone <span class="req-star">*</span></label>
-                    <input type="tel" id="fr_phone" name="phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23456" required>
+                    <input type="tel" id="fr_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23456" required>
                   </div>
-                  <div class="col-md-4 s2d-field">
-                    <label class="s2d-label" for="fr_sec_name">Hostel Warden / In-charge</label>
-                    <input type="text" id="fr_sec_name" name="secondary_contact_name" class="s2d-input" placeholder="Mr. Suresh Verma">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_username">Portal Login Username <span class="req-star">*</span></label>
+                    <input type="text" id="fr_username" name="username" class="s2d-input mono-code" placeholder="e.g. berkshire_admin" required autocomplete="off">
+                    <span class="field-hint">Unique username for the school administrator to sign into the School Admin Portal.</span>
                   </div>
-                  <div class="col-md-4 s2d-field">
-                    <label class="s2d-label" for="fr_sec_email">Hostel Warden Email</label>
-                    <input type="email" id="fr_sec_email" name="secondary_contact_email" class="s2d-input" placeholder="warden@doonvalley.edu.in">
-                  </div>
-                  <div class="col-md-4 s2d-field">
-                    <label class="s2d-label" for="fr_sec_phone">Hostel Warden Direct Phone</label>
-                    <input type="tel" id="fr_sec_phone" name="secondary_contact_phone" class="s2d-input" data-validate-phone="true" placeholder="+91 98101 23457">
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="fr_password">Initial Password <span class="req-star">*</span></label>
+                    <input type="text" id="fr_password" name="password" class="s2d-input" placeholder="Enter secure password" value="12345" required autocomplete="off">
+                    <span class="field-hint">Initial password provided to the school admin for their first login.</span>
                   </div>
                 </div>
               </div>
 
-              <!-- SECTION 4: CAPACITY, SUBSCRIPTION & CALLING POLICIES -->
+              <!-- SECTION 3: CAPACITY, SUBSCRIPTION & CALLING POLICIES -->
               <div class="s2d-form-section">
                 <div class="form-section-meta">
                   <h3>Capacity, Subscription &amp; Calling Policies</h3>
-                  <p>Configure licensed student seats, calling window hours, daily caps, and Android Enterprise booth tag.</p>
+                  <p>Configure licensed student seats, daily calling limit, and operational calling window hours.</p>
                 </div>
                 <div class="row g-3">
                   <div class="col-md-6 s2d-field">
                     <label class="s2d-label" for="fr_sub_plan">Subscription Tier <span class="req-star">*</span></label>
                     <select id="fr_sub_plan" name="subscription_plan" class="s2d-select" required>
-                      <option value="Campus Growth Annual">Campus Growth Annual (₹5,90,000 / yr · 550 seats)</option>
-                      <option value="Enterprise Boarding Annual">Enterprise Boarding Annual (₹8,40,000 / yr · 850 seats)</option>
-                      <option value="Standard Hostel Quarterly">Standard Hostel Quarterly (₹1,85,000 / qtr · 300 seats)</option>
+                      <option value="Campus Growth Annual" selected>Campus Growth Annual (550 seats)</option>
+                      <option value="Enterprise Boarding Annual">Enterprise Boarding Annual (850 seats)</option>
+                      <option value="Standard Hostel Quarterly">Standard Hostel Quarterly (300 seats)</option>
                     </select>
                   </div>
                   <div class="col-md-3 s2d-field">
-                    <label class="s2d-label" for="fr_billing_cycle">Billing Cycle</label>
-                    <select id="fr_billing_cycle" name="billing_cycle" class="s2d-select">
-                      <option value="Annually">Annually</option>
-                      <option value="Quarterly">Quarterly</option>
-                      <option value="Monthly">Monthly</option>
-                    </select>
+                    <label class="s2d-label" for="fr_students">Licensed Student Seats <span class="req-star">*</span></label>
+                    <input type="number" id="fr_students" name="student_seats" class="s2d-input" min="25" max="5000" value="400" required>
                   </div>
                   <div class="col-md-3 s2d-field">
-                    <label class="s2d-label" for="fr_students">Estimated Student Seats <span class="req-star">*</span></label>
-                    <input type="number" id="fr_students" name="students" class="s2d-input" min="25" max="5000" value="400" required>
+                    <label class="s2d-label" for="fr_daily_cap">Daily Calling Limit (Mins/Student) <span class="req-star">*</span></label>
+                    <input type="number" id="fr_daily_cap" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="15" required>
                   </div>
-                  <div class="col-md-3 s2d-field">
-                    <label class="s2d-label" for="fr_daily_cap">Default Daily Cap (Mins)</label>
-                    <input type="number" id="fr_daily_cap" name="daily_duration_cap" class="s2d-input" min="5" max="60" value="15">
-                  </div>
-                  <div class="col-md-3 s2d-field">
+                  <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_win_start">Calling Window Start</label>
                     <input type="time" id="fr_win_start" name="calling_window_start" class="s2d-input" value="17:00">
                   </div>
-                  <div class="col-md-3 s2d-field">
+                  <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_win_end">Calling Window End</label>
                     <input type="time" id="fr_win_end" name="calling_window_end" class="s2d-input" value="19:30">
                   </div>
-                  <div class="col-md-3 s2d-field">
+                  <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="fr_days">Allowed Calling Days</label>
                     <select id="fr_days" name="allowed_calling_days" class="s2d-select">
-                      <option value="All 7 Days">All 7 Days</option>
+                      <option value="All 7 Days" selected>All 7 Days</option>
                       <option value="Weekdays Only (Mon-Fri)">Weekdays Only (Mon-Fri)</option>
                       <option value="Weekends Only (Sat-Sun)">Weekends Only (Sat-Sun)</option>
-                      <option value="Mon / Wed / Fri / Sun">Mon / Wed / Fri / Sun</option>
                     </select>
-                  </div>
-                  <div class="col-md-6 s2d-field">
-                    <label class="s2d-label" for="fr_kiosk_tag">Android Enterprise Kiosk Group Tag</label>
-                    <input type="text" id="fr_kiosk_tag" name="kiosk_group_tag" class="s2d-input mono-code" value="AE-HOSTEL-BOOTH">
-                  </div>
-                  <div class="col-md-6 s2d-field d-flex align-items-center pt-3">
-                    <label class="d-flex align-items-center gap-2 mb-0" style="font-size:0.84rem;color:var(--s2d-heading);cursor:pointer;">
-                      <input type="checkbox" name="emergency_calling_allowed" class="s2d-checkbox" checked>
-                      <span>Enable 24/7 Emergency Outbound Calling Bypass</span>
-                    </label>
                   </div>
                 </div>
               </div>

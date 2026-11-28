@@ -18,10 +18,20 @@ def get_role_dashboard_url(user):
     username = user.username.lower() if user and user.username else ''
     if user.is_superuser or user.is_staff or username == 'admin':
         return '/super-admin/dashboard.html'
-    elif username == 'franchise':
+    elif username == 'franchise' or hasattr(user, 'franchise_partner'):
         return '/franchise/dashboard.html'
     elif username == 'school' or hasattr(user, 'school_admin_profile'):
         return '/school-admin/dashboard.html'
+
+    try:
+        from .models import Franchise, SchoolAdminProfile
+        if Franchise.objects.filter(user=user).exists() or (user.email and Franchise.objects.filter(email__iexact=user.email).exists()):
+            return '/franchise/dashboard.html'
+        if SchoolAdminProfile.objects.filter(user=user).exists():
+            return '/school-admin/dashboard.html'
+    except Exception:
+        pass
+
     return '/school-admin/dashboard.html'
 
 

@@ -134,7 +134,7 @@ def schools_list(request):
     total_campuses = School.objects.count()
     active_campuses = School.objects.filter(status='Active').count()
     suspended_campuses = School.objects.filter(status='Suspended').count()
-    total_enrolled = School.objects.aggregate(total=Sum('enrolled_students'))['total'] or 0
+    total_enrolled = Student.objects.count()
     avg_per_campus = int(total_enrolled / total_campuses) if total_campuses > 0 else 0
     expiring_subs = School.objects.filter(subscription_status='Expiring').count()
     franchise_assigned_count = School.objects.filter(franchise__isnull=False).count()
@@ -221,7 +221,7 @@ def school_add(request):
             secondary_contact_name=request.POST.get('secondary_contact_name', ''),
             secondary_contact_email=request.POST.get('secondary_contact_email', ''),
             secondary_contact_phone=request.POST.get('secondary_contact_phone', ''),
-            subscription_plan=request.POST.get('subscription_plan', 'Enterprise Boarding Annual'),
+            subscription_plan=request.POST.get('subscription_plan', 'Campus Growth Annual'),
             billing_cycle=request.POST.get('billing_cycle', 'Annually'),
             student_seats=seats,
             enrolled_students=seats,
@@ -230,17 +230,47 @@ def school_add(request):
             calling_window_start=request.POST.get('calling_window_start', '17:00'),
             calling_window_end=request.POST.get('calling_window_end', '19:30'),
             allowed_calling_days=request.POST.get('allowed_calling_days', 'All 7 Days'),
-            emergency_calling_allowed=bool(request.POST.get('emergency_calling_allowed')),
-            kiosk_group_tag=request.POST.get('kiosk_group_tag', 'AE-HOSTEL-BOOTH'),
-            primary_emergency_phone=request.POST.get('primary_emergency_phone', '+91 98765 43210'),
-            secondary_emergency_phone=request.POST.get('secondary_emergency_phone', '+91 98765 43211'),
-            warden_escalation_phone=request.POST.get('warden_escalation_phone', '+91 98765 43212'),
-            display_school_caller_id=bool(request.POST.get('display_school_caller_id')),
-            show_guardian_whitelist_numbers=bool(request.POST.get('show_guardian_whitelist_numbers')),
-            notify_sms_guardians=bool(request.POST.get('notify_sms_guardians')),
+            emergency_calling_allowed=True,
             status=status,
             subscription_status="Active"
         )
+
+        # Create or update School Administrator login credentials
+        admin_username = request.POST.get('username', '').strip()
+        admin_password = request.POST.get('password', '').strip() or '12345'
+        admin_email = request.POST.get('admin_email', '').strip() or f"admin@{code.lower()}.edu"
+        admin_name = request.POST.get('admin_name', 'Campus Administrator').strip()
+
+        if not admin_username:
+            admin_username = f"admin_{code.lower().replace('-', '_')}"
+
+        admin_user = User.objects.filter(username__iexact=admin_username).first()
+        if not admin_user:
+            admin_user = User.objects.create_user(
+                username=admin_username,
+                email=admin_email,
+                password=admin_password,
+                first_name=admin_name
+            )
+        else:
+            admin_user.email = admin_email
+            if admin_password:
+                admin_user.set_password(admin_password)
+            admin_user.save()
+
+        SchoolAdminProfile.objects.update_or_create(
+            user=admin_user,
+            defaults={
+                "school": school,
+                "admin_id": f"ADM-{school.code}",
+                "name": admin_name,
+                "email": admin_email,
+                "phone": request.POST.get('admin_phone', ''),
+                "designation": "Campus Principal / Administrator",
+                "status": "Active"
+            }
+        )
+
         return redirect('source2destination:super_admin_schools_list')
 
     # GET request
@@ -340,13 +370,60 @@ def school_edit(request, school_id=None):
             else:
                 school.active_students = school.enrolled_students
 
+        # Handle password & username update for school administrator
+        school_pwd = request.POST.get('school_admin_password', '').strip()
+        school_uname = request.POST.get('school_admin_username', '').strip()
+        admin_prof = SchoolAdminProfile.objects.filter(school=school).select_related('user').first()
+        if school_pwd or school_uname:
+            if not admin_prof:
+                uname = school_uname or school.code.lower()
+                u = User.objects.filter(username=uname).first()
+                if not u:
+                    u = User.objects.create_user(username=uname, email=school.admin_email, password=school_pwd or "12345")
+                elif school_pwd:
+                    u.set_password(school_pwd)
+                    u.save()
+                admin_prof = SchoolAdminProfile.objects.create(
+                    user=u,
+                    school=school,
+                    admin_id=f"ADM-{school.code.split('-')[-1] if '-' in school.code else school.id}",
+                    name=school.admin_name,
+                    email=school.admin_email,
+                    phone=school.admin_phone,
+                    designation="Principal / School Administrator",
+                    status="Active"
+                )
+            else:
+                u = admin_prof.user
+                if not u:
+                    uname = school_uname or school.code.lower()
+                    u = User.objects.filter(username=uname).first()
+                    if not u:
+                        u = User.objects.create_user(username=uname, email=school.admin_email, password=school_pwd or "12345")
+                    elif school_pwd:
+                        u.set_password(school_pwd)
+                        u.save()
+                    admin_prof.user = u
+                    admin_prof.save(update_fields=['user'])
+                else:
+                    if school_uname and school_uname != u.username:
+                        if not User.objects.filter(username=school_uname).exclude(pk=u.pk).exists():
+                            u.username = school_uname
+                    if school_pwd:
+                        u.set_password(school_pwd)
+                    if school.admin_email and u.email != school.admin_email:
+                        u.email = school.admin_email
+                    u.save()
+
         school.save()
         return redirect(f"/super-admin/schools/details.html?id={school.code}")
 
     franchises = Franchise.objects.filter(status='Active').order_by('name')
+    school_admin_profile = SchoolAdminProfile.objects.filter(school=school).select_related('user').first()
     context = {
         "school": school,
-        "franchises": franchises
+        "franchises": franchises,
+        "school_admin_profile": school_admin_profile
     }
     return render(request, 'super-admin/schools/edit.html', context)
 
@@ -639,6 +716,25 @@ def franchise_add(request):
         if not code:
             code = f"FRN-{Franchise.objects.count() + 101}"
 
+        franchise_username = request.POST.get('username', '').strip()
+        franchise_password = request.POST.get('password', '').strip() or '12345'
+        if not franchise_username:
+            franchise_username = f"franchise_{code.lower().replace('-', '_')}"
+
+        franchise_user = User.objects.filter(username__iexact=franchise_username).first()
+        if not franchise_user:
+            franchise_user = User.objects.create_user(
+                username=franchise_username,
+                email=email,
+                password=franchise_password,
+                first_name=partner_contact or name
+            )
+        else:
+            franchise_user.email = email
+            if franchise_password:
+                franchise_user.set_password(franchise_password)
+            franchise_user.save()
+
         franchise = Franchise.objects.create(
             code=code,
             name=name,
@@ -647,7 +743,8 @@ def franchise_add(request):
             phone=phone,
             territory=territory,
             commission_rate=float(commission_rate) if commission_rate else 15.00,
-            status='Active' if status in ['Active', 'active'] else 'Suspended'
+            status='Active' if status in ['Active', 'active'] else 'Suspended',
+            user=franchise_user
         )
 
         log_admin_action(
@@ -873,6 +970,35 @@ def school_admin_edit(request):
 
         status = request.POST.get('status', 'Active')
         profile.status = 'Active' if status in ['Active', 'active'] else 'Deactivated'
+
+        # Manage Portal Credentials & Password
+        new_password = request.POST.get('password', '').strip()
+        new_username = request.POST.get('username', '').strip()
+
+        admin_user = profile.user
+        if not admin_user and (new_username or profile.email):
+            fallback_uname = new_username or profile.email.split('@')[0] or f"school_{profile.admin_id.lower()}"
+            admin_user = User.objects.filter(username=fallback_uname).first()
+            if not admin_user and profile.email:
+                admin_user = User.objects.filter(email__iexact=profile.email).first()
+            if not admin_user:
+                admin_user = User.objects.create_user(
+                    username=fallback_uname,
+                    email=profile.email,
+                    password=new_password or "12345"
+                )
+            profile.user = admin_user
+
+        if admin_user:
+            if new_username and new_username != admin_user.username:
+                if not User.objects.filter(username=new_username).exclude(pk=admin_user.pk).exists():
+                    admin_user.username = new_username
+            if new_password:
+                admin_user.set_password(new_password)
+            if profile.email and admin_user.email != profile.email:
+                admin_user.email = profile.email
+            admin_user.save()
+
         profile.save()
 
         log_admin_action(
@@ -1064,7 +1190,7 @@ def device_details(request):
         "onlineStatus": device.status if device else "Online",
         "batteryLevel": f"{device.battery_level}%" if device else "95%",
         "signalStrength": device.signal_strength if device else "4G LTE (-78 dBm)",
-        "appVersion": device.app_version if device else "v2.4.12-enterprise",
+        "appVersion": device.app_version if (device and device.app_version) else "",
         "lastHeartbeat": device.last_heartbeat.strftime("%Y-%m-%d %H:%M") if device else "Just now"
     }
 
@@ -1327,8 +1453,11 @@ def reports_overview(request):
             "franchise": s.franchise.name if s.franchise else s.franchise_name_cache or "Unassigned",
             "adminName": s.admin_name,
             "adminEmail": s.admin_email,
-            "students": s.enrolled_students or s.student_seats,
-            "activeStudents": s.active_students,
+            "students": s.students.count() or s.enrolled_students,
+            "studentSeats": s.student_seats or 50,
+            "activeStudents": s.students.filter(status='Active').count() or s.active_students,
+            "subscriptionPlan": s.subscription_plan or "Enterprise Boarding",
+            "subscriptionStatus": s.subscription_status or "Active",
             "status": s.status
         }
         for s in schools_qs

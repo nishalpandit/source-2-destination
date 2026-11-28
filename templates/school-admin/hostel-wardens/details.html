@@ -39,7 +39,7 @@
           <div><div class="kv-item-label">Email</div><div class="kv-item-value">{{ warden.email|default:"Not provided" }}</div></div>
           <div><div class="kv-item-label">Phone</div><div class="kv-item-value mono-code">{{ warden.phone|default:"Not provided" }}</div></div>
           <div><div class="kv-item-label">Shift Timings</div><div class="kv-item-value mono-code">{{ warden.shift_timings|default:"16:00 – 00:00" }}</div></div>
-          <div><div class="kv-item-label">Supervised Booths</div><div class="kv-item-value">{{ warden.booths_monitored|default:0 }}</div></div>
+          <div><div class="kv-item-label">Supervised Devices</div><div class="kv-item-value">{{ assigned_devices_count|default:0 }}</div></div>
         </div></div></div>
         <div data-s2d-table="sch-devices-table"></div>
     

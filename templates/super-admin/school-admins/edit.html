@@ -68,6 +68,25 @@
                 </div>
               </div>
             </div>
+
+            <div class="s2d-form-section">
+              <div class="form-section-meta">
+                <h3>Portal Login &amp; Password</h3>
+                <p>Manage authentication credentials for this school administrator.</p>
+              </div>
+              <div class="row g-3">
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Portal Username</label>
+                  <input type="text" name="username" class="s2d-input" value="{{ profile.user.username|default:'' }}" placeholder="Leave blank to keep existing username">
+                  <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);">Used to sign in at /login.html</span>
+                </div>
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Change Password</label>
+                  <input type="password" name="password" class="s2d-input" placeholder="Enter new password to change, or leave blank to keep current">
+                  <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);">Set a new password for this administrator account</span>
+                </div>
+              </div>
+            </div>
             <div class="form-actions-bar">
               <div class="unsaved-indicator"><i data-lucide="alert-circle" style="width:15px;height:15px;"></i><span>Unsaved edits</span></div>
               <div class="d-flex gap-2 ms-auto"><a href="list.html" class="btn-s2d btn-s2d-secondary">Cancel</a><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Changes</span></button></div>

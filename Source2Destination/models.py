@@ -13,6 +13,7 @@ class Franchise(models.Model):
     phone = models.CharField(max_length=32, blank=True)
     commission_rate = models.DecimalField(max_digits=5, decimal_places=2, default=18.00, help_text="Percentage e.g. 18.00%")
     territory = models.CharField(max_length=255, blank=True)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='franchise_partner')
     status = models.CharField(
         max_length=20,
         choices=[('Active', 'Active'), ('Suspended', 'Suspended'), ('Pending', 'Pending')],
@@ -647,8 +648,8 @@ class KioskDevice(models.Model):
         ('Maintenance', 'Maintenance'),
     ]
     ASSIGNMENT_TYPE_CHOICES = [
-        ('Student', 'Dedicated Student Phone'),
-        ('Wing', 'Shared Hostel Booth'),
+        ('Student', 'Dedicated Student Handset (1-to-1)'),
+        ('Warden', 'Hostel Warden Handset (1-to-1)'),
     ]
 
     device_id = models.CharField(max_length=64, unique=True, db_index=True, help_text="e.g. DEV-BOOTH-01")
@@ -657,7 +658,7 @@ class KioskDevice(models.Model):
     serial_number = models.CharField(max_length=64, blank=True, default="")
     mac_address = models.CharField(max_length=64, blank=True, default="")
     imei = models.CharField(max_length=64, blank=True, default="")
-    app_version = models.CharField(max_length=32, default="v2.4.12-enterprise")
+    app_version = models.CharField(max_length=32, blank=True, null=True, default="")
     battery_level = models.PositiveIntegerField(default=95, help_text="Percentage battery remaining")
     signal_strength = models.CharField(max_length=32, default="4G LTE (-78 dBm)")
     kiosk_mode_locked = models.BooleanField(default=True, help_text="Android Enterprise lock-task mode")
@@ -671,11 +672,19 @@ class KioskDevice(models.Model):
         related_name='assigned_devices',
         help_text="Student for 1-to-1 dedicated device binding"
     )
+    assigned_warden = models.ForeignKey(
+        'HostelWarden',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='assigned_devices',
+        help_text="Hostel warden for 1-to-1 device binding"
+    )
     assignment_type = models.CharField(
         max_length=20,
         choices=ASSIGNMENT_TYPE_CHOICES,
         default='Student',
-        help_text="Dedicated 1-to-1 Student Phone vs Shared Hostel Booth"
+        help_text="Dedicated 1-to-1 Student Phone vs Hostel Warden Handset"
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Online', db_index=True)
     last_heartbeat = models.DateTimeField(default=timezone.now)
@@ -688,22 +697,29 @@ class KioskDevice(models.Model):
         ]
 
     def __str__(self):
-        target = f" -> {self.assigned_student.name}" if self.assigned_student else f" ({self.hostel_block})"
+        if self.assigned_student:
+            target = f" -> {self.assigned_student.name}"
+        elif self.assigned_warden:
+            target = f" -> Warden {self.assigned_warden.name}"
+        else:
+            target = f" ({self.hostel_block})"
         return f"{self.device_id} · {self.name}{target} [{self.status}]"
 
     @property
     def is_available(self):
-        """Check if device is enrolled, online, and not currently assigned to an active student."""
+        """Check if device is enrolled, online, and not currently assigned."""
         if self.status != 'Online':
             return False
         if self.assignment_type == 'Student' and self.assigned_student is not None:
+            return False
+        if self.assignment_type == 'Warden' and self.assigned_warden is not None:
             return False
         return True
 
 
 class DeviceAssignment(models.Model):
     """
-    Mapping between kiosk device, individual students, or hostel dorm cohorts.
+    Mapping between kiosk device and individual students or hostel wardens (1-to-1).
     """
     school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='device_assignments')
     device = models.ForeignKey(KioskDevice, on_delete=models.CASCADE, related_name='assignments')
@@ -715,7 +731,15 @@ class DeviceAssignment(models.Model):
         related_name='device_assignments',
         help_text="Assigned student for 1-to-1 device binding"
     )
-    assignment_type = models.CharField(max_length=20, default='Student', choices=[('Student', 'Student'), ('Wing', 'Hostel Wing')])
+    warden = models.ForeignKey(
+        'HostelWarden',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='device_assignments',
+        help_text="Assigned hostel warden for 1-to-1 device binding"
+    )
+    assignment_type = models.CharField(max_length=20, default='Student', choices=[('Student', 'Student'), ('Warden', 'Hostel Warden')])
     academic_class = models.CharField(max_length=128, blank=True, default="All Classes")
     hostel_wing = models.CharField(max_length=128, default="North Wing")
     assigned_by = models.CharField(max_length=128, default="Campus Administrator")
@@ -728,6 +752,8 @@ class DeviceAssignment(models.Model):
     def __str__(self):
         if self.student:
             return f"{self.device.name} assigned to {self.student.name} ({self.status})"
+        if self.warden:
+            return f"{self.device.name} assigned to Warden {self.warden.name} ({self.status})"
         return f"{self.device.name} assigned to {self.hostel_wing} ({self.status})"
 
 

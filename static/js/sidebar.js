@@ -7,6 +7,19 @@
   'use strict';
 
   function getUserProfile(role) {
+    const userMetaName = document.querySelector('.sidebar-user-name');
+    const userMetaEmail = document.querySelector('.sidebar-user-email');
+    if (userMetaName && userMetaName.textContent.trim()) {
+      const name = userMetaName.textContent.trim();
+      const email = userMetaEmail ? userMetaEmail.textContent.trim() : '';
+      const parts = name.split(/\s+/);
+      const inits = parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : parts[0].slice(0, 2).toUpperCase();
+      let roleLabel = 'Super Administrator';
+      if (role === 'franchise') roleLabel = 'Franchise Partner';
+      else if (role === 'school-admin') roleLabel = 'School Administrator';
+      return { fullName: name, initials: inits, email: email, roleLabel: roleLabel };
+    }
+
     const ctx = (window.S2D_DEMO && window.S2D_DEMO.currentContext) || {};
     if (role === 'franchise') return ctx.franchise || { fullName: 'Vikramaditya Singhania', initials: 'VS', email: 'v.singhania@northedunet.in', roleLabel: 'Franchise Partner' };
     if (role === 'school-admin') {

@@ -54,20 +54,48 @@ def device_enroll(request):
         return JsonResponse({"error": "MISSING_DEVICE_ID", "message": "Hardware device_id is required."}, status=400)
 
     school_code = (data.get('school_code') or '').strip()
-    school = School.objects.filter(code=school_code).first() if school_code else None
-    if not school:
-        school = School.objects.filter(code='SCH-1001').first() or School.objects.first()
-
-    if not school:
-        return JsonResponse({"error": "SCHOOL_NOT_CONFIGURED", "message": "No campus found in database."}, status=500)
+    school = None
+    if school_code:
+        school = School.objects.filter(code__iexact=school_code).first()
+        if not school:
+            return JsonResponse({
+                "error": "SCHOOL_NOT_FOUND",
+                "message": f"Campus with code '{school_code}' not found. Please verify the school_code assigned to this device."
+            }, status=404)
+    else:
+        # Fall back to single campus ONLY if exactly 1 school exists in the database
+        if School.objects.count() == 1:
+            school = School.objects.first()
+        elif School.objects.count() == 0:
+            school, _ = School.objects.get_or_create(
+                code='SCH-1001',
+                defaults={
+                    "name": "Doon Valley Residential Academy",
+                    "city": "Dehradun",
+                    "admin_name": "Campus Administrator",
+                    "admin_email": "admin@doonvalley.edu.in",
+                    "status": "Active",
+                }
+            )
+        else:
+            return JsonResponse({
+                "error": "MISSING_SCHOOL_CODE",
+                "message": "Multiple campuses exist on this platform. Please provide 'school_code' in the enrollment payload to bind this device to your specific school."
+            }, status=400)
 
     model_name = (data.get('model_name') or data.get('name') or "Android Kiosk Phone").strip()
+    serial_number = (data.get('serial_number') or '').strip()
+    imei = (data.get('imei') or '').strip()
+    mac_address = (data.get('mac_address') or '').strip()
 
     device, created = KioskDevice.objects.get_or_create(
         device_id=device_id,
         defaults={
             "school": school,
             "name": model_name,
+            "serial_number": serial_number,
+            "imei": imei,
+            "mac_address": mac_address,
             "kiosk_mode_locked": True,
             "status": "Online",
             "assignment_type": "Student",
@@ -78,9 +106,15 @@ def device_enroll(request):
     if not created:
         device.school = school
         device.name = model_name
+        if serial_number:
+            device.serial_number = serial_number
+        if imei:
+            device.imei = imei
+        if mac_address:
+            device.mac_address = mac_address
         device.status = "Online"
         device.last_heartbeat = timezone.now()
-        device.save(update_fields=['school', 'name', 'status', 'last_heartbeat'])
+        device.save(update_fields=['school', 'name', 'serial_number', 'imei', 'mac_address', 'status', 'last_heartbeat'])
 
     return JsonResponse({
         "status": "success",

@@ -14,10 +14,11 @@ from django.template.loader import get_template
 from django.template import TemplateDoesNotExist
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
+from django.contrib.auth.models import User
 from .models import (
     School, Franchise, Student, AcademicClass, ClassSection,
     GlobalDurationRule, CampusDurationRule, CallingScheduleRule,
-    RechargePlan, StudentRecharge, CallRecord, Guardian
+    RechargePlan, StudentRecharge, CallRecord, Guardian, SchoolAdminProfile
 )
 from .calling_services import (
     get_global_duration_rule, ValidityService, RechargeService
@@ -26,6 +27,15 @@ from .calling_services import (
 
 def get_current_franchise(request):
     """Retrieve the active franchise partner (defaults to FRN-101 North-East EduNet Partners)."""
+    if getattr(request, 'user', None) and request.user.is_authenticated:
+        if hasattr(request.user, 'franchise_partner') and request.user.franchise_partner:
+            return request.user.franchise_partner
+        fr = Franchise.objects.filter(user=request.user).first()
+        if not fr and request.user.email:
+            fr = Franchise.objects.filter(email__iexact=request.user.email).first()
+        if fr:
+            return fr
+
     code = request.GET.get('franchise_code') or request.session.get('franchise_code', 'FRN-101')
     franchise = Franchise.objects.filter(code=code).first()
     if not franchise:
@@ -115,7 +125,7 @@ def schools_list(request):
     schools_qs = School.objects.filter(franchise=franchise).order_by('-id')
     total_campuses = schools_qs.count()
     active_campuses = schools_qs.filter(status='Active').count()
-    total_students = schools_qs.aggregate(total=Sum('enrolled_students'))['total'] or 0
+    total_students = Student.objects.filter(school__franchise=franchise).count()
 
     schools_data = [
         {
@@ -127,10 +137,10 @@ def schools_list(request):
             "franchise": s.franchise.name if s.franchise else "",
             "adminName": s.admin_name,
             "adminEmail": s.admin_email,
-            "students": s.enrolled_students or s.student_seats,
+            "students": Student.objects.filter(school=s).count() or s.enrolled_students,
             "studentSeats": s.student_seats,
-            "activeStudents": s.active_students,
-            "callingMinutes": s.active_students * 45,
+            "activeStudents": Student.objects.filter(school=s, status='Active').count() or s.active_students,
+            "callingMinutes": Student.objects.filter(school=s, status='Active').count() * 45,
             "subscriptionPlan": s.subscription_plan,
             "subscriptionStatus": s.subscription_status,
             "status": s.status
@@ -168,7 +178,7 @@ def school_add(request):
         seats = int(request.POST.get('students') or request.POST.get('student_seats') or 400)
         daily_cap = int(request.POST.get('daily_duration_cap') or 15)
 
-        School.objects.create(
+        school = School.objects.create(
             code=code,
             name=name,
             campus_type=request.POST.get('campus_type', 'Co-ed Residential Boarding'),
@@ -191,8 +201,7 @@ def school_add(request):
             secondary_contact_phone=request.POST.get('secondary_contact_phone', ''),
             daily_duration_cap=daily_cap,
             allowed_calling_days=request.POST.get('allowed_calling_days', 'All 7 Days'),
-            emergency_calling_allowed=bool(request.POST.get('emergency_calling_allowed', True)),
-            kiosk_group_tag=request.POST.get('kiosk_group_tag', 'AE-HOSTEL-BOOTH'),
+            emergency_calling_allowed=True,
             subscription_plan=request.POST.get('subscription_plan', 'Campus Growth Annual'),
             billing_cycle=request.POST.get('billing_cycle', 'Annually'),
             student_seats=seats,
@@ -201,6 +210,43 @@ def school_add(request):
             status='Active',
             subscription_status="Active"
         )
+
+        # Create or update School Administrator login credentials
+        admin_username = request.POST.get('username', '').strip()
+        admin_password = request.POST.get('password', '').strip() or '12345'
+        admin_email = request.POST.get('adminEmail') or request.POST.get('admin_email') or f"admin@{code.lower()}.edu"
+        admin_name = request.POST.get('admin_name', 'Campus Administrator').strip()
+
+        if not admin_username:
+            admin_username = f"admin_{code.lower().replace('-', '_')}"
+
+        admin_user = User.objects.filter(username__iexact=admin_username).first()
+        if not admin_user:
+            admin_user = User.objects.create_user(
+                username=admin_username,
+                email=admin_email,
+                password=admin_password,
+                first_name=admin_name
+            )
+        else:
+            admin_user.email = admin_email
+            if admin_password:
+                admin_user.set_password(admin_password)
+            admin_user.save()
+
+        SchoolAdminProfile.objects.update_or_create(
+            user=admin_user,
+            defaults={
+                "school": school,
+                "admin_id": f"ADM-{school.code}",
+                "name": admin_name,
+                "email": admin_email,
+                "phone": request.POST.get('phone') or request.POST.get('admin_phone') or '',
+                "designation": "Campus Principal / Administrator",
+                "status": "Active"
+            }
+        )
+
         return redirect('/franchise/schools/list.html')
 
     context = {
@@ -286,8 +332,7 @@ def school_edit(request):
             school.postal_code = request.POST.get('postal_code').strip()
 
         school.admin_name = (request.POST.get('admin_name') or request.POST.get('adminName', school.admin_name)).strip()
-        school.admin_email = (request.POST.get('admin_email') or request.POST.get('adminEmail', school.admin_email)).strip()
-        school.admin_phone = (request.POST.get('admin_phone') or request.POST.get('phone', school.admin_phone)).strip()
+        # Note: admin_email and admin_phone are locked and cannot be changed by Franchise Admin
 
         if request.POST.get('secondary_contact_name'):
             school.secondary_contact_name = request.POST.get('secondary_contact_name').strip()
@@ -1121,10 +1166,7 @@ def settings_overview(request):
             franchise.name = name
         if 'partner_contact' in request.POST:
             franchise.partner_contact = request.POST.get('partner_contact', '').strip()
-        if 'email' in request.POST:
-            franchise.email = request.POST.get('email', '').strip()
-        if 'phone' in request.POST:
-            franchise.phone = request.POST.get('phone', '').strip()
+        # Note: franchise email and phone are locked and cannot be changed by Franchise Admin
         if 'territory' in request.POST:
             franchise.territory = request.POST.get('territory', '').strip()
         franchise.save()

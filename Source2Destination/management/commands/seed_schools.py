@@ -731,6 +731,7 @@ class Command(BaseCommand):
             stus = list(primary_school.students.all()[:4])
             if stus and plan_term:
                 StudentRecharge.objects.create(
+                    recharge_id=f"RCG-2026-{random.randint(1000, 4999)}",
                     student=stus[0],
                     school=primary_school,
                     plan=plan_term,
@@ -738,13 +739,13 @@ class Command(BaseCommand):
                     minutes_added=plan_term.minutes_allocated,
                     validity_days_added=plan_term.validity_days,
                     payment_mode="UPI / Razorpay",
-                    gateway_ref="PAY-RZP-994821A",
-                    status="Completed",
-                    plan_name_cache=plan_term.name,
-                    notes="Authorized guardian term pack topup"
+                    voucher_ref="PAY-RZP-994821A",
+                    status="Successful",
+                    plan_name_cache=plan_term.name
                 )
             if len(stus) > 1 and plan_annual:
                 StudentRecharge.objects.create(
+                    recharge_id=f"RCG-2026-{random.randint(5000, 9999)}",
                     student=stus[1],
                     school=primary_school,
                     plan=plan_annual,
@@ -752,10 +753,9 @@ class Command(BaseCommand):
                     minutes_added=plan_annual.minutes_allocated,
                     validity_days_added=plan_annual.validity_days,
                     payment_mode="UPI / PhonePe",
-                    gateway_ref="PAY-RZP-994822B",
-                    status="Completed",
-                    plan_name_cache=plan_annual.name,
-                    notes="Annual academic year topup"
+                    voucher_ref="PAY-RZP-994822B",
+                    status="Successful",
+                    plan_name_cache=plan_annual.name
                 )
             self.stdout.write(self.style.SUCCESS("Seeded initial Indian StudentRecharge records."))
 

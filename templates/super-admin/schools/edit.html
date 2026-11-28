@@ -152,6 +152,16 @@
                     <label class="s2d-label" for="admin_phone">Principal Contact Phone <span class="req-star">*</span></label>
                     <input type="tel" id="admin_phone" name="admin_phone" class="s2d-input" data-validate-phone="true" value="{{ school.admin_phone }}" required>
                   </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="school_admin_username">School Portal Login Username</label>
+                    <input type="text" id="school_admin_username" name="school_admin_username" class="s2d-input" value="{{ school_admin_profile.user.username|default:'' }}" placeholder="Leave blank to keep current username">
+                    <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);">Used for school admin login</span>
+                  </div>
+                  <div class="col-md-6 s2d-field">
+                    <label class="s2d-label" for="school_admin_password">Change School Portal Password</label>
+                    <input type="password" id="school_admin_password" name="school_admin_password" class="s2d-input" placeholder="Enter new password to change, or leave blank to keep current">
+                    <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);">Leave blank if password change is not required</span>
+                  </div>
                   <div class="col-md-4 s2d-field">
                     <label class="s2d-label" for="secondary_contact_name">Secondary Admin / Chief Warden</label>
                     <input type="text" id="secondary_contact_name" name="secondary_contact_name" class="s2d-input" value="{{ school.secondary_contact_name }}">

@@ -53,8 +53,16 @@
               <div class="row g-3">
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Franchise Entity Name <span class="req-star">*</span></label><input type="text" name="name" class="s2d-input" value="{{ franchise.name }}" required></div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Partner Director <span class="req-star">*</span></label><input type="text" name="partner_contact" class="s2d-input" value="{{ franchise.partner_contact }}" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Official Email <span class="req-star">*</span></label><input type="email" name="email" class="s2d-input" value="{{ franchise.email }}" required></div>
-                <div class="col-md-6 s2d-field"><label class="s2d-label">Contact Phone <span class="req-star">*</span></label><input type="tel" name="phone" class="s2d-input" data-validate-phone="true" value="{{ franchise.phone }}" required></div>
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Official Email (Immutable)</label>
+                  <input type="email" class="s2d-input" value="{{ franchise.email }}" readonly style="background:var(--s2d-surface-subtle); cursor:not-allowed;">
+                  <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);"><i data-lucide="lock" style="width:11px;height:11px;display:inline;"></i> Only Super Admin can modify</span>
+                </div>
+                <div class="col-md-6 s2d-field">
+                  <label class="s2d-label">Contact Phone (Immutable)</label>
+                  <input type="tel" class="s2d-input" value="{{ franchise.phone }}" readonly style="background:var(--s2d-surface-subtle); cursor:not-allowed;">
+                  <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);"><i data-lucide="lock" style="width:11px;height:11px;display:inline;"></i> Only Super Admin can modify</span>
+                </div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Assigned Territory</label><input type="text" name="territory" class="s2d-input" value="{{ franchise.territory|default:'' }}" placeholder="e.g. Northern Region"></div>
                 <div class="col-md-6 s2d-field"><label class="s2d-label">Partner Commission Rate</label><input type="text" class="s2d-input mono-code" value="{{ franchise.commission_rate }}% (Contractual Rate)" readonly style="background:var(--s2d-surface-subtle);"></div>
               </div>

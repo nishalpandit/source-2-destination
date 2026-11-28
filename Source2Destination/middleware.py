@@ -22,9 +22,17 @@ def is_user_authorized_for_path(user, path):
 
     if path.startswith('/franchise'):
         # Superuser and School admin are strictly forbidden from Franchise portal
-        if user.is_superuser or username == 'school':
+        if user.is_superuser or username == 'school' or hasattr(user, 'school_admin_profile'):
             return False
-        return bool(username == 'franchise')
+        if username == 'franchise' or hasattr(user, 'franchise_partner'):
+            return True
+        try:
+            from .models import Franchise
+            if Franchise.objects.filter(user=user).exists() or (user.email and Franchise.objects.filter(email__iexact=user.email).exists()):
+                return True
+        except Exception:
+            pass
+        return False
 
     if path.startswith('/school-admin'):
         # Superuser and Franchise admin are strictly forbidden from School Admin portal

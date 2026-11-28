@@ -62,8 +62,16 @@
                   <div class="row g-3">
                     <div class="col-md-6 s2d-field"><label class="s2d-label">School Name <span class="req-star">*</span></label><input type="text" name="school_name" class="s2d-input" value="{{ school.name|default:'Doon Valley Residential Academy' }}" required></div>
                     <div class="col-md-6 s2d-field"><label class="s2d-label">Primary Admin <span class="req-star">*</span></label><input type="text" name="admin_name" class="s2d-input" value="{{ school.admin_name|default:'Dr. Ramesh Chandra Sharma' }}" required></div>
-                    <div class="col-md-6 s2d-field"><label class="s2d-label">Official Campus Email <span class="req-star">*</span></label><input type="email" name="admin_email" class="s2d-input" value="{{ school.admin_email|default:'principal@doonvalley.edu.in' }}" required></div>
-                    <div class="col-md-6 s2d-field"><label class="s2d-label">Hostel Control Desk Phone <span class="req-star">*</span></label><input type="tel" name="admin_phone" class="s2d-input" value="{{ school.admin_phone|default:'+91 98101 23456' }}" required></div>
+                    <div class="col-md-6 s2d-field">
+                      <label class="s2d-label">Official Campus Email (Immutable)</label>
+                      <input type="email" class="s2d-input" value="{{ school.admin_email|default:'principal@doonvalley.edu.in' }}" readonly style="background:var(--s2d-surface-subtle); cursor:not-allowed;">
+                      <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);"><i data-lucide="lock" style="width:11px;height:11px;display:inline;"></i> Only Super Admin can modify</span>
+                    </div>
+                    <div class="col-md-6 s2d-field">
+                      <label class="s2d-label">Hostel Control Desk Phone (Immutable)</label>
+                      <input type="tel" class="s2d-input" value="{{ school.admin_phone|default:'+91 98101 23456' }}" readonly style="background:var(--s2d-surface-subtle); cursor:not-allowed;">
+                      <span class="cell-sub" style="font-size:0.75rem;color:var(--s2d-muted);"><i data-lucide="lock" style="width:11px;height:11px;display:inline;"></i> Only Super Admin can modify</span>
+                    </div>
                   </div>
                 </div>
                 <div class="form-actions-bar"><div class="ms-auto"><button type="submit" class="btn-s2d btn-s2d-primary"><i data-lucide="save"></i><span>Save Campus Preferences</span></button></div></div>
