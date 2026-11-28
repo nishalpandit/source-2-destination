@@ -866,5 +866,3 @@ def school_call_data(request, school_code):
         "total_minutes": total_minutes,
         "records": records
     }, status=200)
-
-
